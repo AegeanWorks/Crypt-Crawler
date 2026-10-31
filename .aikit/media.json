@@ -61,6 +61,25 @@
         "score": 91,
         "reviewed_at": "2026-10-28T11:49:29"
       }
+    },
+    {
+      "path": "assets/screenshots/2026-10-31-index.png",
+      "alt": "Crypt-Crawler interface at 2026-10-31",
+      "caption": "Crypt-Crawler interface captured from projects/crypt-crawler/static/index.html",
+      "commit": "1b9f612ba4d4950d0025aaff349d8e1ccc2bce53",
+      "taken_at": "2026-10-31",
+      "viewport": "1440x900",
+      "width": 1440,
+      "height": 900,
+      "status": "approved",
+      "review": {
+        "status": "approved",
+        "reviewer": "human:owner",
+        "method": "vision",
+        "notes": "Real 1440x900 capture of the dungeon crawler gameplay: Valerius Paladin rendered in catacombs room with torchlight, floor tiles, FOV, minimap, inventory items, floor bounties, and chronicle log; replaces old capture where center canvas was pitch black.",
+        "score": 95,
+        "reviewed_at": "2026-10-31T15:32:08"
+      }
     }
   ],
   "model": "community/scriptsnsenses-sys/flux-2-dev-free"
