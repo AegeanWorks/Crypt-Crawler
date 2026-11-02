@@ -34,7 +34,24 @@ export const OMENS = [
     desc: "Something followed you down. One extra enemy stalks this floor.",
     atkMult: 1, fov: 7, goldMult: 1, extraFoe: 1,
   },
+  {
+    id: "ember_tithe", name: "Ember Tithe", icon: "🔥",
+    desc: "The dead demand warmth. Chests pay 25% less, shrines heal 50% more.",
+    atkMult: 1, fov: 7, goldMult: 0.75, extraFoe: 0, shrineHealMult: 1.5,
+  },
+  {
+    id: "hollow_silence", name: "Hollow Silence", icon: "🤫",
+    desc: "The floor is silent and traps multiply. Disarming pays double XP.",
+    atkMult: 1, fov: 7, goldMult: 1, extraFoe: 0, trapBonus: 1, disarmXpMult: 2.0,
+  },
 ];
+
+// Trap variants share one Search/disarm loop; damage lives here as DATA.
+export const TRAP_TYPES = {
+  spike: { name: "Spike Trap", min: 8, max: 13, desc: "8-13 damage when stepped on." },
+  dart: { name: "Dart Trap", min: 4, max: 6, hits: 2, desc: "4-6 damage twice (volley)." },
+  snare: { name: "Snare Trap", min: 0, max: 2, stun: 1, desc: "0-2 damage and stuns 1 turn." },
+};
 
 export function omenFor(seed, depth) {
   let hash = (Number(seed) >>> 0) ^ Math.imul(Number(depth) || 1, 0x9e3779b1);
@@ -289,8 +306,10 @@ export class GameEngine {
       player_spawn: spawn,
       stairs_pos: stairs,
       rooms: rooms,
+      room_themes: rooms.map((_, i) => ["ossuary", "choke", "gallery", "urn_crypt", "chapel"][i % 5]),
       chests: [[rooms[1].center[0] + 1, rooms[1].center[1] + 1]],
       traps: traps,
+      trap_kinds: { [`${traps[0][0]},${traps[0][1]}`]: "spike" },
       shrines: [[rooms[2].center[0], rooms[2].center[1]]],
       urns: [[rooms[3].center[0], rooms[3].center[1]]],
       souls: souls,
@@ -450,6 +469,18 @@ export class GameEngine {
             is_boss: false, is_champion: false, champion_affix: null, status_effects: {},
           },
         );
+        try {
+          const offOmen = omenFor(seed || 1234, depth);
+          if (depth === 2 && (offOmen.id === "restless_dead" || offOmen.id === "hollow_silence")) {
+            this.monsters.push({
+              name: "Hollow Choir", type: "boss_choir",
+              x: rooms[4].center[0] - 1, y: rooms[4].center[1] - 1,
+              hp: 70, max_hp: 70, attack: 10, defense: 2,
+              xp_reward: 150, gold_reward: 110, loot_drop: "tome_pyromancy",
+              is_boss: true, is_champion: false, champion_affix: null, status_effects: {},
+            });
+          }
+        } catch (e) { /* offline choir is best-effort */ }
       }
     }
     this._applyDifficulty();
@@ -725,7 +756,7 @@ export class GameEngine {
            <li><strong>Journal:</strong> Every discovery is recorded in the codex and survives death.</li>
            <li><strong>Ancient Shrines:</strong> Bestow sacred blessings (Might, Aegis, Renewal)</li>
            <li><strong>Burial Urns:</strong> Shatter for hidden coins or relics</li>
-           <li><strong>Traps &amp; Sconces:</strong> Watch out for concealed spike traps; press <strong>R</strong> to reveal them or to disarm a revealed trap beside you for a little XP. Wall sconces within two tiles restore the lantern to 7 tiles, even in Deep Fog!</li>
+           <li><strong>Traps &amp; Sconces:</strong> Watch out for spike, dart-volley and snare traps (hover a revealed trap for odds); press <strong>R</strong> to reveal them or to disarm a revealed trap beside you for XP (double on Hollow Silence). Wall sconces within two tiles restore the lantern to 7 tiles, even in Deep Fog!</li>
            <li><strong>Gilded Mimics:</strong> Some chests are teeth in a wooden lid; open one and fight instead of looting.</li>
            <li><strong>Class Passives:</strong> Paladin Zeal restores HP/MP on a kill; Rogue Executioner hits foes below 30% HP harder; Mage Arcane Focus boosts spell damage.</li>
            <li><strong>Status Combos:</strong> Frost on a burning foe shatters for +12+3×depth; Fireball or its scroll on a poisoned foe detonates for the same bonus, consuming the status.</li>
@@ -733,7 +764,7 @@ export class GameEngine {
          <br>
          <p>Conquer Depth B3F and slay <strong>Arch-Lich Malakor</strong> to claim the <em>Crown of Eternity</em>!</p>
          <br>
-         <p><strong>Floor Omens:</strong> every floor carries one omen — Blood Moon (enemies hit 25% harder), Deep Fog (lantern 5 tiles, or 7 near a sconce), Gilded Crypt (+50% chest and urn gold) or Restless Dead (one extra enemy). The omen pill in the header always names the current one.</p>
+         <p><strong>Floor Omens:</strong> every floor carries one omen — Blood Moon (enemies hit 25% harder), Deep Fog (lantern 5 tiles, or 7 near a sconce), Gilded Crypt (+50% chest and urn gold), Restless Dead (one extra enemy), Ember Tithe (chests pay 25% less, shrines heal +15) or Hollow Silence (more traps, disarm XP x2). The omen pill in the header always names the current one. Watch for telegraphs: Malakor inhales before draining, the Choir hums before its verse, and the Warden hardens at low health.</p>
          <p><strong>Enemies:</strong> Skeletal Archers shoot across open rooms, Crypt Hounds lunge two tiles a turn, and Pact-Bound Wraiths rise from Avarice.</p>
          <p><strong>Shortcuts:</strong> <strong>?</strong> opens this guide, <strong>R</strong> searches for traps, <strong>Escape</strong> closes any dialog, and the 🎞️ button toggles reduced motion (persisted).</p>`
       );
@@ -1215,6 +1246,8 @@ export class GameEngine {
     this.omenDungeon = this.dungeon;
     if (announce) {
       this.unlockLore(this.loreEvents?.omen);
+      if (omen.id === "ember_tithe") this.unlockLore(this.loreEvents?.tithe);
+      if (omen.id === "hollow_silence") this.unlockLore(this.loreEvents?.silence);
       this.ui.logMessage(`${omen.icon} Omen — ${omen.name}: ${omen.desc}`, "system");
     }
     if (extraFoe && omen.extraFoe) this._spawnOmenFoe();
@@ -1330,6 +1363,7 @@ export class GameEngine {
       this.renderer.addParticles(nx, ny, "#38b2ac", 16);
       this.unlockLore(this.loreEvents?.shrine);
 
+      const titheMult = this.omen?.shrineHealMult || 1;
       const roll = Math.random();
       if (roll < 0.35) {
         // Full heal & renewal
@@ -1351,6 +1385,12 @@ export class GameEngine {
         this.renderer.addFloatingText("+6 DEF BARRIER", nx, ny, "#ecc94b");
         this.ui.logMessage("🏛️ Ancient Shrine bestowed Blessing of the Aegis (+6 DEF for 25 turns)!", "loot");
       }
+      if (titheMult > 1) {
+        const titheHeal = 15;
+        this.player.hp = Math.min(this.player.max_hp, this.player.hp + titheHeal);
+        this.renderer.addFloatingText(`+${titheHeal} TITHE`, nx, ny, "#fc8181");
+        this.ui.logMessage(`🔥 Ember Tithe warms the shrine: +${titheHeal} HP!`, "loot");
+      }
       this.updateBountyProgress("bounty_shrine", 1);
     }
 
@@ -1364,7 +1404,9 @@ export class GameEngine {
       const baseUrnGold = Math.floor(
         (6 + Math.floor(Math.random() * 12)) * (this.omen?.goldMult || 1)
       );
-      const goldDrop = isUrnCrit ? Math.floor(baseUrnGold * 2.5) : baseUrnGold;
+      const goldDrop = isUrnCrit
+        ? Math.min(Math.floor(baseUrnGold * 2.4), Math.floor((baseUrnGold / (this.omen?.goldMult || 1)) * 3.0))
+        : baseUrnGold;
       this.player.gold += goldDrop;
 
       if (isUrnCrit) {
@@ -1448,14 +1490,14 @@ export class GameEngine {
       chest.opened = true;
       const roll = Math.random();
       const baseGold = Math.floor(
-        (18 + Math.floor(Math.random() * 22) + (this.depth - 1) * 10)
+        (17 + Math.floor(Math.random() * 20) + (this.depth - 1) * 10)
         * (this.omen?.goldMult || 1)
       );
       let goldFound = baseGold;
 
-      if (roll >= 0.15 && roll < 0.35) {
-        // Critical 2.5x Jackpot!
-        goldFound = Math.floor(baseGold * 2.5);
+      if (roll >= 0.14 && roll < 0.34) {
+        // Critical 2.4x Jackpot, omen-capped at 3.0x of base!
+        goldFound = Math.min(Math.floor(baseGold * 2.4), Math.floor((baseGold / (this.omen?.goldMult || 1)) * 3.0));
         sounds.playJackpot();
         this.renderer.shake(9, 240);
         this.renderer.addJackpotExplosion(nx, ny);
@@ -1471,7 +1513,7 @@ export class GameEngine {
       this.player.gold += goldFound;
       this.updateBountyProgress("bounty_chests", 1);
 
-      if (roll < 0.15 && this.player.inventory.length < 12) {
+      if (roll < 0.14 && this.player.inventory.length < 12) {
         const pool = [
           { id: "potion_rejuvenation", name: "Draught of Rejuvenation", type: "potion", rarity: "rare", description: "Restores 30 HP & 20 Mana, cleanses afflictions.", stats: { heal_hp: 30, restore_mana: 20 } },
           { id: "potion_invulnerability", name: "Divine Aegis Draught", type: "potion", rarity: "rare", description: "Grants impenetrable Barrier (+6 DEF for 4 turns).", stats: { shield_wall_turns: 4 } },
@@ -1491,16 +1533,32 @@ export class GameEngine {
       }
     }
 
-    // Check trap
+    // Check trap (variant from server trap_kinds, defaults to spike for old saves)
     const trap = this.dungeon.traps.find((t) => t.x === nx && t.y === ny && !t.triggered && !t.disarmed);
     if (trap) {
       trap.triggered = true;
       trap.discovered = true;
-      const trapDmg = 8 + Math.floor(Math.random() * 6);
+      const kind = trap.kind || "spike";
+      const spec = TRAP_TYPES[kind] || TRAP_TYPES.spike;
+      let trapDmg = 0;
+      let trapLabel = spec.name;
+      if (kind === "dart") {
+        const h1 = spec.min + Math.floor(Math.random() * (spec.max - spec.min + 1));
+        const h2 = spec.min + Math.floor(Math.random() * (spec.max - spec.min + 1));
+        trapDmg = h1 + h2;
+        this.ui.logMessage(`⚠️ Triggered a dart trap! Two volleys for ${h1}+${h2} damage!`, "hit");
+      } else if (kind === "snare") {
+        trapDmg = spec.min + Math.floor(Math.random() * (spec.max - spec.min + 1));
+        this.player.status_effects = this.player.status_effects || {};
+        this.player.status_effects.stun = Math.max(this.player.status_effects.stun || 0, 1);
+        this.ui.logMessage(`⚠️ Triggered a snare trap! Took ${trapDmg} damage and is snared!`, "hit");
+      } else {
+        trapDmg = spec.min + Math.floor(Math.random() * (spec.max - spec.min + 1));
+        this.ui.logMessage(`⚠️ Triggered a spike trap! Took ${trapDmg} damage!`, "hit");
+      }
       this.player.hp = Math.max(0, this.player.hp - trapDmg);
       sounds.playHit(false);
-      this.renderer.addFloatingText(`-${trapDmg}`, nx, ny, "#ff2222");
-      this.ui.logMessage(`⚠️ Triggered a spike trap! Took ${trapDmg} damage!`, "hit");
+      this.renderer.addFloatingText(`-${trapDmg} ${trapLabel}`, nx, ny, "#ff2222");
 
       if (this.player.hp <= 0) {
         this.handlePlayerDeath("a concealed spike trap");
@@ -2158,8 +2216,10 @@ export class GameEngine {
       sounds.playShrine();
       this.renderer.addFloatingText("DISARMED", adjacent.x, adjacent.y, this.renderer.warningColor);
       this.renderer.addParticles(adjacent.x, adjacent.y, this.renderer.trapColor, 10);
-      this.ui.logMessage("🔧 You disarm the revealed spike trap and recover its mechanism.", "loot");
-      this._grantXp(4 + this.depth * 2);
+      const kindName = (TRAP_TYPES[adjacent.kind || "spike"] || TRAP_TYPES.spike).name;
+      this.ui.logMessage(`🔧 You disarm the revealed ${kindName.toLowerCase()} and recover its mechanism.`, "loot");
+      const xpMult = this.omen?.disarmXpMult || 1;
+      this._grantXp(Math.floor((4 + this.depth * 2) * xpMult));
       this.finishPlayerTurn();
       return;
     }
@@ -2499,17 +2559,111 @@ export class GameEngine {
         this.ui.logMessage("🔥 The Crown of Eternity flares crimson. Malakor fights like a cornered god!", "crit");
       }
 
-      // Boss special ability: Soul Drain
-      if (monster.is_boss && isVisible && dist <= 5 && Math.random() < 0.35) {
-        const drain = Math.max(1, Math.round(12 * (this.omen?.atkMult || 1)));
-        this.player.hp = Math.max(0, this.player.hp - drain);
-        monster.hp = Math.min(monster.max_hp, monster.hp + 10);
-        sounds.playSpell("fireball");
-        this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#9f7aea");
-        this.renderer.addFloatingText(`-${drain} DRAIN`, this.player.x, this.player.y, "#b794f4");
-        this.renderer.addFloatingText("+10 HP", monster.x, monster.y, "#9f7aea");
-        this.ui.logMessage(`💀 Malakor casts Soul Drain! Drained ${drain} HP to empower himself!`, "hit");
+      // Boss special ability: Soul Drain is telegraphed one turn ahead.
+      // Turn N: Malakor inhales (badge + log, no damage). Turn N+1: the drain
+      // fires only if still visible and within 5 — break LOS/range to avoid it.
+      if (monster.type === "boss_lich" && monster.drainCharged) {
+        monster.drainCharged = false;
+        monster.intent = null;
+        if (isVisible && dist <= 5) {
+          const drain = Math.max(1, Math.round(12 * (this.omen?.atkMult || 1)));
+          this.player.hp = Math.max(0, this.player.hp - drain);
+          monster.hp = Math.min(monster.max_hp, monster.hp + 10);
+          sounds.playSpell("fireball");
+          this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#9f7aea");
+          this.renderer.addFloatingText(`-${drain} DRAIN`, this.player.x, this.player.y, "#b794f4");
+          this.renderer.addFloatingText("+10 HP", monster.x, monster.y, "#9f7aea");
+          this.ui.logMessage(`💀 Malakor unleashes Soul Drain! Drained ${drain} HP to empower himself!`, "hit");
+          if (this.player.hp <= 0) { this.handlePlayerDeath("Malakor's soul drain"); return; }
+        } else {
+          this.ui.logMessage("💨 Malakor's drain fizzles — you broke line of sight!", "system");
+        }
         continue;
+      }
+      if (monster.type === "boss_lich" && !monster.drainCharged && isVisible && dist <= 5 && Math.random() < 0.35) {
+        monster.drainCharged = true;
+        monster.intent = "DRAIN";
+        this.renderer.addFloatingText("INHALE…", monster.x, monster.y, "#b794f4");
+        this.ui.logMessage("💀 Malakor inhales… Soul Drain incoming! Break line of sight or step away!", "crit");
+        continue;
+      }
+      // Hollow Choir telegraphed hymn: 1-turn Hymn charge, then 6 dmg in 2 tiles
+      // unless the player moved behind a wall (not visible) or out of radius.
+      if (monster.type === "boss_choir" && monster.intent === "SILENCE") {
+        monster.intent = null;
+        const sDist = Math.hypot(monster.x - this.player.x, monster.y - this.player.y);
+        if (sDist <= 2 && isVisible) {
+          this.player.status_effects = this.player.status_effects || {};
+          this.player.status_effects.stun = Math.max(this.player.status_effects.stun || 0, 1);
+          this.ui.logMessage("🤫 The silence breaks — you are stunned by the verse!", "hit");
+        } else {
+          this.ui.logMessage("🤫 You kept your distance — the silence passes.", "system");
+        }
+        continue;
+      }
+      if (monster.type === "boss_choir" && monster.hymnCharged) {
+        monster.hymnCharged = false;
+        monster.intent = null;
+        const hymnDist = Math.hypot(monster.x - this.player.x, monster.y - this.player.y);
+        if (hymnDist <= 2 && this.dungeon.isVisible(monster.x, monster.y)) {
+          const hymn = Math.max(1, Math.round(6 * (this.omen?.atkMult || 1)));
+          this.player.hp = Math.max(0, this.player.hp - hymn);
+          this.renderer.addShockwave(monster.x, monster.y, "#d6bcfa", 80);
+          this.renderer.addFloatingText(`-${hymn} HYMN`, this.player.x, this.player.y, "#d6bcfa");
+          this.ui.logMessage(`🎵 The Hollow Choir resolves its verse for ${hymn} damage!`, "hit");
+          if (this.player.hp <= 0) { this.handlePlayerDeath("the Hollow Choir's verse"); return; }
+        } else {
+          this.ui.logMessage("🎵 The verse breaks against stone — you avoided the hymn!", "system");
+        }
+        continue;
+      }
+      if (monster.type === "boss_choir" && !monster.hymnCharged && isVisible && dist <= 4 && Math.random() < 0.3) {
+        monster.hymnCharged = true;
+        monster.intent = "HYMN";
+        this.renderer.addFloatingText("HUMMING…", monster.x, monster.y, "#d6bcfa");
+        this.ui.logMessage("🎵 The Hollow Choir hums one note… a verse is coming! Move or break sight!", "crit");
+        continue;
+      }
+      // Elder Vault Warden phases: below 50% enrage (+25% like champions),
+      // below 25% stone stance telegraphed (next hit +DEF message, still avoidable).
+      if (monster.type === "vault_warden" && !monster.phase_two && monster.hp <= monster.max_hp * 0.5) {
+        monster.phase_two = true;
+        monster.attack = Math.ceil(monster.attack * 1.15);
+        this.renderer.addFloatingText("ENRAGED!", monster.x, monster.y, "#fc8181");
+        this.ui.logMessage(`💢 The Elder Warden remembers its oath and fights with fury!`, "crit");
+      }
+      if (monster.type === "vault_warden" && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
+        monster.phase_three = true;
+        monster.defense = (monster.defense || 0) + 2;
+        this.renderer.addFloatingText("STONE STANCE!", monster.x, monster.y, "#a0aec0");
+        this.ui.logMessage("🛡️ The Warden plants its shield — its guard hardens (+2 DEF)! Kite it!", "crit");
+      }
+      // Hollow Choir phases: <50% splits into two echoes (telegraphed, capped),
+      // <25% falls silent (telegraphs a stunning verse next turn, avoidable).
+      if (monster.type === "boss_choir" && !monster.phase_two && monster.hp <= monster.max_hp * 0.5) {
+        monster.phase_two = true;
+        const spots = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        let split = 0;
+        for (const [sx, sy] of spots) {
+          if (split >= 2) break;
+          const tx = monster.x + sx;
+          const ty = monster.y + sy;
+          if (this.dungeon.isWalkable(tx, ty) && !this._isOccupied(tx, ty)) {
+            newMonsters.push(this._spawnChoirEcho(tx, ty));
+            this.renderer.addParticles(tx, ty, "#d6bcfa", 14);
+            split += 1;
+          }
+        }
+        this.renderer.addShockwave(monster.x, monster.y, "#d6bcfa", 90);
+        this.renderer.addFloatingText("THE CHOIR SPLITS!", monster.x, monster.y, "#d6bcfa");
+        this.ui.logMessage(`🎵 The Hollow Choir splits into ${split} echoing voices!`, "crit");
+        this.unlockLore(this.loreEvents?.choir);
+      }
+      if (monster.type === "boss_choir" && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
+        monster.phase_three = true;
+        monster.intent = "SILENCE";
+        this.renderer.addFloatingText("SILENCE…", monster.x, monster.y, "#a0aec0");
+        this.ui.logMessage("🤫 The Choir falls silent… a stunning verse is coming! Strike or step away!", "crit");
       }
 
       // Skeletal Archer: fires from a distance instead of closing to melee.
@@ -2619,6 +2773,25 @@ export class GameEngine {
       if (!this.dungeon.isWalkable(x, y)) return false;
     }
     return true;
+  }
+  _spawnChoir(x, y) {
+    return this._scaleMonster({
+      name: "Hollow Choir", type: "boss_choir", x, y,
+      hp: 70, max_hp: 70, attack: 10, defense: 2,
+      xp_reward: 150, gold_reward: 110, loot_drop: "tome_pyromancy",
+      is_boss: true, is_champion: false, champion_affix: null,
+      ai_state: "idle", status_effects: {},
+    });
+  }
+
+  _spawnChoirEcho(x, y) {
+    return this._scaleMonster({
+      name: "Choir Echo", type: "choir_echo", x, y,
+      hp: 22, max_hp: 22, attack: 7, defense: 1,
+      xp_reward: 30, gold_reward: 20, loot_drop: null,
+      is_boss: false, is_champion: false, champion_affix: null,
+      ai_state: "idle", status_effects: {},
+    });
   }
 
   _summonSkeleton(x, y) {

@@ -284,24 +284,34 @@ HERO_CLASSES: Dict[str, Dict[str, Any]] = {
 }
 
 MERCHANT_STOCK: List[Dict[str, Any]] = [
-    {"item_id": "potion_health", "price": 18},
+    {"item_id": "potion_health", "price": 20},
     {"item_id": "potion_mana", "price": 18},
-    {"item_id": "potion_rejuvenation", "price": 40},
-    {"item_id": "potion_invulnerability", "price": 45},
-    {"item_id": "scroll_fireball", "price": 35},
-    {"item_id": "scroll_nova", "price": 55},
-    {"item_id": "sword_runic", "price": 85},
-    {"item_id": "hammer_thunder", "price": 130},
-    {"item_id": "armor_plate", "price": 75},
-    {"item_id": "cloak_ethereal", "price": 120},
-    {"item_id": "shield_tower", "price": 90},
+    {"item_id": "potion_rejuvenation", "price": 42},
+    {"item_id": "potion_invulnerability", "price": 48},
+    {"item_id": "scroll_fireball", "price": 32},
+    {"item_id": "scroll_nova", "price": 58},
+    {"item_id": "sword_runic", "price": 82},
+    {"item_id": "hammer_thunder", "price": 115},
+    {"item_id": "armor_plate", "price": 78},
+    {"item_id": "cloak_ethereal", "price": 118},
+    {"item_id": "shield_tower", "price": 92},
     {"item_id": "ring_shadow", "price": 95},
-    {"item_id": "amulet_bloodstone", "price": 75},
-    {"item_id": "boots_shadowstep", "price": 65},
-    {"item_id": "tome_pyromancy", "price": 105},
-    {"item_id": "potion_elixir_str", "price": 70},
-    {"item_id": "potion_elixir_def", "price": 70},
+    {"item_id": "amulet_bloodstone", "price": 72},
+    {"item_id": "boots_shadowstep", "price": 68},
+    {"item_id": "tome_pyromancy", "price": 108},
+    {"item_id": "potion_elixir_str", "price": 68},
+    {"item_id": "potion_elixir_def", "price": 68},
 ]
+
+# Economy bounds (validator + docs): buy 15-140, sell 10/30/60/100.
+ECONOMY_BOUNDS: Dict[str, Any] = {
+    "buy_min": 15,
+    "buy_max": 140,
+    "sell": {"common": 10, "rare": 30, "epic": 60, "legendary": 100},
+    "chest_base": (14, 32),
+    "urn_base": (5, 16),
+    "jackpot_mult": (2.0, 2.5),
+}
 
 
 class Entity:
@@ -424,6 +434,27 @@ GUARDIAN_TEMPLATES = {
     },
 }
 
+# New phased boss table (DATA, never hardcoded one-offs).
+BOSS_TEMPLATES = {
+    "boss_choir": {
+        "name": "Hollow Choir",
+        "hp": 70,
+        "attack": 10,
+        "defense": 2,
+        "xp_reward": 150,
+        "gold_reward": 110,
+        "loot_drop": "tome_pyromancy",
+    },
+}
+
+# Foundry content packs: installed data bosses merge into the table above.
+# The loader skips bad packs with a recorded error (never raises), so the
+# canon game always boots; pack_load_errors() exposes what was skipped.
+from crawler.foundry_packs import foundry_bosses as _foundry_bosses
+
+for _pack_key, _pack_entry in _foundry_bosses().items():
+    BOSS_TEMPLATES.setdefault(_pack_key, _pack_entry)
+
 
 def spawn_monster(
     monster_type: str,
@@ -463,6 +494,21 @@ def spawn_monster(
             xp_reward=200,
             gold_reward=150,
             loot_drop="crown_eternity",
+            is_boss=True,
+        )
+    if monster_type in BOSS_TEMPLATES:
+        t = BOSS_TEMPLATES[monster_type]
+        return Monster(
+            name=t["name"],
+            monster_type=monster_type,
+            x=x,
+            y=y,
+            hp=t["hp"],
+            attack=t["attack"],
+            defense=t["defense"],
+            xp_reward=t["xp_reward"],
+            gold_reward=t["gold_reward"],
+            loot_drop=t["loot_drop"],
             is_boss=True,
         )
 

@@ -25,35 +25,40 @@ EXPLOIT_RELIC_DROPS = [
 ]
 
 
-def roll_chest_reward(depth: int = 1, rng: Optional[random.Random] = None) -> Tuple[int, str, Optional[str], str]:
+def roll_chest_reward(depth: int = 1, rng: Optional[random.Random] = None,
+                      gold_mult: float = 1.0) -> Tuple[int, str, Optional[str], str]:
     """Calculate variable-ratio reward payout and drops for opening chests (Skinner box reinforcement schedule).
 
     Returns: (gold_awarded, reward_description, optional_item_id, reward_type)
+    gold_mult carries the floor omen (Gilded 1.5, Ember Tithe 0.75); stacking
+    with a jackpot is capped at 3.0x so Gilded+jackpot cannot explode.
     """
     if rng is None:
         rng = random.Random()
 
-    base_gold = 18 + rng.randint(0, 14) + (depth - 1) * 10
+    base_gold = 17 + rng.randint(0, 13) + (depth - 1) * 10
 
     roll = rng.random()
 
-    # 15% Chance: Rare Relic Artifact Drop
-    if roll < 0.15:
+    # 14% Chance: Rare Relic Artifact Drop
+    if roll < 0.14:
         drop_id = rng.choice(EXPLOIT_RELIC_DROPS)
         desc = "★ ANCIENT RELIC CACHE UNLOCKED! Discovered hidden artifact!"
-        return base_gold, desc, drop_id, RewardType.RARE_RELIC_DROP
+        return int(base_gold * min(gold_mult, 3.0)), desc, drop_id, RewardType.RARE_RELIC_DROP
 
-    # 20% Chance: Critical Gold Jackpot (2.5x payout)
-    if roll < 0.35:
-        jackpot_gold = int(base_gold * 2.5)
-        desc = f"★★★ CRITICAL TREASURE JACKPOT! 2.5X PAYOUT (+{jackpot_gold} Gold) ★★★"
+    # 20% Chance: Critical Gold Jackpot (2.4x payout, capped with omen at 3.0x)
+    if roll < 0.34:
+        # Simpler exact rule: jackpot 2.4x, omen-capped total 3.0x of base.
+        jackpot_gold = min(int(base_gold * 2.4 * gold_mult), int(base_gold * 3.0))
+        desc = f"★★★ CRITICAL TREASURE JACKPOT! 2.4X PAYOUT (+{jackpot_gold} Gold) ★★★"
         return jackpot_gold, desc, None, RewardType.CRITICAL_JACKPOT
 
-    # 65% Chance: Standard Payout
-    return base_gold, f"Recovered dungeon chest coins (+{base_gold} Gold).", None, RewardType.STANDARD
+    # 66% Chance: Standard Payout
+    return int(base_gold * gold_mult), f"Recovered dungeon chest coins (+{int(base_gold * gold_mult)} Gold).", None, RewardType.STANDARD
 
 
-def roll_urn_reward(depth: int = 1, rng: Optional[random.Random] = None) -> Tuple[int, str, bool]:
+def roll_urn_reward(depth: int = 1, rng: Optional[random.Random] = None,
+                   gold_mult: float = 1.0) -> Tuple[int, str, bool]:
     """Variable-ratio coin and surprise relic payout when shattering burial urns."""
     if rng is None:
         rng = random.Random()
@@ -61,12 +66,12 @@ def roll_urn_reward(depth: int = 1, rng: Optional[random.Random] = None) -> Tupl
     base_gold = 6 + rng.randint(0, 10) + (depth - 1) * 4
     roll = rng.random()
 
-    # 18% Chance: Critical Urn Jackpot (2.5x)
+    # 18% Chance: Critical Urn Jackpot (2.4x, omen-capped at 3.0x)
     if roll < 0.18:
-        jackpot = int(base_gold * 2.5)
+        jackpot = min(int(base_gold * 2.4 * gold_mult), int(base_gold * 3.0))
         return jackpot, f"✨ CRITICAL URN JACKPOT! (+{jackpot} Gold)!", True
 
-    return base_gold, f"Shattered burial urn (+{base_gold} Gold).", False
+    return int(base_gold * gold_mult), f"Shattered burial urn (+{int(base_gold * gold_mult)} Gold).", False
 
 
 def check_near_miss_survival(current_hp: int, max_hp: int, damage_taken: int) -> Optional[Dict[str, Any]]:

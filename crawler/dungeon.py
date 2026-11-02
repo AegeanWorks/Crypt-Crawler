@@ -26,6 +26,50 @@ class TileType:
     PACT = 13
 
 
+# Procedural depth tables: the generator reads these, never hardcoded one-offs.
+# Room themes only change prop density/placement, never connectivity.
+ROOM_THEMES: Tuple[str, ...] = ("ossuary", "choke", "gallery", "urn_crypt", "chapel")
+
+# Trap variants share one Search/disarm loop; damage lives here as DATA.
+TRAP_TYPES: Dict[str, Dict[str, Any]] = {
+    "spike": {"name": "Spike Trap", "damage": (8, 13), "desc": "8-13 damage when stepped on."},
+    "dart": {"name": "Dart Trap", "damage": (4, 6), "desc": "4-6 damage twice (volley)."},
+    "snare": {"name": "Snare Trap", "damage": (0, 2), "desc": "0-2 damage and stuns 1 turn."},
+}
+
+# Omen ids mirror static/js/engine.js OMENS (order-independent lookup).
+OMEN_IDS: Tuple[str, ...] = (
+    "blood_moon", "deep_fog", "gilded_crypt", "restless_dead",
+    "ember_tithe", "hollow_silence",
+)
+
+OMEN_TABLE: Dict[str, Dict[str, Any]] = {
+    "blood_moon": {"atkMult": 1.25, "fov": 7, "goldMult": 1.0, "extraFoe": 0},
+    "deep_fog": {"atkMult": 1.0, "fov": 5, "goldMult": 1.0, "extraFoe": 0},
+    "gilded_crypt": {"atkMult": 1.0, "fov": 7, "goldMult": 1.5, "extraFoe": 0},
+    "restless_dead": {"atkMult": 1.0, "fov": 7, "goldMult": 1.0, "extraFoe": 1},
+    "ember_tithe": {"atkMult": 1.0, "fov": 7, "goldMult": 0.75, "extraFoe": 0,
+                    "shrineHealMult": 1.5},
+    "hollow_silence": {"atkMult": 1.0, "fov": 7, "goldMult": 1.0, "extraFoe": 0,
+                       "trapBonus": 1, "disarmXpMult": 2.0},
+}
+
+
+def omen_for(seed: int, depth: int) -> str:
+    """Python mirror of engine.js omenFor, extended to six omens.
+
+    Same 32-bit mix as the client so both engines agree on the floor mood.
+    """
+    h = (int(seed) & 0xFFFFFFFF) ^ ((int(depth) or 1) * 0x9E3779B1 & 0xFFFFFFFF)
+    h &= 0xFFFFFFFF
+    h = (h ^ (h >> 15)) * 0x85EBCA6B & 0xFFFFFFFF
+    h = (h ^ (h >> 13)) * 0xC2B2AE35 & 0xFFFFFFFF
+    h = (h ^ (h >> 16)) & 0xFFFFFFFF
+    ids = ["blood_moon", "deep_fog", "gilded_crypt", "restless_dead",
+           "ember_tithe", "hollow_silence"]
+    return ids[h % len(ids)]
+
+
 @dataclass
 class Room:
     x: int
@@ -83,6 +127,9 @@ class Dungeon:
         self.sconces: List[Tuple[int, int]] = []
         self.merchants: List[Tuple[int, int]] = []
         self.depth: int = 1
+        # DATA-driven dressing: parallel to rooms/traps, same rng stream.
+        self.room_themes: List[str] = []
+        self.trap_kinds: Dict[Tuple[int, int], str] = {}
 
     @property
     def biome(self) -> str:
@@ -210,10 +257,12 @@ class Dungeon:
             "seed": self.seed,
             "depth": self.depth,
             "biome": self.biome,
+            "omen": omen_for(self.seed, self.depth),
             "player_spawn": list(self.player_spawn),
             "stairs_pos": list(self.stairs_pos),
             "chests": [list(c) for c in self.chests],
             "traps": [list(t) for t in self.traps],
+            "trap_kinds": {f"{x},{y}": k for (x, y), k in self.trap_kinds.items()},
             "shrines": [list(s) for s in self.shrines],
             "urns": [list(u) for u in self.urns],
             "souls": [list(s) for s in self.souls],
@@ -226,6 +275,7 @@ class Dungeon:
                 {"x": r.x, "y": r.y, "w": r.w, "h": r.h, "center": list(r.center)}
                 for r in self.rooms
             ],
+            "room_themes": list(self.room_themes),
             "tiles": self.tiles,
         }
 
@@ -277,6 +327,8 @@ class DungeonGenerator:
                 self._carve_corridor(dungeon, prev_center, new_center, rng)
 
             dungeon.rooms.append(new_room)
+            # DATA theme per room, same rng stream so replay holds.
+            dungeon.room_themes.append(rng.choice(list(ROOM_THEMES)))
 
         # Player spawn in first room center
         if dungeon.rooms:
@@ -331,8 +383,20 @@ class DungeonGenerator:
                         dungeon.tiles[cy][cx] = TileType.CHEST
                         dungeon.chests.append((cx, cy))
 
-                # Traps
-                if rng.random() < 0.4:
+                # Traps (variant lives in DATA; one Search/disarm loop covers all)
+                trap_chance = 0.4
+                try:
+                    theme_idx = dungeon.rooms.index(room)
+                    theme = dungeon.room_themes[theme_idx] if theme_idx < len(dungeon.room_themes) else ""
+                except ValueError:
+                    theme = ""
+                if theme == "choke":
+                    trap_chance = 0.55
+                elif theme == "gallery":
+                    trap_chance = 0.25
+                if omen_for(dungeon.seed, dungeon.depth) == "hollow_silence":
+                    trap_chance = min(0.75, trap_chance + 0.15)
+                if rng.random() < trap_chance:
                     tx = rng.randint(room.x1 + 1, room.x2 - 2)
                     ty = rng.randint(room.y1 + 1, room.y2 - 2)
                     if (
@@ -342,6 +406,7 @@ class DungeonGenerator:
                     ):
                         dungeon.tiles[ty][tx] = TileType.TRAP
                         dungeon.traps.append((tx, ty))
+                        dungeon.trap_kinds[(tx, ty)] = rng.choice(list(TRAP_TYPES.keys()))
 
                 # Urns
                 if rng.random() < 0.7:

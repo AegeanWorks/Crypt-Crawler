@@ -46,8 +46,7 @@ export class ClientDungeon {
     this.chests = (data.chests || []).map((c) => ({
       ...point(c),
       opened: Array.isArray(c) ? false : Boolean(c.opened),
-    }));
-    this.mimics = new Set();
+    }));    this.mimics = new Set();
     const mimicIndex = mimicChestIndex(this.seed, this.depth, this.chests.length);
     if (mimicIndex >= 0) {
       const mimicChest = this.chests[mimicIndex];
@@ -55,12 +54,18 @@ export class ClientDungeon {
         this.mimics.add(`${mimicChest.x},${mimicChest.y}`);
       }
     }
-    this.traps = (data.traps || []).map((t) => ({
-      ...point(t),
-      triggered: Array.isArray(t) ? false : Boolean(t.triggered),
-      discovered: Array.isArray(t) ? false : Boolean(t.discovered),
-      disarmed: Array.isArray(t) ? false : Boolean(t.disarmed),
-    }));
+    this.traps = (data.traps || []).map((t) => {
+      const kind = Array.isArray(t) ? (data.trap_kinds?.[`${t[0]},${t[1]}`] || "spike") : (t.kind || "spike");
+      return {
+        ...point(t),
+        triggered: Array.isArray(t) ? false : Boolean(t.triggered),
+        discovered: Array.isArray(t) ? false : Boolean(t.discovered),
+        disarmed: Array.isArray(t) ? false : Boolean(t.disarmed),
+        kind,
+      };
+    });
+    this.room_themes = data.room_themes || (this.rooms || []).map(() => "ossuary");
+    this.omen = data.omen || null;
     this.shrines = (data.shrines || []).map((s) => ({
       ...point(s),
       activated: Array.isArray(s) ? false : Boolean(s.activated),

@@ -199,6 +199,36 @@ LORE_ENTRIES: List[Dict[str, str]] = [
             "oath does not know your face."
         ),
     },
+    {
+        "id": "lore_tithe",
+        "title": "The Ember Tithe",
+        "category": "Whispers",
+        "text": (
+            "On some floors the dead demand warmth before they give up gold. "
+            "Chests pay thin but shrines burn brighter: the tithe takes coin "
+            "and returns healing. Pay it gladly; the crypt always collects."
+        ),
+    },
+    {
+        "id": "lore_silence",
+        "title": "The Hollow Silence",
+        "category": "Whispers",
+        "text": (
+            "Some floors go quiet and the traps multiply. The silence is not "
+            "empty; it is listening. Break its teeth one by one and it pays "
+            "double for the trouble."
+        ),
+    },
+    {
+        "id": "lore_choir",
+        "title": "The Hollow Choir",
+        "category": "The Fallen",
+        "text": (
+            "They were cantors who sang the vault shut and could not stop. "
+            "Now they hum one note before they strike, split when wounded, "
+            "and fall silent before the killing verse. Move when they breathe in."
+        ),
+    },
 ]
 
 LORE_BY_ID: Dict[str, Dict[str, str]] = {entry["id"]: entry for entry in LORE_ENTRIES}
@@ -224,6 +254,9 @@ LORE_EVENTS: Dict[str, str] = {
     "lantern": "lore_lantern",
     "debt": "lore_debt",
     "warden": "lore_warden",
+    "tithe": "lore_tithe",
+    "silence": "lore_silence",
+    "choir": "lore_choir",
 }
 
 

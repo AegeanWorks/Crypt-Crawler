@@ -13,6 +13,7 @@ from urllib.parse import parse_qs, urlparse
 
 from crawler.dungeon import DungeonGenerator
 from crawler.entities import HERO_CLASSES, MERCHANT_STOCK, Player, create_item, spawn_monster
+from crawler.foundry_packs import spawn_for as _foundry_spawn_for
 from crawler.lore import LORE_EVENTS, public_entries, starting_lore
 from crawler.rewards import generate_dungeon_bounties
 
@@ -109,7 +110,11 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
             boss_room = None
             if depth >= 3 and dungeon.rooms:
                 bx, by = dungeon.stairs_pos
-                monsters.append(spawn_monster("boss_lich", bx, by, depth=depth))
+                # Foundry replacement: an installed pack claiming this
+                # (depth, seed) takes the stairs post instead of the canon
+                # lich. Count and position invariants are unchanged.
+                _boss_type = _foundry_spawn_for(depth=depth, seed=seed) or "boss_lich"
+                monsters.append(spawn_monster(_boss_type, bx, by, depth=depth))
                 boss_room = next((r for r in dungeon.rooms if r.center == dungeon.stairs_pos), None)
                 if boss_room and boss_room.w >= 4 and boss_room.h >= 4:
                     for ex, ey in ((bx - 1, by), (bx + 1, by)):
@@ -128,6 +133,20 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
                         monsters.append(spawn_monster("vault_warden", wx, wy, depth=depth))
                         reserved.add((wx, wy))
                         break
+                # Hollow Choir: second vault guardian on restless/silent floors.
+                # DATA boss, deterministic post beside the vault, same reserved rules.
+                try:
+                    from crawler.dungeon import omen_for as _omen_for
+                    _omen = _omen_for(dungeon.seed, depth)
+                except Exception:
+                    _omen = ""
+                if depth == 2 and _omen in ("restless_dead", "hollow_silence") and dungeon.vault:
+                    for cx, cy in ((vx - 1, vy), (vx, vy - 1), (vx, vy + 1), (vx + 1, vy)):
+                        if (cx, cy) not in reserved and dungeon.is_walkable(cx, cy):
+                            if not any(m.x == cx and m.y == cy for m in monsters):
+                                monsters.append(spawn_monster("boss_choir", cx, cy, depth=depth))
+                                reserved.add((cx, cy))
+                            break
 
             # No two monsters may share a tile: the random roll below is independent
             # per monster and used to stack pairs on one square.

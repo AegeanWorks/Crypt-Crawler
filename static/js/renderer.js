@@ -1499,6 +1499,26 @@ export class DungeonRenderer {
         ctx.stroke();
       }
       ctx.restore();
+    } else if (monster.type === "boss_choir" || monster.type === "choir_echo") {
+      // Hollow Choir: three hooded cantors humming one note; echo is smaller.
+      const s = monster.type === "choir_echo" ? 0.7 : 1.0;
+      ctx.fillStyle = monster.type === "boss_choir" ? "#4c1d95" : "#6b46c1";
+      ctx.beginPath();
+      ctx.moveTo(px + ts / 2, py + 4);
+      ctx.lineTo(px + ts - 4, py + ts - 2);
+      ctx.lineTo(px + 4, py + ts - 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#f7fafc";
+      ctx.beginPath();
+      ctx.arc(px + ts / 2, py + 10 * s, 5 * s, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#1a202c";
+      ctx.fillRect(px + ts / 2 - 3, py + 8 * s, 2, 2);
+      ctx.fillRect(px + ts / 2 + 1, py + 8 * s, 2, 2);
+      ctx.fillStyle = "#d6bcfa";
+      ctx.font = "bold 10px sans-serif";
+      ctx.fillText("♪", px + ts / 2 - 4, py + ts - 4);
     } else if (monster.type === "necromancer") {
       // Dread Necromancer with bone skull staff and hovering runes
       // Shroud
@@ -1666,8 +1686,12 @@ export class DungeonRenderer {
 
     // Telegraph badges: behavior intent + rogue execution threshold, readable at a glance.
     // Archer hangs back and shoots, hound lunges, boss is the run objective.
+    // DRAIN/HYMN/SILENCE charge one turn ahead so no damage is unavoidable.
     let intent = null;
-    if (monster.type === "archer") intent = "🏹";
+    if (monster.intent === "DRAIN") intent = "💀 DRAIN!";
+    else if (monster.intent === "HYMN") intent = "🎵 HYMN!";
+    else if (monster.intent === "SILENCE") intent = "🤫!";
+    else if (monster.type === "archer") intent = "🏹";
     else if (monster.type === "hound") intent = "💨";
     else if (monster.is_boss) intent = "👑";
     if (intent) {
@@ -2391,13 +2415,15 @@ export class DungeonRenderer {
     const at = (entry) => entry && entry.x === tx && entry.y === ty;
     const trap = (dungeon.traps || []).find((t) => at(t) && t.discovered && !t.triggered);
     if (trap) {
+      const kindName = trap.kind === "dart" ? "Dart Trap" : trap.kind === "snare" ? "Snare Trap" : "Spike Trap";
+      const odds = trap.kind === "dart" ? "4-6 x2 volley." : trap.kind === "snare" ? "0-2 + stun 1." : "8-13 damage.";
       return {
-        title: trap.disarmed ? "🔧 Disarmed Spike Trap" : "⚠️ Revealed Spike Trap",
+        title: trap.disarmed ? `🔧 Disarmed ${kindName}` : `⚠️ Revealed ${kindName}`,
         border: trap.disarmed ? "#4a5568" : "#d69e2e",
         color: trap.disarmed ? "#a0aec0" : "#f6ad55",
         lines: trap.disarmed
           ? ["The mechanism is broken.", "Safe to cross."]
-          : ["It is armed and waiting.", "Step around it; it still triggers."],
+          : [odds, "Step around it; it still triggers."],
       };
     }
     const pact = (dungeon.pacts || []).find((p) => at(p) && !p.used);

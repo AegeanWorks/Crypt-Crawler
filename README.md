@@ -83,7 +83,7 @@ The passive is printed on each class card before you choose, and the in-game gui
 Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; or poison with a dagger/Shadow Strike, then detonate it with fire.
 
 ### 🎭 Floor Omens, Mobs and Story
-Every floor carries one omen chosen deterministically from the seed: **Blood Moon** (enemies strike 25% harder), **Deep Fog** (lantern 5 tiles, or 7 near a wall sconce), **Gilded Crypt** (+50% chest and urn gold) or **Restless Dead** (one extra enemy). The header pill names it, the chronicle announces it, and the journal keeps it.
+Every floor carries one omen chosen deterministically from the seed: **Blood Moon** (enemies strike 25% harder), **Deep Fog** (lantern 5 tiles, or 7 near a wall sconce), **Gilded Crypt** (+50% chest and urn gold), **Restless Dead** (one extra enemy), **Ember Tithe** (chests pay 25% less, shrines heal +15) or **Hollow Silence** (more traps, disarm XP x2). The header pill names it, the chronicle announces it, and the journal keeps it.
 
 Wall sconces are real light sources: standing within two tiles restores the lantern to 7, so Deep Fog has a positional counterplay instead of a flat penalty.
 
@@ -93,16 +93,19 @@ Wall sconces are real light sources: standing within two tiles restores the lant
 | Crypt Hound | B2F | Lunges two tiles per turn and never lets the scent go |
 | Gilded Mimic | any chest | Disguised as a chest; opening it springs a scaled fight instead of loot |
 | Pact-Bound Wraith | any | Raised in pairs by the Pact of Avarice and hunts the debtor |
+| Elder Vault Warden | B2F vault | Enrages at 50% (+15% ATK), hardens at 25% (+2 DEF); kite it |
+| Hollow Choir | B2F restless/silent | Hums 1 turn before a 2-tile verse (break LOS to avoid), splits at 50%, stunning silence at 25% |
+| Arch-Lich Malakor | B3F | Inhales 1 turn before Soul Drain (break LOS/range to avoid); summons at 50%, enrages at 25% |
 
 Chests can be **Gilded Mimics**: opening one pushes you back and springs a depth-scaled fight instead of paying gold. The mimic is chosen deterministically from the run seed and chest order, so a known seed reproduces the same trapped chest. Trap search reveals traps, not mimics.
 
-QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, and the 🎞️ header button toggles reduced motion (persisted, disables screen shake and pulsing accents). Story: three new codex entries — *Signs in the Blood*, *The Lantern-Keeper* and *The Debt of Malakor* — and a victory epilogue that closes the ledger.
+QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, and the 🎞️ header button toggles reduced motion (persisted, disables screen shake and pulsing accents). Story: three new codex entries — *Signs in the Blood*, *The Lantern-Keeper* and *The Debt of Malakor* — plus *Ember Tithe*, *Hollow Silence* and *Hollow Choir*, and a victory epilogue that closes the ledger.
 
 ### 🔍 Trap Search
-Press `R` or the deck's **Search** button to spend a turn revealing armed traps within three visible tiles. A revealed trap gets a dashed amber grille and a hover card, but it still triggers if stepped on: the search buys information, not safety. Press `R` again while beside a revealed trap to disarm it for a little XP; the trap becomes a grey crossed grille, is safe to cross, and stays disarmed in saves. The revealed state survives saves; each new floor starts with fresh hidden traps. Deep Fog shortens the search because it uses the same line of sight as the lantern.
+Press `R` or the deck's **Search** button to spend a turn revealing armed traps within three visible tiles. Traps come as **Spike** (8-13), **Dart volley** (4-6 x2) and **Snare** (0-2 + stun 1); a revealed trap gets a dashed amber grille and a hover card with odds, but it still triggers if stepped on: the search buys information, not safety. Press `R` again while beside a revealed trap to disarm it for `4+depth*2` XP (`x2` on Hollow Silence); the trap becomes a grey crossed grille, is safe to cross, and stays disarmed in saves. The revealed state survives saves; each new floor starts with fresh hidden traps. Deep Fog shortens the search because it uses the same line of sight as the lantern.
 
 ### 🧳 Merchant
-Hermit Grimbold opens a two-tab shop on B2F and deeper. **Buy** spends gold on potions, gear and relics; **Sell** converts outclassed backpack loot into gold at a rarity-based price (common 10, rare 30, epic 60). The shop stays open after a sale, so a full 12-slot backpack can be cleared in one visit, and selling is refused once the shop is closed. The Crown of Eternity is a trophy, not stock: it never appears in the Sell tab.
+Hermit Grimbold opens a two-tab shop on B2F and deeper. **Buy** spends gold on potions, gear and relics (15-140, rebalanced: Health 20, Hammer 115); **Sell** converts outclassed backpack loot into gold at a rarity-based price (common 10, rare 30, epic 60). The shop stays open after a sale, so a full 12-slot backpack can be cleared in one visit, and selling is refused once the shop is closed. The Crown of Eternity is a trophy, not stock: it never appears in the Sell tab. Chests pay 17+0-13 base with a 2.4x jackpot capped at 3.0x with omens; urns pay 6+0-10 with the same cap, so risk-for-power stays a real choice.
 
 ### 🛠️ AIKit Commands (run from the AIKit folder)
 | Role | Command |

@@ -119,6 +119,7 @@ STATE_JS = """
       seed: e.dungeon.seed,
       depth: e.dungeon.depth,
       biome: e.dungeon.biome,
+      omen: e.omen?.id || e.dungeon.omen || null,
       width: e.dungeon.width,
       height: e.dungeon.height,
       spawn: { x: e.dungeon.playerSpawn[0], y: e.dungeon.playerSpawn[1] },
@@ -143,10 +144,13 @@ STATE_JS = """
         triggered: t.triggered,
         discovered: Boolean(t.discovered),
         disarmed: Boolean(t.disarmed),
+        kind: t.kind || "spike",
       })),
       sconces: (e.dungeon.sconces || []).map(point),
       rooms: (e.dungeon.rooms || []).map((r) => ({ x: r.x, y: r.y, w: r.w, h: r.h })),
+      room_themes: e.dungeon.room_themes || [],
     },
+    omen: e.omen || null,
     sigilCount: e.sigilCount,
     bounties: (e.bounties || []).map((b) => ({
       id: b.id, title: b.title, progress: b.progress, target: b.target, completed: b.completed,
@@ -281,7 +285,9 @@ def layout_hash(state: Dict[str, Any]) -> str:
         "seed": dungeon["seed"],
         "depth": dungeon["depth"],
         "biome": dungeon["biome"],
+        "omen": dungeon.get("omen") or state.get("omen"),
         "rooms": [(r["x"], r["y"], r["w"], r["h"]) for r in dungeon["rooms"]],
+        "room_themes": sorted(dungeon.get("room_themes", [])),
         "spawn": dungeon["spawn"],
         "stairs": dungeon["stairs"],
         "monsters": monsters,
@@ -293,7 +299,7 @@ def layout_hash(state: Dict[str, Any]) -> str:
         "vault": dungeon["vault"],
         "pacts": [(p["x"], p["y"]) for p in dungeon["pacts"]],
         "merchants": [(m["x"], m["y"]) for m in dungeon["merchants"]],
-        "traps": [(t["x"], t["y"]) for t in dungeon["traps"]],
+        "traps": sorted((t["x"], t["y"], t.get("kind", "spike")) for t in dungeon["traps"]),
         "sconces": [(s["x"], s["y"]) for s in dungeon["sconces"]],
     }
     encoded = json.dumps(material, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -1562,7 +1568,7 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("omens_are_deterministic", omen["deterministic"] is True, omen))
     checks.append(_check(
         "every_omen_is_reachable",
-        omen["ids"] == ["blood_moon", "deep_fog", "gilded_crypt", "restless_dead"],
+        omen["ids"] == ["blood_moon", "deep_fog", "ember_tithe", "gilded_crypt", "hollow_silence", "restless_dead"],
         omen["ids"],
     ))
     checks.append(_check(
@@ -1648,7 +1654,7 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     checks.append(_check(
         "gilded_crypt_multiplies_chest_gold",
-        effects["chestOpened"] is True and effects["chestGold"] == 43,
+        effects["chestOpened"] is True and effects["chestGold"] == 40,
         effects,
     ))
     page.context.close()
