@@ -214,6 +214,29 @@ export class UIController {
 
     // Inventory
     this.renderInventory(player.inventory);
+
+    // Deck affordability: dim abilities the current mana cannot pay for.
+    // Visual only — the engine still validates mana on every cast.
+    this._refreshDeckAffordability(player);
+  }
+
+  _refreshDeckAffordability(player) {
+    const mana = Number.isFinite(player?.mana) ? player.mana : 0;
+    const heroClass = player?.hero_class || "paladin";
+    const costsByClass = {
+      paladin: { btnActionFireball: 10, btnActionBash: 4, btnActionHeal: 8, btnActionShieldWall: 6 },
+      rogue: { btnActionFireball: 4, btnActionBash: 6, btnActionHeal: 10, btnActionShieldWall: 8 },
+      mage: { btnActionFireball: 10, btnActionBash: 6, btnActionHeal: 10, btnActionShieldWall: 6 },
+    };
+    const costs = costsByClass[heroClass] || costsByClass.paladin;
+    for (const [id, cost] of Object.entries(costs)) {
+      const btn = document.getElementById(id);
+      if (!btn) continue;
+      const affordable = mana >= cost;
+      btn.classList.toggle("deck-unaffordable", !affordable);
+      if (!affordable) btn.setAttribute("aria-disabled", "true");
+      else btn.removeAttribute("aria-disabled");
+    }
   }
 
   updateActionDeck(heroClass) {

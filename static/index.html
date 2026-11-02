@@ -154,7 +154,7 @@
 
         <!-- Tactical Command Deck -->
         <div class="tactical-deck" id="tacticalDeck">
-          <button class="deck-btn" id="btnActionMelee" title="Melee Attack adjacent enemy [1]">
+          <button class="deck-btn" id="btnActionMelee" title="Melee Attack adjacent enemy [1]" aria-label="Melee strike, hotkey 1">
             <span class="deck-icon">🗡️</span>
             <span class="deck-label">Strike</span>
             <span class="deck-hotkey">[1]</span>
@@ -184,7 +184,7 @@
             <span class="deck-label">Potion</span>
             <span class="deck-hotkey">[6]</span>
           </button>
-          <button class="deck-btn" id="btnActionWait" title="Wait / Pass Turn (+1 MP) [Space]">
+          <button class="deck-btn" id="btnActionWait" title="Wait / Pass Turn (+1 MP) [Space]" aria-label="Wait a turn, hotkey Space">
             <span class="deck-icon">⏳</span>
             <span class="deck-label">Wait</span>
             <span class="deck-hotkey">[Space]</span>
@@ -236,7 +236,7 @@
         </div>
 
         <h2 class="panel-title log-title">Dungeon Chronicle</h2>
-        <div class="chronicle-log" id="chronicleLog">
+        <div class="chronicle-log" id="chronicleLog" aria-live="polite" aria-label="Dungeon chronicle log">
           <div class="log-entry log-system">You step into the damp, shadowed catacombs. Light your torch...</div>
         </div>
       </aside>

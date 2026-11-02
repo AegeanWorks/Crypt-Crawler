@@ -217,6 +217,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - Rights holder: AegeanWorks; commercial use under ACL-1.0.
 - Counsel review of the 1.1 texts remains pending.
 
+### ADR-028: Sprite Presence and Telegraphing (visual slice 1)
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: Automated audit was 75/75 green, yet eye review of `new_mobs_zoom_desktop.png` showed the Crypt Hound as a brown blob with a floating white ring and the Skeletal Archer as a flat green triangle; intent badges never painted because they tested `skeletal_archer`/`crypt_hound` while the engine spawns `archer`/`hound`.
+- **Decision**: Display-only canvas work in `static/js/renderer.js` (plus three one-line `_hitFlash` stamps in `static/js/engine.js` as FX triggers, no rule change): tile top-bevel catch-light, deterministic hash floor cracks/pebbles, grounding shadows under merchant/monsters/player, torchlight hot core + stronger biome falloff, sconce halo, hound snout/fangs/spine-ridge/collar-band, archer hood rim-light/quiver/tattered hem, fixed badge type strings, monster/player hit-flash veils, hover tooltip strike preview. Chrome in the same pass: deck affordability dimming (`ui.js` + `style.css`, engine still validates mana), focus rings, log/low-HP/capacity motion, aria labels (`index.html`). No combat/dungeon/save rule changed.
+- **Consequences**: Sprites read at 1x and 4x zoom; badges paint; hits flash. Verified by `.inspect/slice1-sprites/` (57/57 desktop, 0 console errors) side-by-side against `.inspect/stage1-baseline/`, and 71 unit tests green. Tooltip clamp (cardX/cardY + paint-after-minimap) and the reduced-motion pulse freeze are explicitly deferred to slices 2 and 3.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write; badge strings verified by grep) and PRINCIPLE-014 (gates re-run, no test weakened).
+
 ## License notice cleanup (2026-10-26)
 
 - The license-history notes were removed from README.md and COMMERCIAL.md: the project is offered only under the Aegean Game License 1.1 (AGL-1.1), with commercial use under ACL-1.0.

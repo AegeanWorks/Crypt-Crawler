@@ -1737,3 +1737,49 @@ body.crt-active {
 }
 
 /* Sealed vault and sigils are drawn on canvas; the HUD only needs the pill. */
+
+/* --- Polish pass: deck affordability, focus rings, log motion, low-HP pulse --- */
+.deck-btn.deck-unaffordable {
+  opacity: 0.45;
+  filter: saturate(0.5);
+}
+.deck-btn.deck-unaffordable .deck-icon {
+  filter: grayscale(0.6);
+}
+.deck-btn:focus-visible,
+.filter-btn:focus-visible,
+.btn:focus-visible,
+.dpad-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.inventory-capacity.full {
+  animation: capacityBlink 1.6s ease-in-out infinite;
+}
+@keyframes capacityBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.chronicle-log .log-entry {
+  animation: logSlideIn 0.18s ease-out;
+}
+@keyframes logSlideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.gauge-bar-fill.low-hp {
+  animation: lowHpPulse 1.1s ease-in-out infinite;
+}
+@keyframes lowHpPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
+.dpad-btn {
+  min-width: 52px;
+  min-height: 52px;
+}
+body.reduced-motion .chronicle-log .log-entry,
+body.reduced-motion .gauge-bar-fill.low-hp,
+body.reduced-motion .inventory-capacity.full {
+  animation: none;
+}
