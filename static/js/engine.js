@@ -429,6 +429,13 @@ export class GameEngine {
       if (depth >= 2) {
         this.monsters.push(
           {
+            name: "Elder Vault Warden", type: "vault_warden",
+            x: rooms[4].center[0] + 1, y: rooms[4].center[1] - 1,
+            hp: 60, max_hp: 60, attack: 11, defense: 3,
+            xp_reward: 120, gold_reward: 90, loot_drop: "amulet_bloodstone",
+            is_boss: false, is_champion: true, champion_affix: "Elder", status_effects: {},
+          },
+          {
             name: "Crypt Hound", type: "hound",
             x: rooms[3].center[0] + 1, y: rooms[3].center[1] + 1,
             hp: 18, max_hp: 18, attack: 6, defense: 1,
@@ -1638,6 +1645,10 @@ export class GameEngine {
         this.ui.logMessage(`Found rare champion relic: ${bonusItem.name}!`, "loot");
       }
       this.updateBountyProgress("bounty_champions", 1);
+      if (monster.type === "vault_warden") {
+        this.unlockLore(this.loreEvents?.warden);
+        this.ui.logMessage("🛡️ The vault's oath is broken. The seal no longer has a keeper.", "level");
+      }
     }
 
     // Combo Kill Streak & Momentum

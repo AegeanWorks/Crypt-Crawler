@@ -1535,6 +1535,59 @@ export class DungeonRenderer {
       ctx.beginPath();
       ctx.arc(px + ts - 4, py + 2, 3.5 + flamePulse * 0.5, 0, Math.PI * 2);
       ctx.fill();
+    } else if (monster.type === "vault_warden") {
+      // Elder Vault Warden: a bronze-clad guardian posted at the sealed vault.
+      // Tower shield left, halberd right, ward-lantern burning over the helm.
+      const midX = px + ts / 2;
+      const midY = py + ts / 2;
+      // Ward-lantern halo
+      const halo = ctx.createRadialGradient(midX, py + 6, 1, midX, py + 6, ts * 0.45);
+      halo.addColorStop(0, "rgba(236, 201, 75, 0.4)");
+      halo.addColorStop(1, "rgba(236, 201, 75, 0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(midX, py + 6, ts * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+      // Plate body
+      ctx.fillStyle = "#5b4a1e";
+      ctx.beginPath();
+      ctx.moveTo(midX, py + 9);
+      ctx.lineTo(px + ts - 6, py + ts - 3);
+      ctx.lineTo(px + 6, py + ts - 3);
+      ctx.closePath();
+      ctx.fill();
+      // Bronze helm with eye slit
+      ctx.fillStyle = "#b7791f";
+      ctx.beginPath();
+      ctx.arc(midX, py + 12, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#1a202c";
+      ctx.fillRect(midX - 3, py + 10.5, 6, 2);
+      // Tower shield (left) with gold boss
+      ctx.fillStyle = "#744210";
+      ctx.fillRect(px + 3, midY - 4, 6, 16);
+      ctx.strokeStyle = "#ecc94b";
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(px + 3, midY - 4, 6, 16);
+      ctx.fillStyle = "#ecc94b";
+      ctx.beginPath();
+      ctx.arc(px + 6, midY + 4, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      // Halberd (right): haft, axe head, tip
+      ctx.strokeStyle = "#8b6f47";
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(px + ts - 5, py + 4);
+      ctx.lineTo(px + ts - 5, py + ts - 2);
+      ctx.stroke();
+      ctx.fillStyle = "#e2e8f0";
+      ctx.beginPath();
+      ctx.moveTo(px + ts - 5, py + 4);
+      ctx.lineTo(px + ts - 11, py + 10);
+      ctx.lineTo(px + ts - 5, py + 12);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillRect(px + ts - 5.8, py + 1, 1.6, 3.5);
     } else if (monster.type === "mimic") {
       // Gilded Mimic: a chest lid split by teeth and two bright eyes.
       const midX = px + ts / 2;

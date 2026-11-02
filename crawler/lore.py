@@ -187,6 +187,18 @@ LORE_ENTRIES: List[Dict[str, str]] = [
             "to you in your father's voice."
         ),
     },
+    {
+        "id": "lore_warden",
+        "title": "The Oathbound Warden",
+        "category": "The Fallen",
+        "text": (
+            "The vaults were sealed by masons who did not trust the living, so "
+            "they bound one of their own to each door. The Elder Warden has "
+            "stood beside the seal for longer than the kingdom above has had a "
+            "name. It does not hate you. It simply remembers the oath, and the "
+            "oath does not know your face."
+        ),
+    },
 ]
 
 LORE_BY_ID: Dict[str, Dict[str, str]] = {entry["id"]: entry for entry in LORE_ENTRIES}
@@ -211,6 +223,7 @@ LORE_EVENTS: Dict[str, str] = {
     "omen": "lore_omen",
     "lantern": "lore_lantern",
     "debt": "lore_debt",
+    "warden": "lore_warden",
 }
 
 

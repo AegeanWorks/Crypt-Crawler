@@ -249,6 +249,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Cornered champions are now a threat spike the existing 💀/tooltip telegraphing already hinted at; Swift champions feel fast. Verified by 74 unit tests green (71 + 3 new), `ai_harness.py selftest` exit 0, desktop inspector 57/57 with 0 console errors.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (dual engines kept consistent) and PRINCIPLE-014 (failing-first tests, no weakening).
 
+### ADR-032: Elder Vault Warden (content slice 5)
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: Every sealed vault sat unguarded; the only boss owned the stairs on depth 3, so vault runs had no fight guarding the best loot and the bestiary/lore had no mid-tier boss.
+- **Decision**: New mini-boss as DATA, reachable through the existing sigil→vault progression (no new gate, no victory change): `GUARDIAN_TEMPLATES` table in `crawler/entities.py` (fixed 60 HP / 11 ATK / 3 DEF / Elder affix / amulet_bloodstone), server posts one warden on a deterministic free tile beside the vault from depth 2, engine offline fallback mirrors it, renderer draws a bronze warden (halo, helm, tower shield, halberd), bestiary + `lore_warden`/`warden` event added, warden defeat unlocks the lore and logs the broken oath through the existing champion-kill path (no victory hijack; verified). B4F stays explicitly out of scope.
+- **Consequences**: Vaults now have a 120-XP guardian that Enrages (Slice 4 synergy) when cornered. Verified by failing-first `test_vault_warden_guards_the_seal` (8 seeds, adjacent/champion/stats/no-stack), a seeded scripted kill (champion flow + lore + no victory), and `warden_sprite/fight_desktop.png`. 75 unit tests green, selftest exit 0, full inspector 75/75 with 0 console errors.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-009 (new type plugs into spawn/render/bestiary/lore registries) and PRINCIPLE-014 (gates re-run).
+
 ## License notice cleanup (2026-10-26)
 
 - The license-history notes were removed from README.md and COMMERCIAL.md: the project is offered only under the Aegean Game License 1.1 (AGL-1.1), with commercial use under ACL-1.0.

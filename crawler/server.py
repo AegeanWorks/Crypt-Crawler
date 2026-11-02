@@ -118,6 +118,17 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
                                 spawn_monster("skeleton", ex, ey, depth=depth)
                             )
 
+            # The sealed vault keeps an Elder warden from depth 2 on: a fixed
+            # guardian table, posted on a deterministic free tile beside the
+            # vault so every seed agrees where the fight waits.
+            if depth >= 2 and dungeon.vault:
+                vx, vy = dungeon.vault
+                for wx, wy in ((vx + 1, vy), (vx - 1, vy), (vx, vy + 1), (vx, vy - 1)):
+                    if (wx, wy) not in reserved and dungeon.is_walkable(wx, wy):
+                        monsters.append(spawn_monster("vault_warden", wx, wy, depth=depth))
+                        reserved.add((wx, wy))
+                        break
+
             # No two monsters may share a tile: the random roll below is independent
             # per monster and used to stack pairs on one square.
             occupied = {(m.x, m.y) for m in monsters}

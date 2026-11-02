@@ -707,6 +707,7 @@ export class UIController {
       { id: "hound", name: "Crypt Hound", icon: "🐺", desc: "Lunges two tiles a turn and never lets the scent go.", weakness: "Fire / Stun" },
       { id: "mimic", name: "Gilded Mimic", icon: "🦷", desc: "A chest that grew teeth. Opening it springs a fight instead of loot.", weakness: "Fire / Blunt" },
       { id: "boss_lich", name: "Arch-Lich Malakor", icon: "👑", desc: "Lord of the Sunken Crypt. Drains mortal souls to regenerate essence.", weakness: "Crown of Eternity" },
+      { id: "vault_warden", name: "Elder Vault Warden", icon: "🛡️", desc: "Oathbound guardian posted at the sealed vault from depth two. Fights with desperate fury when cornered.", weakness: "Kite / Frost" },
     ];
 
     let bestiaryHtml = "";

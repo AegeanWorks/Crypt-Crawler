@@ -145,6 +145,24 @@ class TestServer(unittest.TestCase):
                 ]
                 self.assertNotIn(tuple(dungeon["stairs_pos"]), others)
 
+    def test_vault_warden_guards_the_seal(self):
+        for seed in (1, 2, 5, 7, 8, 42, 777, 1234):
+            with self.subTest(seed=seed):
+                url = f"{self.base_url}/api/new-game?seed={seed}&depth=2"
+                with urlopen(url, timeout=3) as response:
+                    data = json.loads(response.read().decode("utf-8"))
+                wardens = [m for m in data["monsters"] if m["type"] == "vault_warden"]
+                self.assertEqual(len(wardens), 1, "one warden per sealed vault")
+                w = wardens[0]
+                self.assertTrue(w["is_champion"])
+                self.assertEqual(w["champion_affix"], "Elder")
+                self.assertEqual((w["hp"], w["attack"], w["defense"]), (60, 11, 3))
+                vx, vy = data["dungeon"]["vault"]
+                self.assertEqual(abs(w["x"] - vx) + abs(w["y"] - vy), 1)
+                # Still no stacking and still clear of every prop tile.
+                tiles = [(m["x"], m["y"]) for m in data["monsters"]]
+                self.assertEqual(len(tiles), len(set(tiles)))
+
     def test_api_new_game_with_class_and_merchant(self):
         url = f"{self.base_url}/api/new-game?seed=101&depth=2&class=rogue"
         with urlopen(url, timeout=3) as response:

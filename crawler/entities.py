@@ -409,6 +409,22 @@ class Monster(Entity):
         }
 
 
+# Mini-boss guardian table: bespoke vault defenders the dungeon reads and
+# validates. Fixed numbers (no depth scale) so the fight is predictable.
+GUARDIAN_TEMPLATES = {
+    "vault_warden": {
+        "name": "Vault Warden",
+        "hp": 60,
+        "attack": 11,
+        "defense": 3,
+        "xp_reward": 120,
+        "gold_reward": 90,
+        "loot_drop": "amulet_bloodstone",
+        "affix": "Elder",
+    },
+}
+
+
 def spawn_monster(
     monster_type: str,
     x: int,
@@ -418,6 +434,23 @@ def spawn_monster(
     champion_affix: Optional[str] = None,
 ) -> Monster:
     scale = 1.0 + (depth - 1) * 0.25
+    if monster_type in GUARDIAN_TEMPLATES:
+        t = GUARDIAN_TEMPLATES[monster_type]
+        affix = t["affix"]
+        return Monster(
+            name=f"{affix} {t['name']}",
+            monster_type=monster_type,
+            x=x,
+            y=y,
+            hp=t["hp"],
+            attack=t["attack"],
+            defense=t["defense"],
+            xp_reward=t["xp_reward"],
+            gold_reward=t["gold_reward"],
+            loot_drop=t["loot_drop"],
+            is_champion=True,
+            champion_affix=affix,
+        )
     if monster_type == "boss_lich":
         return Monster(
             name="Arch-Lich Malakor",
