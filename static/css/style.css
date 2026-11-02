@@ -1780,6 +1780,7 @@ body.crt-active {
 }
 body.reduced-motion .chronicle-log .log-entry,
 body.reduced-motion .gauge-bar-fill.low-hp,
+body.reduced-motion .damage-flash,
 body.reduced-motion .inventory-capacity.full {
   animation: none;
 }

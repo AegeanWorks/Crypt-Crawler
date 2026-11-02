@@ -233,6 +233,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Rooms fill the panel; the pact card in `prop_tooltip_desktop.png` paints fully on-screen above the minimap layer. Verified by `.inspect/slice2-scale/` (75/75 all viewports, 0 console errors) against `.inspect/slice1-sprites/`, 71 unit tests green. Reduced-motion pulse freeze stays deferred to slice 3.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-010 (smaller visible tile count keeps frame cost flat) and PRINCIPLE-014 (gates re-run).
 
+### ADR-030: Animation Freeze for Reduced Motion (visual slice 3)
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: The motion toggle stopped shake and some CSS pulses, but every `Math.sin(timestamp…)` bob/pulse/flicker kept running and `damage-flash` was unbanned, so reduced motion was a partial promise.
+- **Decision**: One freeze in `static/js/renderer.js` (`timestamp = 0` at the top of `render()` when `reducedMotion`, so all sine-driven ambience holds a static pose; transient combat FX still step as feedback) plus `body.reduced-motion .damage-flash { animation: none }` in `static/css/style.css`. No FX scheduler or rule change.
+- **Consequences**: Proven by pixel diff on a live page: motion-on frames 1s apart differ by 67,747 px, motion-off frames are identical (0 px). `.inspect/slice3-motion/` 57/57 desktop, 0 console errors; 71 unit tests green.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-011 (the toggle's promise is now true) and PRINCIPLE-014 (proof script + gates re-run).
+
 ## License notice cleanup (2026-10-26)
 
 - The license-history notes were removed from README.md and COMMERCIAL.md: the project is offered only under the Aegean Game License 1.1 (AGL-1.1), with commercial use under ACL-1.0.

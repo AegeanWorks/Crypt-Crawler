@@ -187,6 +187,12 @@ export class DungeonRenderer {
       }
     }
 
+    // Reduced motion: freeze the animation clock so every sine-driven pulse,
+    // bob, flicker and reticle holds a single static pose. (Shake is already
+    // skipped above; transient combat FX still step because they are feedback,
+    // not ambience.)
+    if (this.reducedMotion) timestamp = 0;
+
     // Camera offset: Center player on screen with dynamic shake
     const camX = Math.floor(w / 2 - player.x * ts - ts / 2 + shakeX);
     const camY = Math.floor(h / 2 - player.y * ts - ts / 2 + shakeY);
