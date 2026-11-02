@@ -241,6 +241,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Proven by pixel diff on a live page: motion-on frames 1s apart differ by 67,747 px, motion-off frames are identical (0 px). `.inspect/slice3-motion/` 57/57 desktop, 0 console errors; 71 unit tests green.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-011 (the toggle's promise is now true) and PRINCIPLE-014 (proof script + gates re-run).
 
+### ADR-031: Champion Enrage and Swift Sprint (mechanics slice 4)
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: Server data spawns all four champion affixes, but only Molten and Vampiric had behaviors in either engine; Swift's +2 attack was a silent stat and its speed fantasy (and any low-HP comeback) did not exist. The rogue Executioner threshold (30%) and the 💀 marker had no monster-side mirror.
+- **Decision**: Two rules, both engines where the logic lives, no visuals: (1) **Enrage** — non-boss champions at or below 30% HP deal +25% attack damage with a fury log line (`crawler/combat.py` `resolve_melee_attack`, `static/js/engine.js` monster attack branch; boss keeps its own phase pattern). (2) **Swift sprint** — Swift-affix champions close two tiles per turn like hounds (`engine.js` move branch; movement lives only in the shipped engine). Failing-first: new `TestChampionDepth` unit tests (exact 1.25× under identical seeds, boundary, non-champion exclusion) failed before, pass after; a seeded Playwright probe failed before (`ENRAGE: FAIL`, `SWIFT: FAIL d0=4 d1=3`) and passes after (fury log + 20 damage; `d0=4 d1=2`).
+- **Consequences**: Cornered champions are now a threat spike the existing 💀/tooltip telegraphing already hinted at; Swift champions feel fast. Verified by 74 unit tests green (71 + 3 new), `ai_harness.py selftest` exit 0, desktop inspector 57/57 with 0 console errors.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (dual engines kept consistent) and PRINCIPLE-014 (failing-first tests, no weakening).
+
 ## License notice cleanup (2026-10-26)
 
 - The license-history notes were removed from README.md and COMMERCIAL.md: the project is offered only under the Aegean Game License 1.1 (AGL-1.1), with commercial use under ACL-1.0.

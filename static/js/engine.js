@@ -2523,10 +2523,15 @@ export class GameEngine {
       // If adjacent: attack player
       if (Math.abs(monster.x - this.player.x) + Math.abs(monster.y - this.player.y) === 1) {
         const baseDmg = Math.max(1, monster.attack - this.player.defense);
-        const dmg = Math.max(
+        let dmg = Math.max(
           1,
           Math.floor(baseDmg * (0.8 + Math.random() * 0.4) * (this.omen?.atkMult || 1))
         );
+        // Champion Enrage: cornered champions (below 30% HP, non-boss)
+        // strike with desperate fury for +25% damage.
+        const enraged = !monster.is_boss && monster.is_champion
+          && monster.max_hp > 0 && monster.hp <= monster.max_hp * 0.3;
+        if (enraged) dmg = Math.floor(dmg * 1.25);
         this.player.hp = Math.max(0, this.player.hp - dmg);
         this.player._hitFlash = performance.now();
         sounds.playHit(false);
@@ -2538,6 +2543,10 @@ export class GameEngine {
         this.renderer.addSlash(this.player.x, this.player.y);
         this.renderer.addFloatingText(`-${dmg}`, this.player.x, this.player.y, "#ff3333");
         this.ui.logMessage(`${monster.name} attacks you for ${dmg} damage!`, "hit");
+        if (enraged) {
+          this.renderer.addFloatingText("ENRAGED!", monster.x, monster.y, "#fc8181");
+          this.ui.logMessage(`💢 ${monster.name} fights with desperate fury!`, "hit");
+        }
 
         // Check Near-Miss Adrenaline Surge on surviving heavy combat blow
         if (this.player.hp > 0 && this.player.hp <= Math.floor(this.player.max_hp * 0.28) && dmg >= 6) {
@@ -2563,9 +2572,10 @@ export class GameEngine {
           this.ui.logMessage(`🪙 Sneaky Goblin stole ${stolen} gold from your coin pouch!`, "hit");
         }
       } else if (isVisible && dist <= 7) {
-        // Step toward player; a hound lunges two tiles per turn.
+        // Step toward player; hounds lunge and Swift champions sprint,
+        // closing two tiles per turn.
         this._stepToward(monster);
-        if (monster.type === "hound") this._stepToward(monster);
+        if (monster.type === "hound" || monster.champion_affix === "Swift") this._stepToward(monster);
       }
     }
     if (newMonsters.length) this.monsters.push(...newMonsters);

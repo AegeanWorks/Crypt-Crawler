@@ -324,5 +324,40 @@ class TestCombat(unittest.TestCase):
         self.assertEqual(self.player.effective_defense, base_def + 6)
 
 
+class TestChampionDepth(unittest.TestCase):
+    """Slice 4: champions fight back harder when cornered (Enrage)."""
+
+    def _champion(self):
+        return spawn_monster("skeleton", x=5, y=6, depth=1, is_champion=True, champion_affix="Swift")
+
+    def test_champion_enrage_bonus_at_low_hp(self):
+        champ = self._champion()
+        champ.hp = champ.max_hp * 3 // 10  # exactly 30%: cornered
+        probe_hero = Player(name="Probe", x=5, y=5)
+        res = resolve_melee_attack(champ, probe_hero, random.Random(7))
+
+        control = self._champion()
+        control.hp = control.max_hp  # healthy: no bonus
+        control_hero = Player(name="Control", x=5, y=5)
+        base = resolve_melee_attack(control, control_hero, random.Random(7))
+
+        self.assertTrue(any("fury" in m for m in res.messages))
+        self.assertEqual(res.damage_dealt, int(base.damage_dealt * 1.25))
+
+    def test_no_enrage_above_threshold(self):
+        champ = self._champion()
+        champ.hp = champ.max_hp * 3 // 10 + 1  # just above 30%
+        hero = Player(name="Healthy", x=5, y=5)
+        res = resolve_melee_attack(champ, hero, random.Random(7))
+        self.assertFalse(any("fury" in m for m in res.messages))
+
+    def test_no_enrage_for_common_foes(self):
+        mob = spawn_monster("skeleton", x=5, y=6, depth=1)
+        mob.hp = 1  # far below 30% but not a champion
+        hero = Player(name="Common", x=5, y=5)
+        res = resolve_melee_attack(mob, hero, random.Random(7))
+        self.assertFalse(any("fury" in m for m in res.messages))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -49,12 +49,27 @@ def resolve_melee_attack(
     if is_crit:
         damage = int(damage * 1.5)
 
+    # Champion Enrage: cornered champions (below 30% HP) strike with
+    # desperate fury for +25% damage. Bosses have their own phase pattern.
+    attacker_monster = attacker if isinstance(attacker, Monster) else None
+    enraged = (
+        attacker_monster is not None
+        and attacker_monster.is_champion
+        and not attacker_monster.is_boss
+        and attacker_monster.max_hp > 0
+        and attacker_monster.hp <= attacker_monster.max_hp * 0.3
+    )
+    if enraged:
+        damage = int(damage * 1.25)
+
     actual_dmg = defender.take_damage(damage)
     killed = not defender.is_alive
 
     msgs: List[str] = []
     crit_txt = "CRITICAL HIT! " if is_crit else ""
     msgs.append(f"{attacker.name} strikes {defender.name} for {crit_txt}{actual_dmg} damage.")
+    if enraged:
+        msgs.append(f"💢 {attacker.name} fights with desperate fury! Enraged strike empowered!")
 
     # Status effect on hit
     if not killed and isinstance(attacker, Monster) and attacker.monster_type == "spider":
