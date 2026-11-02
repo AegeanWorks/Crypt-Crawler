@@ -225,6 +225,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Sprites read at 1x and 4x zoom; badges paint; hits flash. Verified by `.inspect/slice1-sprites/` (57/57 desktop, 0 console errors) side-by-side against `.inspect/stage1-baseline/`, and 71 unit tests green. Tooltip clamp (cardX/cardY + paint-after-minimap) and the reduced-motion pulse freeze are explicitly deferred to slices 2 and 3.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write; badge strings verified by grep) and PRINCIPLE-014 (gates re-run, no test weakened).
 
+### ADR-029: Scale, Light and Tooltip Layering (visual slice 2)
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: Slice-1 sprites read well, but rooms still felt small at 38px tiles; the hover card could slide under the minimap near the top-right (it painted in world space before the screen-space minimap, with an explicit no-clamp comment); torchlight ignored the floor omen.
+- **Decision**: Display-only `static/js/renderer.js` (+ one-line omen pass in `static/js/engine.js` loop, no rule change): `tileSize` 38 → 46 (camera, culling and picking derive from it, so no layout rewrite); hover tooltip moved after `restore()` + minimap into screen space with camera-offset re-applied and card clamped to the canvas; minimap 100×70 → 120×84 with 4px player blip; torchlight takes the omen id (Deep Fog chokes throw to 0.72× with a hotter core, Blood Moon rims ember-red, Gilded warms gold).
+- **Consequences**: Rooms fill the panel; the pact card in `prop_tooltip_desktop.png` paints fully on-screen above the minimap layer. Verified by `.inspect/slice2-scale/` (75/75 all viewports, 0 console errors) against `.inspect/slice1-sprites/`, 71 unit tests green. Reduced-motion pulse freeze stays deferred to slice 3.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-010 (smaller visible tile count keeps frame cost flat) and PRINCIPLE-014 (gates re-run).
+
 ## License notice cleanup (2026-10-26)
 
 - The license-history notes were removed from README.md and COMMERCIAL.md: the project is offered only under the Aegean Game License 1.1 (AGL-1.1), with commercial use under ACL-1.0.

@@ -9,7 +9,7 @@ export class DungeonRenderer {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    this.tileSize = 38;
+    this.tileSize = 46;
     this.floatingTexts = [];
     this.particles = [];
     this.slashes = [];
@@ -161,7 +161,7 @@ export class DungeonRenderer {
     });
   }
 
-  render(dungeon, player, monsters, timestamp = 0) {
+  render(dungeon, player, monsters, timestamp = 0, omenId = null) {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
@@ -307,7 +307,7 @@ export class DungeonRenderer {
     this._drawPlayer(ctx, player, ts, timestamp);
 
     // 5. Dynamic Torchlight / Radial Lighting
-    this._drawTorchlight(ctx, player, ts, timestamp, biome);
+    this._drawTorchlight(ctx, player, ts, timestamp, biome, omenId);
 
     // 6. Draw Visual FX (Slashes, Shockwaves, Projectiles, Particles, Floating Text)
     this._renderSlashes(ctx);
@@ -316,15 +316,19 @@ export class DungeonRenderer {
     this._renderParticles(ctx);
     this._renderFloatingTexts(ctx);
 
-    // 6.5 Draw Hover Tooltip for Monster or Interactive Prop
-    if (this.hoverTile && dungeon.isVisible(this.hoverTile.x, this.hoverTile.y)) {
-      this._drawHoverTooltip(ctx, this.hoverTile.x, this.hoverTile.y, ts, monsters, dungeon, player);
-    }
-
     ctx.restore();
 
     // 7. Render Radar Minimap in top-right HUD
     this._drawMinimap(ctx, dungeon, player, monsters);
+
+    // 8. Draw Hover Tooltip last in screen space so it always paints above
+    // the minimap instead of sliding underneath it near the top-right.
+    if (this.hoverTile && dungeon.isVisible(this.hoverTile.x, this.hoverTile.y)) {
+      this._drawHoverTooltip(
+        ctx, this.hoverTile.x, this.hoverTile.y, ts, monsters, dungeon, player,
+        camX, camY, w, h
+      );
+    }
   }
 
   _drawTile(ctx, tile, x, y, ts, isVis, timestamp, biome = "crypt") {
@@ -1899,9 +1903,12 @@ export class DungeonRenderer {
     ctx.restore();
   }
 
-  _drawTorchlight(ctx, player, ts, timestamp, biome = "crypt") {
+  _drawTorchlight(ctx, player, ts, timestamp, biome = "crypt", omenId = null) {
     const flicker = Math.sin(timestamp * 0.006) * 6 + Math.cos(timestamp * 0.015) * 4;
-    const radius = Math.max(170, 250 + flicker);
+    // Deep Fog shortens the throw but burns a hotter core: the lantern feels
+    // choked rather than simply dimmed. Blood Moon tints the rim ember-red.
+    const fogChoke = omenId === "deep_fog" ? 0.72 : 1;
+    const radius = Math.max(170, (250 + flicker) * fogChoke);
 
     const cx = player.x * ts + ts / 2;
     const cy = player.y * ts + ts / 2;
@@ -1909,7 +1916,9 @@ export class DungeonRenderer {
     // Hot core: a tight warm pool directly around the hero so the sprite reads
     // against dark floors even at low lantern radii (Deep Fog omen).
     const core = ctx.createRadialGradient(cx, cy, 4, cx, cy, ts * 1.8);
-    if (biome === "cavern") {
+    if (omenId === "deep_fog") {
+      core.addColorStop(0, "rgba(255, 236, 180, 0.44)");
+    } else if (biome === "cavern") {
       core.addColorStop(0, "rgba(129, 230, 217, 0.30)");
     } else if (biome === "inferno") {
       core.addColorStop(0, "rgba(246, 173, 85, 0.32)");
@@ -1933,6 +1942,12 @@ export class DungeonRenderer {
     } else {
       grad.addColorStop(0, "rgba(255, 210, 120, 0.21)");
       grad.addColorStop(0.5, "rgba(230, 150, 40, 0.08)");
+    }
+    if (omenId === "blood_moon") {
+      grad.addColorStop(0.85, "rgba(229, 62, 62, 0.10)");
+    }
+    if (omenId === "gilded_crypt") {
+      grad.addColorStop(0.7, "rgba(236, 201, 75, 0.07)");
     }
     grad.addColorStop(1, "rgba(0, 0, 0, 0)");
 
@@ -2074,8 +2089,8 @@ export class DungeonRenderer {
   }
 
   _drawMinimap(ctx, dungeon, player, monsters) {
-    const mw = 100;
-    const mh = 70;
+    const mw = 120;
+    const mh = 84;
     const mx = this.canvas.width - mw - 10;
     const my = 10;
 
@@ -2139,7 +2154,7 @@ export class DungeonRenderer {
 
     // Player blip
     ctx.fillStyle = "#48bb78";
-    ctx.fillRect(mx + player.x * scaleX - 1, my + player.y * scaleY - 1, 3, 3);
+    ctx.fillRect(mx + player.x * scaleX - 1.5, my + player.y * scaleY - 1.5, 4, 4);
 
     ctx.restore();
   }
@@ -2190,10 +2205,21 @@ export class DungeonRenderer {
     ctx.restore();
   }
 
-  _drawHoverTooltip(ctx, tx, ty, ts, monsters, dungeon, player = null) {
+  _drawHoverTooltip(ctx, tx, ty, ts, monsters, dungeon, player = null, ox = 0, oy = 0, vw = 0, vh = 0) {
     const monster = monsters.find((m) => m.x === tx && m.y === ty && m.hp > 0);
-    const px = tx * ts;
-    const py = ty * ts;
+    // Screen-space anchor: the render loop translates the camera before props
+    // but this card now paints after restore, so re-apply the offset here.
+    const px = tx * ts + ox;
+    const py = ty * ts + oy;
+    const clampCard = (x, y, cardW, cardH) => {
+      if (vw > 0 && vh > 0) {
+        return [
+          Math.min(Math.max(4, x), Math.max(4, vw - cardW - 4)),
+          Math.min(Math.max(4, y), Math.max(4, vh - cardH - 4)),
+        ];
+      }
+      return [x, y];
+    };
 
     if (monster) {
       ctx.save();
@@ -2216,8 +2242,7 @@ export class DungeonRenderer {
       const affix = monster.champion_affix || (monster.is_boss ? "Boss" : "");
       const cardW = 148;
       const cardH = (effects.length ? 62 : 50) + (preview ? 13 : 0);
-      const cardX = px + ts / 2 - cardW / 2;
-      const cardY = py - cardH - 10;
+      const [cardX, cardY] = clampCard(px + ts / 2 - cardW / 2, py - cardH - 10, cardW, cardH);
 
       ctx.fillStyle = "rgba(10, 14, 22, 0.94)";
       ctx.strokeStyle = monster.is_champion ? "#d69e2e" : (monster.is_boss ? "#9f7aea" : "#4a5568");
@@ -2282,10 +2307,7 @@ export class DungeonRenderer {
     if (prop) {
       const cardW = 176;
       const cardH = 58;
-      // World coordinates: the caller has already applied the camera translation, so a
-      // screen-space clamp here would draw the card far from the prop it explains.
-      const cardX = px + ts / 2 - cardW / 2;
-      const cardY = py - cardH - 10;
+      const [cardX, cardY] = clampCard(px + ts / 2 - cardW / 2, py - cardH - 10, cardW, cardH);
       ctx.save();
       ctx.fillStyle = "rgba(10, 14, 22, 0.94)";
       ctx.strokeStyle = prop.border;

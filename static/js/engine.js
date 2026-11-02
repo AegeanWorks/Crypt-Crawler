@@ -222,7 +222,7 @@ export class GameEngine {
   _startRenderLoop() {
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     const loop = (ts) => {
-      this.renderer.render(this.dungeon, this.player, this.monsters, ts);
+      this.renderer.render(this.dungeon, this.player, this.monsters, ts, this.omen && this.omen.id);
       this.animFrameId = requestAnimationFrame(loop);
     };
     this.animFrameId = requestAnimationFrame(loop);
