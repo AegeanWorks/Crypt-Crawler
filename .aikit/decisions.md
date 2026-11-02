@@ -276,3 +276,10 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Decision**: crawler/foundry_packs.py loads packs/*.json (pack_version 1.x, boss_id pattern, stat bands, depth-3 stairs replacing boss_lich only) into BOSS_TEMPLATES, skipping bad packs with a recorded error (never raises); server.py spawns the claiming pack boss instead of the lich for claimed (depth, seed). Installed packs are data files under packs/.
 - **Consequences**: Exactly 1 boss on the stairs is preserved, so the depth-3 guard test and validate_fairness.py stay green. Per-pack content needs no code changes; loader changes are versioned integration work. Proof: tests/test_foundry_packs.py (7 tests).
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write, call-site grep) and PRINCIPLE-009 (adapter at the boundary).
+
+### ADR-035: Re-shoot the gameplay keeper at HEAD; correct the black-canvas review note
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: The README showed only the 2026-10-28 capture whose center canvas is pitch black, while the fixed 2026-10-31 torchlit keeper was never wired in; the 10-28 review note described a different game (netrunner/breach), and 614 lines of renderer/engine drift landed since 10-31.
+- **Decision**: Keep the 10-28 file as before-evidence with a corrected note (score 40, failure documented); show 2026-10-31 (the after) plus a fresh 2026-11-03 capture (plain `python -m http.server` on `static/`, headless Edge 1440x900, commit `c9cfd16`) in the README `aegean:screenshots` block and `.aikit/media.json`.
+- **Consequences**: README proves the renderer rework kept the layout intact. Reproduce with: serve `static/`, headless `--screenshot --window-size=1440,900` on `index.html`.

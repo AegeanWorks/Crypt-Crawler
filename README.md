@@ -187,7 +187,9 @@ Free for personal play under the Aegean Game License 1.1 (AGL-1.1); see [LICENSE
 <!-- aegean:screenshots:start -->
 ## Screenshots
 
-<a href="https://github.com/AegeanWorks/Crypt-Crawler/commit/941f16f"><img src="assets/screenshots/2026-10-28-index.png" alt="Crypt-Crawler interface at 2026-10-28"></a>
+<a href="https://github.com/AegeanWorks/Crypt-Crawler/commit/1b9f612"><img src="assets/screenshots/2026-10-31-index.png" alt="Crypt-Crawler interface at 2026-10-31"></a>
 
-*commit `941f16f` · 2026-10-28*
+<a href="https://github.com/AegeanWorks/Crypt-Crawler/commit/c9cfd16"><img src="assets/screenshots/2026-11-03-index.png" alt="Crypt-Crawler interface at 2026-11-03"></a>
+
+*commit `c9cfd16` · 2026-11-03 · viewport 1440x900 · the 2026-10-28 black-canvas capture was the before, 2026-10-31 the after; 2026-11-03 confirms the renderer rework*
 <!-- aegean:screenshots:end -->
