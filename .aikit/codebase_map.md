@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `19`
-- **Total Classes**: `26`
+- **Total Classes**: `27`
 - **Total Top-Level Functions**: `40`
-- **Total Class Methods**: `134`
-- **Total Source Lines**: `6976`
+- **Total Class Methods**: `139`
+- **Total Source Lines**: `7101`
 
 ---
 
@@ -26,7 +26,7 @@
 ### [`crawler/combat.py`](crawler/combat.py)
 > *Turn-based tactical combat resolution for Crypt-Crawler.*
 
-**Size**: `489` lines (`17046` bytes)
+**Size**: `504` lines (`17679` bytes)
 
 **Classes:**
 - `class CombatResult`
@@ -79,7 +79,7 @@
 ### [`crawler/entities.py`](crawler/entities.py)
 > *Entities, items, inventory and stats for Crypt-Crawler.*
 
-**Size**: `750` lines (`24590` bytes)
+**Size**: `783` lines (`25543` bytes)
 
 **Classes:**
 - `class Item`
@@ -119,7 +119,7 @@
 ### [`crawler/lore.py`](crawler/lore.py)
 > *Lore codex: the readable history of the crypt, its relics and its dead.*
 
-**Size**: `234` lines (`8903` bytes)
+**Size**: `247` lines (`9443` bytes)
 
 **Functions:**
 - `def public_entries()` - *Every entry as a fresh dict, safe to serialise to the client.*
@@ -148,7 +148,7 @@
 ### [`crawler/server.py`](crawler/server.py)
 > *Lightweight HTTP server and REST dispatch for Crypt-Crawler.*
 
-**Size**: `194` lines (`8039` bytes)
+**Size**: `205` lines (`8681` bytes)
 
 **Classes:**
 - `class CryptCrawlerHandler`
@@ -219,7 +219,7 @@
 ### [`tests/test_combat.py`](tests/test_combat.py)
 > *Unit tests for combat, leveling and inventory management.*
 
-**Size**: `328` lines (`13272` bytes)
+**Size**: `363` lines (`14819` bytes)
 
 **Classes:**
 - `class TestCombat`
@@ -245,6 +245,11 @@
   - Method `.test_max_pool_equipment_caps_healing_and_clamps_on_unequip()`
   - Method `.test_expanded_catalog_merchant_stock_and_save_slots()`
   - Method `.test_divine_aegis_draught_potion()`
+- `class TestChampionDepth` - *Slice 4: champions fight back harder when cornered (Enrage).*
+  - Method `._champion()`
+  - Method `.test_champion_enrage_bonus_at_low_hp()`
+  - Method `.test_no_enrage_above_threshold()`
+  - Method `.test_no_enrage_for_common_foes()`
 
 ---
 
@@ -316,7 +321,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit tests for the Crypt-Crawler HTTP server and API endpoints.*
 
-**Size**: `166` lines (`7450` bytes)
+**Size**: `184` lines (`8519` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -332,6 +337,7 @@
   - Method `.test_no_two_monsters_share_a_tile()`
   - Method `.test_new_mobs_start_at_depth_two()`
   - Method `.test_depth_three_boss_guards_the_stairs()`
+  - Method `.test_vault_warden_guards_the_seal()`
   - Method `.test_api_new_game_with_class_and_merchant()`
 
 ---
