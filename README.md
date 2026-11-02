@@ -139,7 +139,9 @@ crypt-crawler/
 │   ├── combat.py             <- combat calculations and status effects
 │   ├── lore.py               <- codex entries, pact altars and discovery events
 │   ├── rewards.py            <- variable-ratio jackpots, near-miss & bounties
+│   ├── foundry_packs.py      <- foundry boss-pack loader (packs are data installs)
 │   └── server.py             <- HTTP request handler & REST endpoints
+├── packs/                   <- installed foundry boss packs (JSON data)
 ├── static/                   <- Web UI assets (zero build step)
 │   ├── index.html            <- modern responsive HTML5 shell
 │   ├── css/
@@ -153,12 +155,18 @@ crypt-crawler/
 ├── tools/
 │   ├── inspect_ui.py         <- Playwright headless Edge UI inspector
 │   ├── ai_harness.py         <- seeded JSON gameplay harness for agents
+│   ├── record_replay.py      <- pins replay hashes for seed x depth combos
+│   ├── validate_fairness.py  <- rejects unwinnable/unfair seeds
+│   ├── verify_replay.py      <- checks live dungeons against pinned hashes
+│   ├── replay_transcripts/   <- pinned replay hashes (pins.json)
 │   └── ui_inventory.py       <- deterministic control/handler inventory
 ├── tests/
 │   ├── __init__.py
 │   ├── test_ai_harness.py    <- harness validation and UI inventory tests
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_dungeon.py       <- procedural generation tests
+│   ├── test_fairness.py      <- fairness validator tests
+│   ├── test_foundry_packs.py <- foundry pack integration tests
 │   ├── test_inspect.py       <- inspection configuration tests
 │   ├── test_lore.py          <- codex data and /api/lore endpoint tests
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests

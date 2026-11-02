@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `19`
-- **Total Classes**: `27`
-- **Total Top-Level Functions**: `40`
-- **Total Class Methods**: `139`
-- **Total Source Lines**: `7101`
+- **Total Python Modules**: `25`
+- **Total Classes**: `29`
+- **Total Top-Level Functions**: `52`
+- **Total Class Methods**: `151`
+- **Total Source Lines**: `7790`
 
 ---
 
@@ -47,7 +47,7 @@
 ### [`crawler/dungeon.py`](crawler/dungeon.py)
 > *Procedural dungeon generation and grid management for Crypt-Crawler.*
 
-**Size**: `485` lines (`17751` bytes)
+**Size**: `550` lines (`21037` bytes)
 
 **Classes:**
 - `class TileType`
@@ -74,12 +74,15 @@
   - Method `._carve_h(dungeon, x1, x2, y)`
   - Method `._carve_v(dungeon, y1, y2, x)`
 
+**Functions:**
+- `def omen_for(seed, depth)` - *Python mirror of engine.js omenFor, extended to six omens.*
+
 ---
 
 ### [`crawler/entities.py`](crawler/entities.py)
 > *Entities, items, inventory and stats for Crypt-Crawler.*
 
-**Size**: `783` lines (`25543` bytes)
+**Size**: `829` lines (`26988` bytes)
 
 **Classes:**
 - `class Item`
@@ -116,10 +119,26 @@
 
 ---
 
+### [`crawler/foundry_packs.py`](crawler/foundry_packs.py)
+> *Foundry pack loader: the consumer-side half of the versioned adapter.*
+
+**Size**: `171` lines (`6184` bytes)
+
+**Functions:**
+- `def pack_load_errors()` - *Recorded pack problems, each naming file + field + reason.*
+- `def foundry_bosses()` - *boss_id -> BOSS_TEMPLATES-shaped entry for every clean pack.*
+- `def spawn_for(depth, seed)` - *boss_id claiming (depth, seed), or None when the canon keeps it.*
+- `def _fail(path, field, reason)`
+- `def _check_pack(path, pack)`
+- `def _ensure_loaded()`
+- `def reset_cache()` - *Test hook: forget loaded packs and errors so a patched PACKS_DIR re-reads.*
+
+---
+
 ### [`crawler/lore.py`](crawler/lore.py)
 > *Lore codex: the readable history of the crypt, its relics and its dead.*
 
-**Size**: `247` lines (`9443` bytes)
+**Size**: `280` lines (`10617` bytes)
 
 **Functions:**
 - `def public_entries()` - *Every entry as a fresh dict, safe to serialise to the client.*
@@ -132,14 +151,14 @@
 ### [`crawler/rewards.py`](crawler/rewards.py)
 > *Variable-ratio reward engine, dopamine loot schedules, and near-miss mechanics for Crypt-Crawler.*
 
-**Size**: `166` lines (`5644` bytes)
+**Size**: `171` lines (`6178` bytes)
 
 **Classes:**
 - `class RewardType`
 
 **Functions:**
-- `def roll_chest_reward(depth, rng)` - *Calculate variable-ratio reward payout and drops for opening chests (Skinner box reinforcement schedule).*
-- `def roll_urn_reward(depth, rng)` - *Variable-ratio coin and surprise relic payout when shattering burial urns.*
+- `def roll_chest_reward(depth, rng, gold_mult)` - *Calculate variable-ratio reward payout and drops for opening chests (Skinner box reinforcement schedule).*
+- `def roll_urn_reward(depth, rng, gold_mult)` - *Variable-ratio coin and surprise relic payout when shattering burial urns.*
 - `def check_near_miss_survival(current_hp, max_hp, damage_taken)` - *Near-miss feedback engine (Clark et al. 2009).*
 - `def generate_dungeon_bounties(depth, seed)` - *Generate 3 active contract bounties per floor (Zeigarnik Effect).*
 
@@ -148,7 +167,7 @@
 ### [`crawler/server.py`](crawler/server.py)
 > *Lightweight HTTP server and REST dispatch for Crypt-Crawler.*
 
-**Size**: `205` lines (`8681` bytes)
+**Size**: `224` lines (`9976` bytes)
 
 **Classes:**
 - `class CryptCrawlerHandler`
@@ -274,6 +293,41 @@
 
 ---
 
+### [`tests/test_fairness.py`](tests/test_fairness.py)
+> *Fairness validator tests: fair seeds pass, broken maps are rejected.*
+
+**Size**: `53` lines (`2260` bytes)
+
+**Classes:**
+- `class TestFairness`
+  - Method `.test_known_good_seeds_are_fair()`
+  - Method `.test_degenerate_maps_stay_fair()`
+  - Method `.test_room_themes_and_trap_variants_come_from_data()`
+  - Method `.test_omen_is_deterministic_and_covers_new_moods()`
+  - Method `.test_rejects_unwinnable_map()`
+
+---
+
+### [`tests/test_foundry_packs.py`](tests/test_foundry_packs.py)
+> *Foundry pack integration: installed packs load and take their posts.*
+
+**Size**: `84` lines (`3386` bytes)
+
+**Classes:**
+- `class TestFoundryPackLoading`
+  - Method `.test_installed_packs_registered()`
+  - Method `.test_installed_packs_clean()`
+  - Method `.test_spawn_claims_own_seed()`
+  - Method `.test_unclaimed_seed_keeps_canon()`
+  - Method `.test_pack_boss_takes_stairs_alone()`
+  - Method `.test_control_seed_still_lich()`
+  - Method `.test_bad_pack_skipped_loudly()`
+
+**Functions:**
+- `def fetch(seed, depth)`
+
+---
+
 ### [`tests/test_inspect.py`](tests/test_inspect.py)
 > *Unit tests for headless inspection configuration and viewports.*
 
@@ -345,7 +399,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `1849` lines (`76642` bytes)
+**Size**: `1855` lines (`76983` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*
@@ -382,6 +436,11 @@
 
 ---
 
+### [`tools/record_replay.py`](tools/record_replay.py)
+**Size**: `21` lines (`1017` bytes)
+
+---
+
 ### [`tools/ui_inventory.py`](tools/ui_inventory.py)
 > *Deterministic UI inventory for the AIKit UI guard (`.aikit/ui.json`).*
 
@@ -398,5 +457,22 @@
 - `def _theme_entries(path)`
 - `def inventory(root)` - *Sorted, deduplicated inventory lines for every shipped UI surface.*
 - `def main(argv)`
+
+---
+
+### [`tools/validate_fairness.py`](tools/validate_fairness.py)
+> *Fairness validator for Crypt-Crawler: rejects unwinnable/unfair seeds.*
+
+**Size**: `167` lines (`7358` bytes)
+
+**Functions:**
+- `def _validate_dungeon(dungeon, depth)`
+- `def validate_seed(seed, depth)` - *Validate generator output plus server monster placement for one seed/depth.*
+- `def main(argv)`
+
+---
+
+### [`tools/verify_replay.py`](tools/verify_replay.py)
+**Size**: `19` lines (`1063` bytes)
 
 ---

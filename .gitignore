@@ -17,3 +17,5 @@ Thumbs.db
 .aikit/reforge.reviews/
 .aikit/ui_task.json
 node_modules/
+# AIKit transient state
+.aikit/*.log

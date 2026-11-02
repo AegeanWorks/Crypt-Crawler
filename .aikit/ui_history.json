@@ -255,5 +255,19 @@
     "final_snapshot_digest": "b1207d9a0ef093d2011922af975684be102982d3d4f6cfc6d862f9ea81e8c29c",
     "final_snapshot_entries": 198,
     "surface_digest": "42e2733a5cf5d48d601d2ab3475b6b8636f16feff95ec334cf24f6ed3c3ad7eb"
+  },
+  {
+    "schema": 1,
+    "surface": "game-ui",
+    "baseline_commit": "e595cab82ee6d1748da624ed0761e853445c0a64",
+    "contract_hash": "9c09d581a8113b4ea0b7dd817a3e4369c216cae42c2aed582dc88029728687fc",
+    "started_at": 1793655247.8758788,
+    "finished_at": 1793655746.332528,
+    "strikes": 0,
+    "reviewer": "\\headless inspector 75/75 0-errors final-check plus vision review dungeon/mobile/class/zoom/tooltip/merchant/warden\"",
+    "allowed_removals": [],
+    "final_snapshot_digest": "15305e8e70483e9af3a2b1604a4d763e452493868d4bf0bc924473e42b4d93f6",
+    "final_snapshot_entries": 198,
+    "surface_digest": "2e9f1ed1b6c95a34a3d2473545eaae04f0744b11f767d5481fb93f1b56ae0a5c"
   }
 ]
