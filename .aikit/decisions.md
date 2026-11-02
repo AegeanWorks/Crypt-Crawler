@@ -268,3 +268,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 ## License notice cleanup (2026-10-26)
 
 - The license-history notes were removed from README.md and COMMERCIAL.md: the project is offered only under the Aegean Game License 1.1 (AGL-1.1), with commercial use under ACL-1.0.
+
+### ADR-034: Foundry pack loader (one-time adapter, data-after)
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: Foundry (projects/foundry) generates versioned boss packs; the game had no JSON pack loading and hardcoded spawn sites, so packs could not land without an integration seam.
+- **Decision**: crawler/foundry_packs.py loads packs/*.json (pack_version 1.x, boss_id pattern, stat bands, depth-3 stairs replacing boss_lich only) into BOSS_TEMPLATES, skipping bad packs with a recorded error (never raises); server.py spawns the claiming pack boss instead of the lich for claimed (depth, seed). Installed packs are data files under packs/.
+- **Consequences**: Exactly 1 boss on the stairs is preserved, so the depth-3 guard test and validate_fairness.py stay green. Per-pack content needs no code changes; loader changes are versioned integration work. Proof: tests/test_foundry_packs.py (7 tests).
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write, call-site grep) and PRINCIPLE-009 (adapter at the boundary).
