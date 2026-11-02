@@ -1552,6 +1552,7 @@ export class GameEngine {
     dmg = Math.floor(dmg * this._classAttackMultiplier(monster));
 
     monster.hp = Math.max(0, monster.hp - dmg);
+    monster._hitFlash = performance.now();
     sounds.playHit(isCrit);
 
     if (isCrit) {
@@ -2511,6 +2512,7 @@ export class GameEngine {
           Math.floor(baseDmg * (0.8 + Math.random() * 0.4) * (this.omen?.atkMult || 1))
         );
         this.player.hp = Math.max(0, this.player.hp - dmg);
+        this.player._hitFlash = performance.now();
         sounds.playHit(false);
         this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#e2e8f0");
         this.renderer.addFloatingText(`-${dmg}`, this.player.x, this.player.y, "#ff3333");
@@ -2526,6 +2528,7 @@ export class GameEngine {
           Math.floor(baseDmg * (0.8 + Math.random() * 0.4) * (this.omen?.atkMult || 1))
         );
         this.player.hp = Math.max(0, this.player.hp - dmg);
+        this.player._hitFlash = performance.now();
         sounds.playHit(false);
 
         if (dmg >= 8) {

@@ -318,7 +318,7 @@ export class DungeonRenderer {
 
     // 6.5 Draw Hover Tooltip for Monster or Interactive Prop
     if (this.hoverTile && dungeon.isVisible(this.hoverTile.x, this.hoverTile.y)) {
-      this._drawHoverTooltip(ctx, this.hoverTile.x, this.hoverTile.y, ts, monsters, dungeon);
+      this._drawHoverTooltip(ctx, this.hoverTile.x, this.hoverTile.y, ts, monsters, dungeon, player);
     }
 
     ctx.restore();
@@ -361,6 +361,14 @@ export class DungeonRenderer {
         ctx.strokeStyle = isVis ? "#363f52" : "#1e2330";
         ctx.lineWidth = 1;
         ctx.strokeRect(px + 1, py + 1, ts - 2, ts - 2);
+        // Top bevel catch-light: sells stacked-stone depth when the lantern grazes walls.
+        ctx.strokeStyle = isVis ? "rgba(226, 232, 240, 0.16)" : "rgba(160, 174, 192, 0.07)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(px + 1, py + 1.5);
+        ctx.lineTo(px + ts - 1, py + 1.5);
+        ctx.stroke();
+        ctx.strokeStyle = isVis ? "#363f52" : "#1e2330";
         ctx.beginPath();
         ctx.moveTo(px, py + ts / 2);
         ctx.lineTo(px + ts, py + ts / 2);
@@ -431,6 +439,27 @@ export class DungeonRenderer {
           ctx.arc(px + 8, py + 8, 2, 0, Math.PI * 2);
           ctx.arc(px + 12, py + 9, 1.5, 0, Math.PI * 2);
           ctx.fill();
+        }
+        if (tile === TileType.FLOOR) {
+          // Deterministic hairline cracks: hash tile coords so the pattern is
+          // stable frame-to-frame (never Math.random here — it would shimmer).
+          const h = ((x * 73856093) ^ (y * 19349663)) >>> 0;
+          if (h % 7 === 0) {
+            ctx.strokeStyle = isVis ? "rgba(0, 0, 0, 0.45)" : "rgba(0, 0, 0, 0.3)";
+            ctx.lineWidth = 1;
+            const off = (h >> 3) % 12;
+            ctx.beginPath();
+            ctx.moveTo(px + 6 + off, py + 6);
+            ctx.lineTo(px + 14 + off * 0.4, py + 16);
+            ctx.lineTo(px + 10 + off * 0.7, py + 26);
+            ctx.stroke();
+          } else if (h % 11 === 0) {
+            ctx.fillStyle = isVis ? "rgba(160, 174, 192, 0.20)" : "rgba(160, 174, 192, 0.08)";
+            const sx = px + 8 + ((h >> 5) % 18);
+            const sy = py + 10 + ((h >> 9) % 14);
+            ctx.fillRect(sx, sy, 2, 1.5);
+            ctx.fillRect(sx + 4, sy + 3, 1.5, 1.5);
+          }
         }
       }
 
@@ -905,9 +934,31 @@ export class DungeonRenderer {
     this._drawInteractMarker(ctx, px + w / 2, py - 4, "#ecc94b", timestamp);
   }
 
+  _drawShadow(ctx, px, py, ts, strength = 0.35) {
+    // Soft grounding ellipse so sprites sit in the scene instead of floating.
+    ctx.save();
+    ctx.fillStyle = `rgba(0, 0, 0, ${strength})`;
+    ctx.beginPath();
+    ctx.ellipse(px + ts / 2, py + ts - 5, ts / 3, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   _drawSconce(ctx, sconce, ts, timestamp, biome = "crypt") {
     const cx = sconce.x * ts + ts / 2;
     const cy = sconce.y * ts + ts - 4;
+    // Warm light pool on the floor around the bracket: sells the lantern-radius fantasy.
+    const haloR = ts * 1.6;
+    const halo = ctx.createRadialGradient(cx, cy - 6, 2, cx, cy - 6, haloR);
+    const haloTint = biome === "cavern" ? "56, 178, 172" : (biome === "inferno" ? "229, 62, 62" : "236, 180, 80");
+    halo.addColorStop(0, `rgba(${haloTint}, 0.28)`);
+    halo.addColorStop(1, `rgba(${haloTint}, 0)`);
+    ctx.save();
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(cx, cy - 6, haloR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
 
     // Iron wall sconce bracket
     ctx.strokeStyle = "#4a5568";
@@ -962,6 +1013,7 @@ export class DungeonRenderer {
     const py = merchant.y * ts;
     const bob = Math.sin(timestamp * 0.004) * 1.5;
 
+    this._drawShadow(ctx, px, py, ts, 0.4);
     ctx.save();
     ctx.translate(0, bob);
 
@@ -1025,6 +1077,7 @@ export class DungeonRenderer {
     const py = monster.y * ts;
     const bob = Math.sin(timestamp * 0.005 + monster.x * 2) * 2;
 
+    this._drawShadow(ctx, px, py, ts, monster.is_boss ? 0.5 : 0.35);
     ctx.save();
     ctx.translate(0, bob);
 
@@ -1302,6 +1355,23 @@ export class DungeonRenderer {
       ctx.fillRect(midX - 2, py + 6.5, 1.6, 1.6);
       ctx.fillRect(midX + 0.4, py + 6.5, 1.6, 1.6);
 
+      // Hood rim-light so the skull separates from the dark cloak at 1x.
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.55)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(midX, py + 8, 4, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+      // Quiver of bone arrows on the back.
+      ctx.fillStyle = "#5c3317";
+      ctx.fillRect(midX - 9, py + 12, 3.5, 9);
+      ctx.fillStyle = "#e2e8f0";
+      ctx.fillRect(midX - 9, py + 10.4, 1.2, 2.4);
+      ctx.fillRect(midX - 7.2, py + 10.4, 1.2, 2.4);
+      // Tattered cloak hem.
+      ctx.fillStyle = "#2f3b2f";
+      ctx.fillRect(px + 8, py + ts - 5, 4, 2.4);
+      ctx.fillRect(px + ts - 12, py + ts - 5, 4, 2.4);
+
       ctx.strokeStyle = "#c05621";
       ctx.lineWidth = 1.6;
       ctx.beginPath();
@@ -1346,11 +1416,32 @@ export class DungeonRenderer {
       ctx.fillStyle = "#f56565";
       ctx.fillRect(px + ts * 0.68, midY - 4, 2, 2);
       ctx.fillRect(px + ts * 0.74, midY - 4, 2, 2);
-      ctx.strokeStyle = "#e2e8f0";
-      ctx.lineWidth = 1.2;
+      // Snout + fangs so the head reads as a hound skull, not a blob.
+      ctx.fillStyle = "#6b5847";
+      ctx.fillRect(px + ts * 0.76, midY - 3, 5, 3.4);
+      ctx.fillStyle = "#f7fafc";
+      ctx.fillRect(px + ts * 0.785, midY - 0.4, 1.2, 1.6);
+      ctx.fillRect(px + ts * 0.815, midY - 0.4, 1.2, 1.6);
+      // Spine ridge: three bone spikes along the back.
+      ctx.fillStyle = "#d6cdb8";
+      for (let s = 0; s < 3; s += 1) {
+        const sx = midX - 6 + s * 5;
+        ctx.beginPath();
+        ctx.moveTo(sx, midY - 1);
+        ctx.lineTo(sx + 2, midY - 5.5);
+        ctx.lineTo(sx + 4, midY - 1);
+        ctx.closePath();
+        ctx.fill();
+      }
+      // Collar band + tag (a band, not a floating ring).
+      ctx.strokeStyle = "#8b1a1a";
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(px + ts * 0.62, midY - 1, 4.5, 0, Math.PI * 2);
+      ctx.moveTo(px + ts * 0.585, midY - 5);
+      ctx.lineTo(px + ts * 0.585, midY + 3);
       ctx.stroke();
+      ctx.fillStyle = "#ecc94b";
+      ctx.fillRect(px + ts * 0.575, midY + 3, 2.2, 2.2);
     } else if (monster.type === "wraith") {
       // Pact-Bound Wraith: a crimson debt given shape. It must read as a different
       // threat from the violet Lost Soul and the grey skeleton at a glance.
@@ -1509,6 +1600,32 @@ export class DungeonRenderer {
       ctx.fillStyle = monster.is_boss ? "#9f7aea" : (hpPct > 0.4 ? "#e53e3e" : "#fc8181");
       ctx.fillRect(barX, barY, Math.floor(barW * hpPct), barH);
     }
+
+    // Telegraph badges: behavior intent + rogue execution threshold, readable at a glance.
+    // Archer hangs back and shoots, hound lunges, boss is the run objective.
+    let intent = null;
+    if (monster.type === "archer") intent = "🏹";
+    else if (monster.type === "hound") intent = "💨";
+    else if (monster.is_boss) intent = "👑";
+    if (intent) {
+      ctx.font = "bold 9px sans-serif";
+      ctx.fillText(intent, px + ts - 12, py + 1);
+    }
+    if (!monster.is_boss && monster.max_hp > 0 && monster.hp > 0 && monster.hp / monster.max_hp <= 0.3) {
+      // Execution range: matches the rogue Executioner passive (+25% below 30%).
+      ctx.font = "bold 9px sans-serif";
+      ctx.fillText("💀", px + 2, py + 1);
+    }
+
+    // Hit flash: engine stamps _hitFlash on damage; a brief white veil sells the impact.
+    if (monster._hitFlash && (timestamp - monster._hitFlash) < 140) {
+      ctx.globalAlpha = 1 - (timestamp - monster._hitFlash) / 140;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(px + ts / 2, py + ts / 2, ts / 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
     ctx.restore();
   }
 
@@ -1518,6 +1635,7 @@ export class DungeonRenderer {
     const bob = Math.sin(timestamp * 0.005) * 1.5;
     const heroClass = player.hero_class || "paladin";
 
+    this._drawShadow(ctx, px, py, ts, 0.45);
     ctx.save();
     ctx.translate(0, bob);
 
@@ -1768,27 +1886,53 @@ export class DungeonRenderer {
       ctx.fillText("⚔️", px, py);
     }
 
+    // Hit flash: engine stamps _hitFlash when the player takes damage.
+    if (player._hitFlash && (timestamp - player._hitFlash) < 160) {
+      ctx.globalAlpha = 0.85 * (1 - (timestamp - player._hitFlash) / 160);
+      ctx.fillStyle = "#ff6b6b";
+      ctx.beginPath();
+      ctx.arc(px + ts / 2, py + ts / 2, ts / 2 - 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
     ctx.restore();
   }
 
   _drawTorchlight(ctx, player, ts, timestamp, biome = "crypt") {
     const flicker = Math.sin(timestamp * 0.006) * 6 + Math.cos(timestamp * 0.015) * 4;
-    const radius = Math.max(160, 240 + flicker);
+    const radius = Math.max(170, 250 + flicker);
 
     const cx = player.x * ts + ts / 2;
     const cy = player.y * ts + ts / 2;
 
+    // Hot core: a tight warm pool directly around the hero so the sprite reads
+    // against dark floors even at low lantern radii (Deep Fog omen).
+    const core = ctx.createRadialGradient(cx, cy, 4, cx, cy, ts * 1.8);
+    if (biome === "cavern") {
+      core.addColorStop(0, "rgba(129, 230, 217, 0.30)");
+    } else if (biome === "inferno") {
+      core.addColorStop(0, "rgba(246, 173, 85, 0.32)");
+    } else {
+      core.addColorStop(0, "rgba(255, 224, 150, 0.34)");
+    }
+    core.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = core;
+    ctx.beginPath();
+    ctx.arc(cx, cy, ts * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+
     const grad = ctx.createRadialGradient(cx, cy, 30, cx, cy, radius);
 
     if (biome === "cavern") {
-      grad.addColorStop(0, "rgba(56, 178, 172, 0.14)");
-      grad.addColorStop(0.5, "rgba(35, 110, 115, 0.05)");
+      grad.addColorStop(0, "rgba(56, 178, 172, 0.20)");
+      grad.addColorStop(0.5, "rgba(35, 110, 115, 0.08)");
     } else if (biome === "inferno") {
-      grad.addColorStop(0, "rgba(229, 62, 62, 0.16)");
-      grad.addColorStop(0.5, "rgba(180, 50, 40, 0.06)");
+      grad.addColorStop(0, "rgba(229, 62, 62, 0.22)");
+      grad.addColorStop(0.5, "rgba(180, 50, 40, 0.09)");
     } else {
-      grad.addColorStop(0, "rgba(255, 210, 120, 0.15)");
-      grad.addColorStop(0.5, "rgba(230, 150, 40, 0.05)");
+      grad.addColorStop(0, "rgba(255, 210, 120, 0.21)");
+      grad.addColorStop(0.5, "rgba(230, 150, 40, 0.08)");
     }
     grad.addColorStop(1, "rgba(0, 0, 0, 0)");
 
@@ -2046,7 +2190,7 @@ export class DungeonRenderer {
     ctx.restore();
   }
 
-  _drawHoverTooltip(ctx, tx, ty, ts, monsters, dungeon) {
+  _drawHoverTooltip(ctx, tx, ty, ts, monsters, dungeon, player = null) {
     const monster = monsters.find((m) => m.x === tx && m.y === ty && m.hp > 0);
     const px = tx * ts;
     const py = ty * ts;
@@ -2060,9 +2204,18 @@ export class DungeonRenderer {
           if (turns) effects.push(`${key} ${turns}`);
         }
       }
+      // Tactical strike preview from the current hero stats (display only).
+      let preview = null;
+      if (player && Number.isFinite(player.attack)) {
+        const lo = Math.max(1, Math.floor((Math.max(1, player.attack - monster.defense)) * 0.85));
+        const hi = Math.max(lo, Math.floor((Math.max(1, player.attack - monster.defense)) * 1.15));
+        const critPct = Math.round((player.crit_chance ?? 0.15) * 100);
+        preview = `Strike ~${lo}-${hi} • Crit ${critPct}%`;
+        if (monster.hp <= monster.max_hp * 0.3) preview += " • EXECUTE 💀";
+      }
       const affix = monster.champion_affix || (monster.is_boss ? "Boss" : "");
       const cardW = 148;
-      const cardH = effects.length ? 62 : 50;
+      const cardH = (effects.length ? 62 : 50) + (preview ? 13 : 0);
       const cardX = px + ts / 2 - cardW / 2;
       const cardY = py - cardH - 10;
 
@@ -2108,10 +2261,15 @@ export class DungeonRenderer {
       ctx.font = "10px sans-serif";
       const statTxt = `ATK: ${monster.attack}   DEF: ${monster.defense}`;
       ctx.fillText(statTxt, cardX + 6, cardY + 41);
+      if (preview) {
+        ctx.fillStyle = "#fbd38d";
+        ctx.font = "bold 9px sans-serif";
+        ctx.fillText(preview, cardX + 6, cardY + 53);
+      }
       if (effects.length) {
         ctx.fillStyle = "#68d391";
         ctx.font = "9px sans-serif";
-        ctx.fillText(effects.join("   "), cardX + 6, cardY + 56);
+        ctx.fillText(effects.join("   "), cardX + 6, cardY + (preview ? 66 : 56));
       }
 
       ctx.restore();
