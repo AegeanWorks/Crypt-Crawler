@@ -77,7 +77,7 @@ def roll_urn_reward(depth: int = 1, rng: Optional[random.Random] = None,
 def check_near_miss_survival(current_hp: int, max_hp: int, damage_taken: int) -> Optional[Dict[str, Any]]:
     """Near-miss feedback engine (Clark et al. 2009).
 
-    Surviving a near-fatal blow (remaining HP <= 25% of max HP after taking heavy damage)
+    Surviving a near-fatal blow (remaining HP <= 28% of max HP after taking >= 6 damage)
     triggers an adrenaline surge, converting near-death loss aversion into an intense dopamine rush.
     """
     if current_hp <= 0:

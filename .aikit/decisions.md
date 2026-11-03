@@ -283,3 +283,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Context**: The README showed only the 2026-10-28 capture whose center canvas is pitch black, while the fixed 2026-10-31 torchlit keeper was never wired in; the 10-28 review note described a different game (netrunner/breach), and 614 lines of renderer/engine drift landed since 10-31.
 - **Decision**: Keep the 10-28 file as before-evidence with a corrected note (score 40, failure documented); show 2026-10-31 (the after) plus a fresh 2026-11-03 capture (plain `python -m http.server` on `static/`, headless Edge 1440x900, commit `c9cfd16`) in the README `aegean:screenshots` block and `.aikit/media.json`.
 - **Consequences**: README proves the renderer rework kept the layout intact. Reproduce with: serve `static/`, headless `--screenshot --window-size=1440,900` on `index.html`.
+
+### ADR-036: Near-miss threshold contract correction (audit waves 0-3)
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: Waves 0-3 audit (commits 1-30, `2485822` introducing `check_near_miss_survival`) found the docstring and `tests/test_rewards.py` comment promised `<= 25%` HP, but the shipped rule, ADR-005 and `static/js/engine.js` all use `<= 28%` HP with `>= 6` damage since introduction. The existing test used 10/50 (20%), which passes under either threshold, so the drift was untested.
+- **Decision**: Correct the docstring to `<= 28%` HP with `>= 6` damage and add failing-first `test_near_miss_boundary_28pct` (14/50 triggers, 15/50 does not, 10/50 with 5 damage does not). No rule change; docs and tests now match the shipped 0.28 contract. Dropped as unverifiable/out-of-scope: `find_path` start-tile walkability (start is always the player pos), `ECONOMY_BOUNDS` staleness (introduced in unpushed `f6610ca`, outside waves 1-30), Ember Tithe omen-desc wording (recent slice, outside waves 1-30).
+- **Consequences**: The threshold is unambiguous and boundary-covered. 88 unit tests green, `aikit check` 5/5.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (contract matches shipped rule) and PRINCIPLE-014 (failing-first boundary coverage).

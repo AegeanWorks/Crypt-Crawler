@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `52`
-- **Total Class Methods**: `151`
-- **Total Source Lines**: `7790`
+- **Total Class Methods**: `152`
+- **Total Source Lines**: `7803`
 
 ---
 
@@ -151,7 +151,7 @@
 ### [`crawler/rewards.py`](crawler/rewards.py)
 > *Variable-ratio reward engine, dopamine loot schedules, and near-miss mechanics for Crypt-Crawler.*
 
-**Size**: `171` lines (`6178` bytes)
+**Size**: `171` lines (`6177` bytes)
 
 **Classes:**
 - `class RewardType`
@@ -360,13 +360,14 @@
 ### [`tests/test_rewards.py`](tests/test_rewards.py)
 > *Unit tests for the variable-ratio reward engine and dopamine loot schedules.*
 
-**Size**: `69` lines (`2458` bytes)
+**Size**: `82` lines (`3016` bytes)
 
 **Classes:**
 - `class TestRewards`
   - Method `.test_roll_chest_reward_determinism()`
   - Method `.test_roll_chest_reward_jackpot()`
   - Method `.test_roll_urn_reward()`
+  - Method `.test_near_miss_boundary_28pct()`
   - Method `.test_near_miss_survival()`
   - Method `.test_generate_dungeon_bounties()`
 

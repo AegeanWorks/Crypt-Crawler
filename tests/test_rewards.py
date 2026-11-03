@@ -38,8 +38,21 @@ class TestRewards(unittest.TestCase):
         self.assertGreater(gold, 0)
         self.assertIsInstance(is_crit, bool)
 
+    def test_near_miss_boundary_28pct(self):
+        # Shipped rule (ADR-005, engine.js): triggers at <=28% HP with >=6 damage.
+        # 14/50 = 28% triggers; 15/50 = 30% does not; light damage does not.
+        self.assertIsNotNone(
+            check_near_miss_survival(current_hp=14, max_hp=50, damage_taken=6)
+        )
+        self.assertIsNone(
+            check_near_miss_survival(current_hp=15, max_hp=50, damage_taken=12)
+        )
+        self.assertIsNone(
+            check_near_miss_survival(current_hp=10, max_hp=50, damage_taken=5)
+        )
+
     def test_near_miss_survival(self):
-        # Current HP <= 25% of Max HP with heavy damage
+        # Current HP <= 28% of Max HP with heavy damage
         res = check_near_miss_survival(current_hp=10, max_hp=50, damage_taken=12)
         self.assertIsNotNone(res)
         self.assertEqual(res["type"], "NEAR_MISS_SURGE")
