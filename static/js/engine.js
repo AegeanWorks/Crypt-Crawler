@@ -996,7 +996,7 @@ export class GameEngine {
       { id: "bounty_urns", title: "Catacomb Purifier", desc: "Shatter 3 Burial Urns in the depths", target: 3, progress: 0, completed: false, reward_gold: 25 + depth * 10, reward_xp: 20 + depth * 5 },
       { id: "bounty_streak", title: "Frenzy of Blades", desc: "Achieve a x3 Kill Streak in rapid combat", target: 3, progress: 0, completed: false, reward_gold: 35 + depth * 10, reward_xp: 30 + depth * 5 },
       { id: "bounty_chests", title: "Vault Plunderer", desc: "Unlock 2 Hidden Treasure Chests", target: 2, progress: 0, completed: false, reward_gold: 30 + depth * 10, reward_xp: 25 + depth * 5 },
-      { id: "bounty_vault", title: "Seal Keeper", desc: "Gather 3 sigils and open a sealed vault", target: 1, progress: 0, completed: false, reward_gold: 60 + depth * 20, reward_xp: 50 + depth * 10 },
+      { id: "bounty_vault", title: "Seal Keeper", desc: "Open a sealed vault (requires 3 sigils)", target: 1, progress: 0, completed: false, reward_gold: 60 + depth * 20, reward_xp: 50 + depth * 10 },
     ];
   }
 

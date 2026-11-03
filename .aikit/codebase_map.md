@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `52`
-- **Total Class Methods**: `152`
-- **Total Source Lines**: `7803`
+- **Total Class Methods**: `156`
+- **Total Source Lines**: `7839`
 
 ---
 
@@ -47,7 +47,7 @@
 ### [`crawler/dungeon.py`](crawler/dungeon.py)
 > *Procedural dungeon generation and grid management for Crypt-Crawler.*
 
-**Size**: `550` lines (`21037` bytes)
+**Size**: `550` lines (`21057` bytes)
 
 **Classes:**
 - `class TileType`
@@ -138,7 +138,7 @@
 ### [`crawler/lore.py`](crawler/lore.py)
 > *Lore codex: the readable history of the crypt, its relics and its dead.*
 
-**Size**: `280` lines (`10617` bytes)
+**Size**: `284` lines (`10735` bytes)
 
 **Functions:**
 - `def public_entries()` - *Every entry as a fresh dict, safe to serialise to the client.*
@@ -275,7 +275,7 @@
 ### [`tests/test_dungeon.py`](tests/test_dungeon.py)
 > *Unit tests for procedural dungeon generation and pathfinding.*
 
-**Size**: `162` lines (`7431` bytes)
+**Size**: `168` lines (`7676` bytes)
 
 **Classes:**
 - `class TestDungeon`
@@ -290,6 +290,7 @@
   - Method `.test_pact_altar_still_spawns_on_a_degenerate_two_room_map()`
   - Method `.test_lost_soul_still_spawns_on_a_degenerate_two_room_map()`
   - Method `.test_merchant_spawns_on_depth_2()`
+  - Method `.test_to_dict_does_not_alias_tiles()`
 
 ---
 
@@ -342,7 +343,7 @@
 ### [`tests/test_lore.py`](tests/test_lore.py)
 > *Unit tests for the lore codex data and its HTTP endpoint.*
 
-**Size**: `74` lines (`2659` bytes)
+**Size**: `90` lines (`3327` bytes)
 
 **Classes:**
 - `class TestLoreData`
@@ -350,6 +351,8 @@
   - Method `.test_starting_entries_exist()`
   - Method `.test_every_event_points_at_a_real_entry()`
   - Method `.test_public_entries_are_copies()`
+  - Method `.test_lore_by_id_does_not_alias_entries()`
+  - Method `.test_invalid_entry_types_are_rejected()`
 - `class TestLoreEndpoint`
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
@@ -360,7 +363,7 @@
 ### [`tests/test_rewards.py`](tests/test_rewards.py)
 > *Unit tests for the variable-ratio reward engine and dopamine loot schedules.*
 
-**Size**: `82` lines (`3016` bytes)
+**Size**: `92` lines (`3431` bytes)
 
 **Classes:**
 - `class TestRewards`
@@ -370,6 +373,7 @@
   - Method `.test_near_miss_boundary_28pct()`
   - Method `.test_near_miss_survival()`
   - Method `.test_generate_dungeon_bounties()`
+  - Method `.test_vault_bounty_single_completion()`
 
 ---
 

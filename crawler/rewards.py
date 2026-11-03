@@ -158,7 +158,7 @@ def generate_dungeon_bounties(depth: int = 1, seed: Optional[int] = None) -> Lis
         {
             "id": "bounty_vault",
             "title": "Seal Keeper",
-            "desc": "Gather 3 sigils and open a sealed vault",
+            "desc": "Open a sealed vault (requires 3 sigils)",
             "target": 1,
             "progress": 0,
             "completed": False,

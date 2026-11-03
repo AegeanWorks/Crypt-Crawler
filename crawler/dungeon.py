@@ -276,7 +276,7 @@ class Dungeon:
                 for r in self.rooms
             ],
             "room_themes": list(self.room_themes),
-            "tiles": self.tiles,
+            "tiles": [row[:] for row in self.tiles],
         }
 
 

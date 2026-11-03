@@ -157,6 +157,12 @@ class TestDungeon(unittest.TestCase):
         self.assertEqual(dungeon.tiles[my][mx], TileType.MERCHANT)
         self.assertTrue(dungeon.is_walkable(mx, my))
 
+    def test_to_dict_does_not_alias_tiles(self):
+        dungeon = DungeonGenerator(width=20, height=20).generate(seed=42)
+        data = dungeon.to_dict()
+        data["tiles"][0][0] = 999
+        self.assertNotEqual(dungeon.tiles[0][0], 999)
+
 
 if __name__ == "__main__":
     unittest.main()

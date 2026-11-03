@@ -47,6 +47,22 @@ class TestLoreData(unittest.TestCase):
         entries[0]["title"] = "Corrupted"
         self.assertNotEqual(LORE_ENTRIES[0]["title"], "Corrupted")
 
+    def test_lore_by_id_does_not_alias_entries(self):
+        self.assertIsNot(LORE_BY_ID["lore_verge"], LORE_ENTRIES[0])
+        original = LORE_ENTRIES[0]["title"]
+        LORE_BY_ID["lore_verge"]["title"] = "Mutated?"
+        try:
+            self.assertEqual(LORE_ENTRIES[0]["title"], original)
+        finally:
+            LORE_BY_ID["lore_verge"]["title"] = original
+
+    def test_invalid_entry_types_are_rejected(self):
+        self.assertFalse(is_valid_entry(None))
+        self.assertFalse(is_valid_entry(123))
+        self.assertFalse(is_valid_entry([]))
+        self.assertEqual(entry_for_event(None), "")
+        self.assertEqual(entry_for_event([]), "")
+
 
 class TestLoreEndpoint(unittest.TestCase):
     @classmethod

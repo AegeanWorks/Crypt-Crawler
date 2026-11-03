@@ -77,6 +77,16 @@ class TestRewards(unittest.TestCase):
             self.assertEqual(b["progress"], 0)
             self.assertFalse(b["completed"])
 
+    def test_vault_bounty_single_completion(self):
+        seen = False
+        for seed in range(50):
+            for bounty in generate_dungeon_bounties(depth=2, seed=seed):
+                if bounty["id"] == "bounty_vault":
+                    seen = True
+                    self.assertEqual(bounty["target"], 1)
+                    self.assertIn("vault", bounty["desc"].lower())
+        self.assertTrue(seen)
+
 
 if __name__ == "__main__":
     unittest.main()

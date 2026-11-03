@@ -231,7 +231,7 @@ LORE_ENTRIES: List[Dict[str, str]] = [
     },
 ]
 
-LORE_BY_ID: Dict[str, Dict[str, str]] = {entry["id"]: entry for entry in LORE_ENTRIES}
+LORE_BY_ID: Dict[str, Dict[str, str]] = {entry["id"]: dict(entry) for entry in LORE_ENTRIES}
 
 STARTING_LORE: Tuple[str, ...] = ("lore_verge",)
 
@@ -267,6 +267,8 @@ def public_entries() -> List[Dict[str, str]]:
 
 def entry_for_event(event: str) -> str:
     """The lore id tied to a discovery event, or an empty string."""
+    if not isinstance(event, str):
+        return ""
     return LORE_EVENTS.get(event, "")
 
 
@@ -277,4 +279,6 @@ def starting_lore() -> List[str]:
 
 def is_valid_entry(entry_id: str) -> bool:
     """Whether an id names a real entry (guards saves against drift)."""
+    if not isinstance(entry_id, str):
+        return False
     return entry_id in LORE_BY_ID
