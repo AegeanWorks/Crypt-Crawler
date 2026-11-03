@@ -17,3 +17,4 @@ for key, old in sorted(pins.items()):
         mismatch += 1
         print(f'DIFF {key}: {old} -> {h}')
 print(f'{len(pins)-mismatch}/{len(pins)} identical' if mismatch == 0 else f'{mismatch} diffs')
+sys.exit(1 if mismatch else 0)

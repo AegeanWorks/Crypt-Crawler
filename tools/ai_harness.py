@@ -281,6 +281,8 @@ def layout_hash(state: Dict[str, Any]) -> str:
     """Stable fingerprint of everything the seeded generator decides."""
     dungeon = state["dungeon"]
     monsters = sorted((m["type"], m["x"], m["y"]) for m in state["monsters"])
+    _vault = dungeon.get("vault")
+    _vault_pos = (_vault["x"], _vault["y"]) if isinstance(_vault, dict) else None
     material = {
         "seed": dungeon["seed"],
         "depth": dungeon["depth"],
@@ -296,7 +298,8 @@ def layout_hash(state: Dict[str, Any]) -> str:
         "urns": [(u["x"], u["y"]) for u in dungeon["urns"]],
         "souls": [(s["x"], s["y"]) for s in dungeon["souls"]],
         "sigils": [(s["x"], s["y"]) for s in dungeon["sigils"]],
-        "vault": dungeon["vault"],
+        "vault": _vault_pos,
+        "mimics": sorted((m["x"], m["y"]) for m in dungeon.get("mimics", [])),
         "pacts": [(p["x"], p["y"]) for p in dungeon["pacts"]],
         "merchants": [(m["x"], m["y"]) for m in dungeon["merchants"]],
         "traps": sorted((t["x"], t["y"], t.get("kind", "spike")) for t in dungeon["traps"]),

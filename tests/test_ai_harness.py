@@ -194,6 +194,22 @@ class TestLayoutHash(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertNotEqual(base, layout_hash(self._with(key, value)))
 
+    def test_hash_covers_mimics_and_ignores_vault_opened(self):
+        import copy
+
+        base = self._state()
+        with_mimic = copy.deepcopy(base)
+        with_mimic["dungeon"]["mimics"] = [{"x": 5, "y": 6}]
+        without_mimic = copy.deepcopy(base)
+        without_mimic["dungeon"]["mimics"] = []
+        self.assertNotEqual(layout_hash(with_mimic), layout_hash(without_mimic))
+
+        closed = copy.deepcopy(base)
+        closed["dungeon"]["vault"] = {"x": 8, "y": 2, "opened": False}
+        opened = copy.deepcopy(closed)
+        opened["dungeon"]["vault"] = {"x": 8, "y": 2, "opened": True}
+        self.assertEqual(layout_hash(closed), layout_hash(opened))
+
 
 class TestUiInventory(unittest.TestCase):
     def setUp(self):

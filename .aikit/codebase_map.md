@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `52`
-- **Total Class Methods**: `161`
-- **Total Source Lines**: `7884`
+- **Total Class Methods**: `162`
+- **Total Source Lines**: `7904`
 
 ---
 
@@ -203,7 +203,7 @@
 ### [`tests/test_ai_harness.py`](tests/test_ai_harness.py)
 > *Unit tests for the AI gameplay harness and the UI inventory contract.*
 
-**Size**: `231` lines (`8981` bytes)
+**Size**: `247` lines (`9656` bytes)
 
 **Classes:**
 - `class TestHarnessCatalog`
@@ -227,6 +227,7 @@
   - Method `._with(key, value)`
   - Method `.test_hash_is_stable_and_sensitive()`
   - Method `.test_hash_tracks_every_seeded_layout_element()`
+  - Method `.test_hash_covers_mimics_and_ignores_vault_opened()`
 - `class TestUiInventory`
   - Method `.setUp()`
   - Method `.test_inventory_names_real_controls_choices_and_handlers()`
@@ -409,7 +410,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `1855` lines (`76983` bytes)
+**Size**: `1858` lines (`77172` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*
@@ -483,6 +484,6 @@
 ---
 
 ### [`tools/verify_replay.py`](tools/verify_replay.py)
-**Size**: `19` lines (`1063` bytes)
+**Size**: `20` lines (`1094` bytes)
 
 ---
