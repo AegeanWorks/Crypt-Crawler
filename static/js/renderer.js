@@ -113,7 +113,7 @@ export class DungeonRenderer {
     this.floatingTexts.push({
       text,
       x: x * this.tileSize + this.tileSize / 2,
-      y: y * this.tileSize + this.tileSize / 2,
+      y: y * this.tileSize + this.tileSize / 2 - 14,
       color,
       alpha: 1.0,
       vy: -0.75,
@@ -410,13 +410,19 @@ export class DungeonRenderer {
         ctx.lineWidth = 1;
         ctx.strokeRect(px, py, ts, ts);
 
-        // Water puddle with animated shimmer
+        // Water puddle with animated shimmer and a shore ring so it
+        // reads as water instead of a selection blob.
         if ((x * 11 + y * 7) % 6 === 0 && tile === TileType.FLOOR) {
-          const shimmer = Math.sin(timestamp * 0.003 + x + y) * 0.15 + 0.35;
-          ctx.fillStyle = isVis ? `rgba(49, 130, 206, ${shimmer})` : "rgba(20, 50, 80, 0.2)";
+          const shimmer = Math.sin(timestamp * 0.003 + x + y) * 0.12 + 0.5;
+          ctx.fillStyle = isVis ? `rgba(49, 130, 206, ${shimmer})` : "rgba(32, 80, 120, 0.35)";
           ctx.beginPath();
-          ctx.ellipse(px + ts / 2, py + ts / 2, ts / 3, ts / 5, 0, 0, Math.PI * 2);
+          ctx.ellipse(px + ts / 2, py + ts / 2, ts / 4, ts / 6, 0, 0, Math.PI * 2);
           ctx.fill();
+          ctx.strokeStyle = isVis ? "rgba(129, 230, 217, 0.55)" : "rgba(60, 110, 140, 0.3)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(px + ts / 2, py + ts / 2, ts / 4, ts / 6, 0, 0, Math.PI * 2);
+          ctx.stroke();
         }
       } else if (biome === "inferno") {
         ctx.fillStyle = isVis ? (altColor ? "#1b0e12" : "#13080b") : "#0a0406";
@@ -1817,6 +1823,10 @@ export class DungeonRenderer {
       ctx.fillRect(px + ts - 4.5, py + ts / 2 - 6, 2.5, 2.5);
     } else if (heroClass === "mage") {
       // Arcane Mage Sprite: Royal purple robes, tall wizard hat with gold buckle & floating mana crystal
+      // Wide robe shoulders break the triangle so the body reads at 1x.
+      ctx.fillStyle = "#44337a";
+      ctx.fillRect(px + 6, py + ts / 2 - 1, 10, 5);
+      ctx.fillRect(px + ts - 16, py + ts / 2 - 1, 10, 5);
       // Flowing robe with gold embroidery
       ctx.fillStyle = "#553c9a";
       ctx.beginPath();
@@ -1840,14 +1850,18 @@ export class DungeonRenderer {
       ctx.ellipse(px + ts / 2, py + 8, 9, 3, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Pointed cone
+      // Pointed cone (kept inside the tile so it never clips into the wall)
       ctx.fillStyle = "#6b46c1";
       ctx.beginPath();
-      ctx.moveTo(px + ts / 2 - 7, py + 8);
-      ctx.lineTo(px + ts / 2 + 2, py - 6);
-      ctx.lineTo(px + ts / 2 + 7, py + 8);
+      ctx.moveTo(px + ts / 2 - 8, py + 9);
+      ctx.lineTo(px + ts / 2 + 3, py + 0);
+      ctx.lineTo(px + ts / 2 + 8, py + 9);
       ctx.closePath();
       ctx.fill();
+
+      // Cowl shadow behind the eyes so the face reads on inferno glow
+      ctx.fillStyle = "#2a2140";
+      ctx.fillRect(px + ts / 2 - 5, py + 6, 10, 5);
 
       // Golden star buckle on hat band
       ctx.fillStyle = "#ecc94b";
@@ -2148,8 +2162,10 @@ export class DungeonRenderer {
 
   _renderFloatingTexts(ctx) {
     ctx.save();
-    ctx.font = "bold 13px 'SFMono-Regular', Consolas, monospace";
+    ctx.font = "bold 14px 'SFMono-Regular', Consolas, monospace";
     ctx.textAlign = "center";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
 
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
       const ft = this.floatingTexts[i];
@@ -2163,8 +2179,7 @@ export class DungeonRenderer {
       }
 
       ctx.globalAlpha = ft.alpha;
-      ctx.fillStyle = "#000";
-      ctx.fillText(ft.text, ft.x + 1, ft.y + 1);
+      ctx.strokeText(ft.text, ft.x, ft.y);
       ctx.fillStyle = ft.color;
       ctx.fillText(ft.text, ft.x, ft.y);
     }
