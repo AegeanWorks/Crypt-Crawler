@@ -23,6 +23,18 @@ class TestDungeon(unittest.TestCase):
         self.assertTrue(dungeon.is_walkable(st_x, st_y))
         self.assertEqual(dungeon.tiles[st_y][st_x], TileType.STAIRS_DOWN)
 
+    def test_find_path_rejects_unwalkable_start(self):
+        dungeon = Dungeon(width=20, height=20, seed=1)
+        # (0, 0) is a wall on a fresh dungeon.
+        self.assertFalse(dungeon.is_walkable(0, 0))
+        self.assertIsNone(dungeon.find_path((0, 0), (0, 0)))
+        self.assertIsNone(dungeon.find_path((0, 0), (4, 0)))
+
+    def test_generator_rejects_tiny_dimensions(self):
+        gen = DungeonGenerator(width=5, height=5)
+        with self.assertRaises(ValueError):
+            gen.generate(seed=42)
+
     def test_all_rooms_connected(self):
         """Verify that every room center can be reached from player spawn."""
         gen = DungeonGenerator(width=50, height=35, max_rooms=12)

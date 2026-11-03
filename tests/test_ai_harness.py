@@ -210,6 +210,17 @@ class TestLayoutHash(unittest.TestCase):
         opened["dungeon"]["vault"] = {"x": 8, "y": 2, "opened": True}
         self.assertEqual(layout_hash(closed), layout_hash(opened))
 
+    def test_hash_differs_by_difficulty(self):
+        normal = self._state()
+        normal["difficulty"] = "normal"
+        hard = copy.deepcopy(normal)
+        hard["difficulty"] = "hard"
+        self.assertNotEqual(layout_hash(normal), layout_hash(hard))
+
+    def test_hash_stable_without_difficulty(self):
+        # Backward compatible: states without a difficulty key still hash stably.
+        self.assertEqual(layout_hash(self._state()), layout_hash(self._state()))
+
 
 class TestUiInventory(unittest.TestCase):
     def setUp(self):

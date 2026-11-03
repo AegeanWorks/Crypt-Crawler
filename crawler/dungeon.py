@@ -217,10 +217,12 @@ class Dungeon:
 
     def find_path(self, start: Tuple[int, int], goal: Tuple[int, int]) -> Optional[List[Tuple[int, int]]]:
         """Breadth-first search shortest path on the walkable grid."""
-        if start == goal:
-            return [start]
+        if not self.is_walkable(start[0], start[1]):
+            return None
         if not self.is_walkable(goal[0], goal[1]):
             return None
+        if start == goal:
+            return [start]
 
         queue = collections.deque([start])
         came_from: Dict[Tuple[int, int], Optional[Tuple[int, int]]] = {start: None}
@@ -298,6 +300,14 @@ class DungeonGenerator:
         self.depth = depth
 
     def generate(self, seed: Optional[int] = None) -> Dungeon:
+        min_side = self.max_room_size + 4
+        if self.width < min_side or self.height < min_side:
+            raise ValueError(
+                "Why: dungeon "
+                f"{self.width}x{self.height} is too small for max_room_size "
+                f"{self.max_room_size} (need at least {min_side} per side). "
+                "Fix: use a larger width/height or a smaller max_room_size."
+            )
         dungeon = Dungeon(self.width, self.height, seed=seed)
         dungeon.depth = self.depth
         rng = dungeon.rng

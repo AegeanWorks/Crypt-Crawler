@@ -286,6 +286,7 @@ def layout_hash(state: Dict[str, Any]) -> str:
     material = {
         "seed": dungeon["seed"],
         "depth": dungeon["depth"],
+        "difficulty": state.get("difficulty"),
         "biome": dungeon["biome"],
         "omen": dungeon.get("omen") or state.get("omen"),
         "rooms": [(r["x"], r["y"], r["w"], r["h"]) for r in dungeon["rooms"]],

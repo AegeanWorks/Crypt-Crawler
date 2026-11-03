@@ -32,6 +32,11 @@ VIEWPORTS: Dict[str, Dict[str, int]] = {
 }
 
 
+def check_failed(value: Any) -> bool:
+    """Gate predicate: any falsy audit value fails, any truthy value passes."""
+    return not value
+
+
 def run_inspection(
     viewports: List[str],
     scenarios: List[str],
@@ -1045,12 +1050,14 @@ def run_inspection(
                         report["audit_checks"].append(
                             {
                                 "viewport": vp_name,
-                                "sigil_vault_objective": not objective.get("skip")
-                                and objective.get("heldThree")
-                                and objective.get("opened")
-                                and objective.get("relic")
-                                and objective.get("lore")
-                                and objective.get("pillReset"),
+                                "sigil_vault_objective": objective.get("skip") is True
+                                or (
+                                    objective.get("heldThree")
+                                    and objective.get("opened")
+                                    and objective.get("relic")
+                                    and objective.get("lore")
+                                    and objective.get("pillReset")
+                                ),
                                 "boss_phase_two_summons": boss.get("phaseTwo")
                                 and boss.get("summoned"),
                                 "boss_phase_three_enrages": boss.get("phaseThree")
@@ -1131,8 +1138,8 @@ def run_inspection(
                         report["audit_checks"].append(
                             {
                                 "viewport": vp_name,
-                                "bounty_xp_levels_immediately": not bounty_xp.get("skip")
-                                and bounty_xp.get("leveled") is True,
+                                "bounty_xp_levels_immediately": bounty_xp.get("skip") is True
+                                or bounty_xp.get("leveled") is True,
                             }
                         )
 
@@ -1501,7 +1508,7 @@ def run_inspection(
         {"viewport": check.get("viewport", "unknown"), "check": name}
         for check in report["audit_checks"]
         for name, value in check.items()
-        if name != "viewport" and value is not True
+        if name != "viewport" and check_failed(value)
     ]
     report["failed_checks"] = failed_checks
     report["total_checks"] = sum(

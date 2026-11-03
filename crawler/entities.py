@@ -361,7 +361,7 @@ class Entity:
         return messages
 
     def take_damage(self, amount: int) -> int:
-        actual = max(1, amount)
+        actual = max(0, amount)
         self.hp = max(0, self.hp - actual)
         return actual
 

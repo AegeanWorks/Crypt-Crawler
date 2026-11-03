@@ -38,6 +38,13 @@ class TestCombat(unittest.TestCase):
         self.assertGreater(res.damage_dealt, 0)
         self.assertEqual(self.skeleton.hp, init_hp - res.damage_dealt)
 
+    def test_take_damage_zero_and_negative_are_noops(self):
+        self.assertEqual(self.skeleton.hp, self.skeleton.max_hp)
+        self.assertEqual(self.skeleton.take_damage(0), 0)
+        self.assertEqual(self.skeleton.hp, self.skeleton.max_hp)
+        self.assertEqual(self.skeleton.take_damage(-5), 0)
+        self.assertEqual(self.skeleton.hp, self.skeleton.max_hp)
+
     def test_killing_monster_awards_xp_and_gold(self):
         self.skeleton.hp = 1
         init_gold = self.player.gold

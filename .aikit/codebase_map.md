@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
-- **Total Top-Level Functions**: `52`
-- **Total Class Methods**: `165`
-- **Total Source Lines**: `7939`
+- **Total Top-Level Functions**: `53`
+- **Total Class Methods**: `172`
+- **Total Source Lines**: `8011`
 
 ---
 
@@ -47,7 +47,7 @@
 ### [`crawler/dungeon.py`](crawler/dungeon.py)
 > *Procedural dungeon generation and grid management for Crypt-Crawler.*
 
-**Size**: `550` lines (`21057` bytes)
+**Size**: `560` lines (`21545` bytes)
 
 **Classes:**
 - `class TileType`
@@ -203,7 +203,7 @@
 ### [`tests/test_ai_harness.py`](tests/test_ai_harness.py)
 > *Unit tests for the AI gameplay harness and the UI inventory contract.*
 
-**Size**: `247` lines (`9656` bytes)
+**Size**: `258` lines (`10131` bytes)
 
 **Classes:**
 - `class TestHarnessCatalog`
@@ -228,6 +228,8 @@
   - Method `.test_hash_is_stable_and_sensitive()`
   - Method `.test_hash_tracks_every_seeded_layout_element()`
   - Method `.test_hash_covers_mimics_and_ignores_vault_opened()`
+  - Method `.test_hash_differs_by_difficulty()`
+  - Method `.test_hash_stable_without_difficulty()`
 - `class TestUiInventory`
   - Method `.setUp()`
   - Method `.test_inventory_names_real_controls_choices_and_handlers()`
@@ -239,13 +241,14 @@
 ### [`tests/test_combat.py`](tests/test_combat.py)
 > *Unit tests for combat, leveling and inventory management.*
 
-**Size**: `402` lines (`16663` bytes)
+**Size**: `409` lines (`17036` bytes)
 
 **Classes:**
 - `class TestCombat`
   - Method `.setUp()`
   - Method `.test_player_stats_and_equipment()`
   - Method `.test_melee_attack_damages_target()`
+  - Method `.test_take_damage_zero_and_negative_are_noops()`
   - Method `.test_killing_monster_awards_xp_and_gold()`
   - Method `.test_level_up()`
   - Method `.test_potion_healing()`
@@ -281,11 +284,13 @@
 ### [`tests/test_dungeon.py`](tests/test_dungeon.py)
 > *Unit tests for procedural dungeon generation and pathfinding.*
 
-**Size**: `168` lines (`7676` bytes)
+**Size**: `180` lines (`8191` bytes)
 
 **Classes:**
 - `class TestDungeon`
   - Method `.test_generator_bounds_and_rooms()`
+  - Method `.test_find_path_rejects_unwalkable_start()`
+  - Method `.test_generator_rejects_tiny_dimensions()`
   - Method `.test_all_rooms_connected()` - *Verify that every room center can be reached from player spawn.*
   - Method `.test_seed_reproducibility()`
   - Method `.test_fov_computation()`
@@ -339,11 +344,13 @@
 ### [`tests/test_inspect.py`](tests/test_inspect.py)
 > *Unit tests for headless inspection configuration and viewports.*
 
-**Size**: `20` lines (`637` bytes)
+**Size**: `44` lines (`1736` bytes)
 
 **Classes:**
 - `class TestInspectConfig`
   - Method `.test_viewports_declared()`
+  - Method `.test_failed_check_predicate_uses_falsy_not_identity()`
+  - Method `.test_skip_is_vacuous_pass_for_optional_fixtures()`
 
 ---
 
@@ -413,7 +420,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `1858` lines (`77172` bytes)
+**Size**: `1859` lines (`77219` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*
@@ -442,9 +449,10 @@
 ### [`tools/inspect_ui.py`](tools/inspect_ui.py)
 > *Headless browser visual inspection and UI auditing tool for Crypt-Crawler.*
 
-**Size**: `1582` lines (`90793` bytes)
+**Size**: `1589` lines (`91030` bytes)
 
 **Functions:**
+- `def check_failed(value)` - *Gate predicate: any falsy audit value fails, any truthy value passes.*
 - `def run_inspection(viewports, scenarios, out_dir)`
 - `def main()`
 
