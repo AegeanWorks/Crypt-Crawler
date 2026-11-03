@@ -323,6 +323,18 @@ class TestCombat(unittest.TestCase):
         self.assertEqual(self.player.status_effects.get("shield_wall"), 4)
         self.assertEqual(self.player.effective_defense, base_def + 6)
 
+    def test_unknown_hero_class_normalizes_to_paladin(self):
+        player = Player(name="X", hero_class="warrior")
+        self.assertIn(player.hero_class, ("paladin", "rogue", "mage"))
+        self.assertEqual(player.hero_class, "paladin")
+        self.assertEqual(player.class_title, "Crusader Paladin")
+
+    def test_add_xp_rejects_negative(self):
+        before = self.player.xp
+        with self.assertRaises(ValueError):
+            self.player.add_xp(-50)
+        self.assertEqual(self.player.xp, before)
+
 
 class TestChampionDepth(unittest.TestCase):
     """Slice 4: champions fight back harder when cornered (Enrage)."""

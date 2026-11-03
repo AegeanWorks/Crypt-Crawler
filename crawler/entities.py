@@ -617,8 +617,9 @@ class Player(Entity):
         y: int = 0,
         hero_class: str = "paladin",
     ):
-        class_key = hero_class.lower() if hero_class else "paladin"
-        class_info = HERO_CLASSES.get(class_key, HERO_CLASSES["paladin"])
+        raw_key = hero_class.lower() if isinstance(hero_class, str) and hero_class else "paladin"
+        class_key = raw_key if raw_key in HERO_CLASSES else "paladin"
+        class_info = HERO_CLASSES[class_key]
         player_name = name if name is not None else class_info["name"]
         super().__init__(
             player_name,
@@ -707,6 +708,8 @@ class Player(Entity):
 
     def add_xp(self, amount: int) -> bool:
         """Add experience points, return True if leveled up."""
+        if amount < 0:
+            raise ValueError("xp amount must be >= 0")
         self.xp += amount
         leveled = False
         while self.xp >= self.next_xp:
