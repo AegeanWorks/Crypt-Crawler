@@ -68,6 +68,18 @@ class TestFoundryPackLoading(unittest.TestCase):
         self.assertEqual(len(bosses), 1)
         self.assertEqual(bosses[0]["type"], "boss_lich")
 
+    def test_foundry_bosses_returns_isolated_copies(self):
+        foundry_packs.reset_cache()
+        try:
+            first = foundry_packs.foundry_bosses()
+            key = next(iter(first))
+            original = first[key]["hp"]
+            first[key]["hp"] = -1
+            second = foundry_packs.foundry_bosses()
+            self.assertEqual(second[key]["hp"], original)
+        finally:
+            foundry_packs.reset_cache()
+
     def test_bad_pack_skipped_loudly(self):
         with tempfile.TemporaryDirectory() as tmp:
             bad = Path(tmp) / "boss_broken.json"

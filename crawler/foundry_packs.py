@@ -53,7 +53,7 @@ def foundry_bosses() -> Dict[str, Dict[str, Any]]:
     """boss_id -> BOSS_TEMPLATES-shaped entry for every clean pack."""
     _ensure_loaded()
     assert _ENTRIES is not None
-    return dict(_ENTRIES)
+    return {boss_id: dict(entry) for boss_id, entry in _ENTRIES.items()}
 
 
 def spawn_for(depth: int, seed: Optional[int]) -> Optional[str]:

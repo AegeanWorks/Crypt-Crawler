@@ -113,7 +113,7 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
                 # Foundry replacement: an installed pack claiming this
                 # (depth, seed) takes the stairs post instead of the canon
                 # lich. Count and position invariants are unchanged.
-                _boss_type = _foundry_spawn_for(depth=depth, seed=seed) or "boss_lich"
+                _boss_type = _foundry_spawn_for(depth=depth, seed=dungeon.seed) or "boss_lich"
                 monsters.append(spawn_monster(_boss_type, bx, by, depth=depth))
                 boss_room = next((r for r in dungeon.rooms if r.center == dungeon.stairs_pos), None)
                 if boss_room and boss_room.w >= 4 and boss_room.h >= 4:
@@ -130,9 +130,10 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
                 vx, vy = dungeon.vault
                 for wx, wy in ((vx + 1, vy), (vx - 1, vy), (vx, vy + 1), (vx, vy - 1)):
                     if (wx, wy) not in reserved and dungeon.is_walkable(wx, wy):
-                        monsters.append(spawn_monster("vault_warden", wx, wy, depth=depth))
-                        reserved.add((wx, wy))
-                        break
+                        if not any(m.x == wx and m.y == wy for m in monsters):
+                            monsters.append(spawn_monster("vault_warden", wx, wy, depth=depth))
+                            reserved.add((wx, wy))
+                            break
                 # Hollow Choir: second vault guardian on restless/silent floors.
                 # DATA boss, deterministic post beside the vault, same reserved rules.
                 try:
@@ -199,7 +200,7 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
                     "monsters": [m.to_dict() for m in monsters],
                     "classes": HERO_CLASSES,
                     "merchant_stock": stock,
-                    "bounties": generate_dungeon_bounties(depth=depth, seed=seed),
+                    "bounties": generate_dungeon_bounties(depth=depth, seed=dungeon.seed),
                 }
             )
         else:

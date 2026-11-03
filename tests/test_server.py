@@ -4,6 +4,7 @@ import json
 import unittest
 from urllib.request import urlopen
 
+from crawler.rewards import generate_dungeon_bounties
 from crawler.server import start_background_server
 from run import find_available_server
 
@@ -178,6 +179,22 @@ class TestServer(unittest.TestCase):
             monster_coords = set((m["x"], m["y"]) for m in data["monsters"])
             self.assertGreater(len(merchant_coords), 0)
             self.assertTrue(merchant_coords.isdisjoint(monster_coords))
+
+    def test_bounties_follow_dungeon_seed(self):
+        with urlopen(f"{self.base_url}/api/new-game?seed=42&depth=2", timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(data["dungeon"]["seed"], 42)
+        self.assertEqual(
+            data["bounties"], generate_dungeon_bounties(depth=2, seed=42)
+        )
+
+    def test_random_seed_bounties_follow_returned_seed(self):
+        with urlopen(f"{self.base_url}/api/new-game?depth=1", timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        dungeon_seed = data["dungeon"]["seed"]
+        self.assertEqual(
+            data["bounties"], generate_dungeon_bounties(depth=1, seed=dungeon_seed)
+        )
 
 
 if __name__ == "__main__":

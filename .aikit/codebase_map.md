@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `52`
-- **Total Class Methods**: `156`
-- **Total Source Lines**: `7839`
+- **Total Class Methods**: `159`
+- **Total Source Lines**: `7869`
 
 ---
 
@@ -122,7 +122,7 @@
 ### [`crawler/foundry_packs.py`](crawler/foundry_packs.py)
 > *Foundry pack loader: the consumer-side half of the versioned adapter.*
 
-**Size**: `171` lines (`6184` bytes)
+**Size**: `171` lines (`6231` bytes)
 
 **Functions:**
 - `def pack_load_errors()` - *Recorded pack problems, each naming file + field + reason.*
@@ -167,7 +167,7 @@
 ### [`crawler/server.py`](crawler/server.py)
 > *Lightweight HTTP server and REST dispatch for Crypt-Crawler.*
 
-**Size**: `224` lines (`9976` bytes)
+**Size**: `225` lines (`10083` bytes)
 
 **Classes:**
 - `class CryptCrawlerHandler`
@@ -312,7 +312,7 @@
 ### [`tests/test_foundry_packs.py`](tests/test_foundry_packs.py)
 > *Foundry pack integration: installed packs load and take their posts.*
 
-**Size**: `84` lines (`3386` bytes)
+**Size**: `96` lines (`3823` bytes)
 
 **Classes:**
 - `class TestFoundryPackLoading`
@@ -322,6 +322,7 @@
   - Method `.test_unclaimed_seed_keeps_canon()`
   - Method `.test_pack_boss_takes_stairs_alone()`
   - Method `.test_control_seed_still_lich()`
+  - Method `.test_foundry_bosses_returns_isolated_copies()`
   - Method `.test_bad_pack_skipped_loudly()`
 
 **Functions:**
@@ -380,7 +381,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit tests for the Crypt-Crawler HTTP server and API endpoints.*
 
-**Size**: `184` lines (`8519` bytes)
+**Size**: `201` lines (`9323` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -398,6 +399,8 @@
   - Method `.test_depth_three_boss_guards_the_stairs()`
   - Method `.test_vault_warden_guards_the_seal()`
   - Method `.test_api_new_game_with_class_and_merchant()`
+  - Method `.test_bounties_follow_dungeon_seed()`
+  - Method `.test_random_seed_bounties_follow_returned_seed()`
 
 ---
 
