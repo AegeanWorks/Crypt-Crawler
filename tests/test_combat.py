@@ -335,6 +335,33 @@ class TestCombat(unittest.TestCase):
             self.player.add_xp(-50)
         self.assertEqual(self.player.xp, before)
 
+    def test_no_reward_for_attacking_corpse(self):
+        self.skeleton.hp = 1
+        first = resolve_melee_attack(self.player, self.skeleton, self.rng)
+        self.assertTrue(first.target_killed)
+        xp, gold = self.player.xp, self.player.gold
+        second = resolve_melee_attack(self.player, self.skeleton, random.Random(0))
+        self.assertFalse(second.target_killed)
+        self.assertEqual(second.xp_gained, 0)
+        self.assertEqual((self.player.xp, self.player.gold), (xp, gold))
+
+    def test_full_inventory_loot_contract(self):
+        while len(self.player.inventory) < self.player.max_slots:
+            self.player.inventory.append(create_item("potion_health"))
+        foe = spawn_monster("boss_lich", x=5, y=6, depth=3)
+        foe.hp = 1
+        res = resolve_melee_attack(self.player, foe, random.Random(0))
+        self.assertTrue(res.target_killed)
+        self.assertIsNone(res.loot_gained)
+        self.assertEqual(len(self.player.inventory), self.player.max_slots)
+
+    def test_vampiric_no_heal_on_kill(self):
+        vamp = spawn_monster("goblin", x=5, y=6, depth=1, is_champion=True, champion_affix="Vampiric")
+        vamp.hp = vamp.max_hp - 1
+        self.player.hp = 1
+        resolve_melee_attack(vamp, self.player, random.Random(0))
+        self.assertEqual(vamp.hp, vamp.max_hp - 1)
+
 
 class TestChampionDepth(unittest.TestCase):
     """Slice 4: champions fight back harder when cornered (Enrage)."""

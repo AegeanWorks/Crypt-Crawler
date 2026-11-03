@@ -29,6 +29,14 @@ def resolve_melee_attack(
     if rng is None:
         rng = random.Random()
 
+    if not defender.is_alive:
+        return CombatResult(
+            damage_dealt=0,
+            is_critical=False,
+            target_killed=False,
+            messages=[f"{defender.name} has already fallen."],
+        )
+
     is_player_atk = isinstance(attacker, Player)
     atk_val = attacker.effective_attack if is_player_atk else attacker.attack  # type: ignore[attr-defined]
 
@@ -78,7 +86,7 @@ def resolve_melee_attack(
             msgs.append(f"⚠️ Venom coursed into {defender.name}! Afflicted with Poison!")
 
     # Champion monster traits
-    if isinstance(attacker, Monster) and attacker.champion_affix == "Vampiric":
+    if isinstance(attacker, Monster) and attacker.champion_affix == "Vampiric" and not killed:
         healed = attacker.heal(3)
         if healed > 0:
             msgs.append(f"🩸 {attacker.name} drained vital essence (+{healed} HP)!")
@@ -120,8 +128,8 @@ def resolve_melee_attack(
             if defender.loot_drop and (defender.is_boss or rng.random() < 0.65):
                 dropped_item = create_item(defender.loot_drop)
                 if dropped_item:
-                    loot = dropped_item
                     if len(player_hero.inventory) < player_hero.max_slots:
+                        loot = dropped_item
                         player_hero.inventory.append(dropped_item)
                         msgs.append(f"Found loot: {dropped_item.name} ({dropped_item.rarity.upper()})!")
                     else:

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `52`
-- **Total Class Methods**: `162`
-- **Total Source Lines**: `7904`
+- **Total Class Methods**: `165`
+- **Total Source Lines**: `7939`
 
 ---
 
@@ -26,7 +26,7 @@
 ### [`crawler/combat.py`](crawler/combat.py)
 > *Turn-based tactical combat resolution for Crypt-Crawler.*
 
-**Size**: `504` lines (`17679` bytes)
+**Size**: `512` lines (`17923` bytes)
 
 **Classes:**
 - `class CombatResult`
@@ -239,7 +239,7 @@
 ### [`tests/test_combat.py`](tests/test_combat.py)
 > *Unit tests for combat, leveling and inventory management.*
 
-**Size**: `375` lines (`15334` bytes)
+**Size**: `402` lines (`16663` bytes)
 
 **Classes:**
 - `class TestCombat`
@@ -267,6 +267,9 @@
   - Method `.test_divine_aegis_draught_potion()`
   - Method `.test_unknown_hero_class_normalizes_to_paladin()`
   - Method `.test_add_xp_rejects_negative()`
+  - Method `.test_no_reward_for_attacking_corpse()`
+  - Method `.test_full_inventory_loot_contract()`
+  - Method `.test_vampiric_no_heal_on_kill()`
 - `class TestChampionDepth` - *Slice 4: champions fight back harder when cornered (Enrage).*
   - Method `._champion()`
   - Method `.test_champion_enrage_bonus_at_low_hp()`
