@@ -47,7 +47,7 @@ ENGAGEMENT_TUNING: Dict[str, Any] = {
         "hp_ratio": 0.28,
         "min_damage": 6,
         "bonus_mana": 2,
-        "bonus_def": 4,
+        "bonus_def": 6,
         "duration": 3,
         "max_per_floor": 1,
     },

@@ -26,7 +26,10 @@ class SoundSystem {
       this.ctx = new AudioCtx();
     }
     if (this.ctx && this.ctx.state === "suspended") {
-      this.ctx.resume();
+      try {
+        const r = this.ctx.resume();
+        if (r && typeof r.catch === "function") r.catch(() => {});
+      } catch (err) {}
     }
   }
 

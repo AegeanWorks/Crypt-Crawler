@@ -104,7 +104,7 @@ def check_near_miss_survival(current_hp: int, max_hp: int, damage_taken: int) ->
         return {
             "type": "NEAR_MISS_SURGE",
             "hp_remaining": current_hp,
-            "message": "⚡ NEAR-MISS ADRENALINE SURGE! Stared death in the eyes and stood firm (+2 MP, +4 DEF barrier)!",
+            "message": "⚡ NEAR-MISS ADRENALINE SURGE! Stared death in the eyes and stood firm (+2 MP, +6 DEF barrier)!",
             "bonus_mana": tune["bonus_mana"],
             "bonus_def": tune["bonus_def"],
             "duration": tune["duration"],

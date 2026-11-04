@@ -60,9 +60,9 @@ class CryptCrawlerHandler(SimpleHTTPRequestHandler):
             )
         elif parsed.path == "/api/new-game":
             params = parse_qs(parsed.query)
+            raw_vals = params.get("seed", [])
             try:
-                raw_seed = int(params.get("seed", ["0"])[0])
-                seed = raw_seed if raw_seed != 0 else None
+                seed = int(raw_vals[0]) if raw_vals and raw_vals[0] not in ("", None) else None
             except (ValueError, TypeError):
                 seed = None
 

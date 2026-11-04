@@ -225,8 +225,8 @@ export class UIController {
     const heroClass = player?.hero_class || "paladin";
     const costsByClass = {
       paladin: { btnActionFireball: 10, btnActionBash: 4, btnActionHeal: 8, btnActionShieldWall: 6 },
-      rogue: { btnActionFireball: 4, btnActionBash: 6, btnActionHeal: 10, btnActionShieldWall: 8 },
-      mage: { btnActionFireball: 10, btnActionBash: 6, btnActionHeal: 10, btnActionShieldWall: 6 },
+      rogue: { btnActionFireball: 4, btnActionBash: 6, btnActionHeal: 8, btnActionShieldWall: 8 },
+      mage: { btnActionFireball: 10, btnActionBash: 6, btnActionHeal: 8, btnActionShieldWall: 6 },
     };
     const costs = costsByClass[heroClass] || costsByClass.paladin;
     for (const [id, cost] of Object.entries(costs)) {

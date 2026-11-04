@@ -78,7 +78,7 @@ export const DIFFICULTIES = {
 export const TUNING = {
   chest: { relicRate: 0.14, jackpotRate: 0.20, jackpotMult: 2.4, omenCapMult: 3.0, baseMin: 17, baseRange: 14, depthBonus: 10 },
   urn: { jackpotRate: 0.18, jackpotMult: 2.4, omenCapMult: 3.0, baseMin: 6, baseRange: 11, depthBonus: 4 },
-  surge: { hpRatio: 0.28, minDamage: 6, bonusMana: 2, bonusDef: 4, duration: 3, maxPerFloor: 1 },
+  surge: { hpRatio: 0.28, minDamage: 6, bonusMana: 2, bonusDef: 6, duration: 3, maxPerFloor: 1 },
   streak: { decayTurns: 4, doubleAt: 2, doubleXp: 10, tripleAt: 3, tripleMana: 1, rampageAt: 5, rampageXp: 25, rampageGold: 5 },
   combo: { base: 12, perDepth: 3 },
 };
@@ -217,7 +217,7 @@ export class GameEngine {
     }
 
     try {
-      const runSeed = seed || Date.now() % 1000000;
+      const runSeed = seed === null || seed === undefined || seed === "" ? Date.now() % 1000000 : Number(seed);
       this.runSeed = runSeed;
       const url = `/api/new-game?seed=${runSeed}&depth=${this.depth}&class=${this.heroClass}`;
       const res = await fetch(url);
@@ -234,7 +234,7 @@ export class GameEngine {
     } catch (err) {
       if (token !== this.runToken) return;
       console.warn("Server API fallback to offline procedural generator:", err);
-      if (!this.runSeed) this.runSeed = seed || Date.now() % 1000000;
+      if (!this.runSeed) this.runSeed = (seed === null || seed === undefined || seed === "" ? Date.now() % 1000000 : Number(seed));
       this._generateOfflineState(this.runSeed, depth, this.heroClass);
       this.bounties = this._generateOfflineBounties(this.depth, this.runSeed);
     }
@@ -1073,11 +1073,11 @@ export class GameEngine {
     this.player.status_effects.shield_wall = Math.max(this.player.status_effects.shield_wall || 0, TUNING.surge.duration);
     this._recalculatePlayerStats();
     this.renderer.addFloatingText("⚡ ADRENALINE SURGE!", this.player.x, this.player.y, "#e53e3e");
-    this.ui.logMessage("⚡ NEAR-MISS ADRENALINE SURGE! Stared death in the face and rallied (+2 MP, +4 DEF Barrier)!", "crit");
+    this.ui.logMessage("⚡ NEAR-MISS ADRENALINE SURGE! Stared death in the face and rallied (+2 MP, +6 DEF Barrier)!", "crit");
   }
 
   _grantXp(amount) {
-    if (!amount) return;
+    if (!Number.isFinite(amount) || amount <= 0) return;
     this.player.xp += amount;
     while (this.player.xp >= this.player.next_xp) {
       this.player.xp -= this.player.next_xp;
@@ -1680,6 +1680,8 @@ export class GameEngine {
   }
 
   attackMonster(monster) {
+    if (!monster || monster.hp <= 0) return;
+    if (this.player.hp <= 0) return;
     const atk = this.player.attack;
     const def = monster.defense;
     const baseDmg = Math.max(1, atk - def);
@@ -2087,6 +2089,7 @@ export class GameEngine {
     if (this.gameOver || this.victory || this.transitioning) return;
     if (index < 0 || index >= this.player.inventory.length) return;
     const item = this.player.inventory[index];
+    if (item && item.id === "crown_eternity") return;
     const price = this._sellPrice(item);
     this.player.inventory.splice(index, 1);
     this.player.gold += price;

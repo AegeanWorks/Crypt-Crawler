@@ -116,7 +116,7 @@ Hermit Grimbold opens a two-tab shop on B2F and deeper. **Buy** spends gold on p
 | Urn jackpot | 18% | 2.4x, omen-capped 3.0x | same as above |
 | Soul toll relic | 50% | one of 4 rares, if backpack fits | stated here, coded in `engine.js:resolveSoul` |
 | Mimic floor | 1-in-4 floors with chests | fight, no loot | `mimicChestIndex` hash |
-| Near-miss survival surge | <=28% HP + >=6 dmg | +2 MP, +4 DEF 3 turns, max 1/floor then flavor | `crawler/engagement.py:ENGAGEMENT_TUNING["surge"]` |
+| Near-miss survival surge | <=28% HP + >=6 dmg | +2 MP, +6 DEF 3 turns, max 1/floor then flavor | `crawler/engagement.py:ENGAGEMENT_TUNING["surge"]` |
 
 Ethics line: tension yes, manipulation no. No empty chests, no low-HP farming (surge capped), no timers, no pay-to-win, no sunk-cost loops.
 

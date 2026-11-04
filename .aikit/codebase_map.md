@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `29`
-- **Total Classes**: `31`
+- **Total Python Modules**: `30`
+- **Total Classes**: `32`
 - **Total Top-Level Functions**: `58`
-- **Total Class Methods**: `196`
-- **Total Source Lines**: `8653`
+- **Total Class Methods**: `203`
+- **Total Source Lines**: `8714`
 
 ---
 
@@ -178,7 +178,7 @@
 ### [`crawler/server.py`](crawler/server.py)
 > *Lightweight HTTP server and REST dispatch for Crypt-Crawler.*
 
-**Size**: `225` lines (`10083` bytes)
+**Size**: `225` lines (`10105` bytes)
 
 **Classes:**
 - `class CryptCrawlerHandler`
@@ -469,6 +469,23 @@
   - Method `.test_api_new_game_with_class_and_merchant()`
   - Method `.test_bounties_follow_dungeon_seed()`
   - Method `.test_random_seed_bounties_follow_returned_seed()`
+
+---
+
+### [`tests/test_swarm_fixes.py`](tests/test_swarm_fixes.py)
+> *Swarm-triage regression locks: verified true findings only (failing-first).*
+
+**Size**: `61` lines (`2931` bytes)
+
+**Classes:**
+- `class TestSwarmFixes`
+  - Method `.test_crown_cannot_be_sold()`
+  - Method `.test_grantxp_rejects_nonpositive()`
+  - Method `.test_attack_monster_guards_corpse_and_corpse_attacker()`
+  - Method `.test_heal_costs_match_engine()`
+  - Method `.test_surge_docs_match_barrier()`
+  - Method `.test_audio_resume_caught()`
+  - Method `.test_seed_zero_is_deterministic()`
 
 ---
 
