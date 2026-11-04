@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `53`
-- **Total Class Methods**: `172`
-- **Total Source Lines**: `8011`
+- **Total Class Methods**: `177`
+- **Total Source Lines**: `8067`
 
 ---
 
@@ -122,7 +122,7 @@
 ### [`crawler/foundry_packs.py`](crawler/foundry_packs.py)
 > *Foundry pack loader: the consumer-side half of the versioned adapter.*
 
-**Size**: `171` lines (`6231` bytes)
+**Size**: `174` lines (`6407` bytes)
 
 **Functions:**
 - `def pack_load_errors()` - *Recorded pack problems, each naming file + field + reason.*
@@ -323,7 +323,7 @@
 ### [`tests/test_foundry_packs.py`](tests/test_foundry_packs.py)
 > *Foundry pack integration: installed packs load and take their posts.*
 
-**Size**: `96` lines (`3823` bytes)
+**Size**: `149` lines (`6096` bytes)
 
 **Classes:**
 - `class TestFoundryPackLoading`
@@ -334,6 +334,11 @@
   - Method `.test_pack_boss_takes_stairs_alone()`
   - Method `.test_control_seed_still_lich()`
   - Method `.test_foundry_bosses_returns_isolated_copies()`
+  - Method `._write_temp_pack(tmp, overrides)`
+  - Method `._load_temp_dir(tmp)`
+  - Method `.test_blank_loot_item_rejected()`
+  - Method `.test_duplicate_seeds_rejected()`
+  - Method `.test_blank_name_rejected()`
   - Method `.test_bad_pack_skipped_loudly()`
 
 **Functions:**

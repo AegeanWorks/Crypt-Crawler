@@ -87,7 +87,7 @@ def _check_pack(path: Path, pack: Any) -> Optional[Tuple[str, Dict[str, Any], Li
         _fail(path, "boss_id", f"must match ^boss_[a-z0-9_]{{2,27}}$, got {boss_id!r}")
         return None
     name = pack.get("name")
-    if not isinstance(name, str) or not (1 <= len(name) <= 60):
+    if not isinstance(name, str) or not (1 <= len(name.strip()) <= 60):
         _fail(path, "name", "must be a 1-60 character string")
         return None
     stats = pack.get("stats")
@@ -104,7 +104,7 @@ def _check_pack(path: Path, pack: Any) -> Optional[Tuple[str, Dict[str, Any], Li
         entry[key] = value
     loot = pack.get("loot")
     item_id = loot.get("item_id") if isinstance(loot, dict) else None
-    if not isinstance(item_id, str) or not item_id:
+    if not isinstance(item_id, str) or not item_id.strip():
         _fail(path, "loot.item_id", "must be a non-empty item id")
         return None
     entry["loot_drop"] = item_id
@@ -119,7 +119,7 @@ def _check_pack(path: Path, pack: Any) -> Optional[Tuple[str, Dict[str, Any], Li
         _fail(path, "spawn.anchor", f"slice 1 supports 'stairs' only, got {spawn.get('anchor')!r}")
         return None
     if spawn.get("replaces") != "boss_lich":
-        _fail(path, "spawn.replaces", f"slice 1 supports 'boss_lich' only")
+        _fail(path, "spawn.replaces", f"slice 1 supports 'boss_lich' only, got {spawn.get('replaces')!r}")
         return None
     seeds = spawn.get("seeds")
     if (
@@ -128,6 +128,9 @@ def _check_pack(path: Path, pack: Any) -> Optional[Tuple[str, Dict[str, Any], Li
         or not all(type(s) is int and 1 <= s <= 999999 for s in seeds)
     ):
         _fail(path, "spawn.seeds", "must be a non-empty list of seeds 1..999999")
+        return None
+    if len(set(seeds)) != len(seeds):
+        _fail(path, "spawn.seeds", "must not contain duplicate seeds")
         return None
     claims = [(3, s) for s in seeds]
     return boss_id, entry, claims

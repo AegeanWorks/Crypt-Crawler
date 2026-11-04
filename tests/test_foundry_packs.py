@@ -80,6 +80,59 @@ class TestFoundryPackLoading(unittest.TestCase):
         finally:
             foundry_packs.reset_cache()
 
+    def _write_temp_pack(self, tmp, overrides):
+        import copy
+
+        pack = {
+            "pack_version": "1.0",
+            "target_game": "crypt-crawler",
+            "boss_id": "boss_temp_check",
+            "name": "Temp",
+            "stats": {"hp": 50, "attack": 10, "defense": 2, "xp_reward": 50, "gold_reward": 50},
+            "loot": {"item_id": "ring_shadow"},
+            "spawn": {"depth": 3, "anchor": "stairs", "replaces": "boss_lich", "seeds": [999991]},
+        }
+        for key, value in overrides.items():
+            if "." in key:
+                top, sub = key.split(".", 1)
+                pack[top] = copy.deepcopy(pack[top])
+                pack[top][sub] = value
+            else:
+                pack[key] = value
+        path = Path(tmp) / "boss_temp_check.json"
+        path.write_text(json.dumps(pack), encoding="utf-8")
+
+    def _load_temp_dir(self, tmp):
+        old = foundry_packs.PACKS_DIR
+        foundry_packs.PACKS_DIR = Path(tmp)
+        try:
+            foundry_packs.reset_cache()
+            return dict(foundry_packs.foundry_bosses()), list(foundry_packs.pack_load_errors())
+        finally:
+            foundry_packs.PACKS_DIR = old
+            foundry_packs.reset_cache()
+
+    def test_blank_loot_item_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_temp_pack(tmp, {"loot": {"item_id": "   "}})
+            bosses, errors = self._load_temp_dir(tmp)
+            self.assertEqual(bosses, {})
+            self.assertTrue(any("loot.item_id" in e for e in errors))
+
+    def test_duplicate_seeds_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_temp_pack(tmp, {"spawn": {"depth": 3, "anchor": "stairs", "replaces": "boss_lich", "seeds": [42, 42]}})
+            bosses, errors = self._load_temp_dir(tmp)
+            self.assertEqual(bosses, {})
+            self.assertTrue(any("spawn.seeds" in e and "duplicate" in e for e in errors))
+
+    def test_blank_name_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_temp_pack(tmp, {"name": "   "})
+            bosses, errors = self._load_temp_dir(tmp)
+            self.assertEqual(bosses, {})
+            self.assertTrue(any("name" in e for e in errors))
+
     def test_bad_pack_skipped_loudly(self):
         with tempfile.TemporaryDirectory() as tmp:
             bad = Path(tmp) / "boss_broken.json"
