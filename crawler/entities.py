@@ -735,8 +735,9 @@ class Player(Entity):
         slot = item.item_type
         if slot not in self.equipped:
             return False
-        if item in self.inventory:
-            self.inventory.remove(item)
+        if item not in self.inventory:
+            return False
+        self.inventory.remove(item)
         if self.equipped[slot] is not None:
             self.inventory.append(self.equipped[slot])  # type: ignore[arg-type]
         self.equipped[slot] = item
@@ -760,7 +761,7 @@ class Player(Entity):
         self.mana = min(self.mana, self.effective_max_mana)
 
     def use_item(self, item_index: int) -> Tuple[bool, str]:
-        if item_index < 0 or item_index >= len(self.inventory):
+        if type(item_index) is not int or item_index < 0 or item_index >= len(self.inventory):
             return False, "Invalid item index."
         item = self.inventory[item_index]
 

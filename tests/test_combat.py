@@ -27,7 +27,8 @@ class TestCombat(unittest.TestCase):
         base_atk = self.player.effective_attack
         sword = create_item("sword_iron")
         self.assertIsNotNone(sword)
-        self.player.equip(sword)  # type: ignore[arg-type]
+        self.player.inventory.append(sword)
+        self.assertTrue(self.player.equip(sword))  # type: ignore[arg-type]
 
         self.assertEqual(self.player.effective_attack, base_atk + 4)
         self.assertEqual(self.player.equipped["weapon"], sword)
@@ -44,6 +45,84 @@ class TestCombat(unittest.TestCase):
         self.assertEqual(self.skeleton.hp, self.skeleton.max_hp)
         self.assertEqual(self.skeleton.take_damage(-5), 0)
         self.assertEqual(self.skeleton.hp, self.skeleton.max_hp)
+
+    def test_dead_attacker_cannot_deal_damage(self):
+        corpse = spawn_monster("skeleton", x=0, y=0, depth=1)
+        corpse.hp = 0
+        victim_hp = self.skeleton.hp
+        res = resolve_melee_attack(corpse, self.skeleton, self.rng)
+        self.assertEqual(res.damage_dealt, 0)
+        self.assertFalse(res.target_killed)
+        self.assertEqual(self.skeleton.hp, victim_hp)
+        self.assertIn("has already fallen", res.messages[0])
+
+    def _fill_backpack(self):
+        while len(self.player.inventory) < self.player.max_slots:
+            item = create_item("potion_health")
+            self.assertIsNotNone(item)
+            self.player.inventory.append(item)
+
+    def _boss_with_loot(self):
+        boss = spawn_monster("skeleton", x=5, y=6, depth=1)
+        boss.hp = 1
+        boss.loot_drop = "sword_iron"
+        boss.is_boss = True
+        return boss
+
+    def test_full_inventory_loot_warns_on_bash(self):
+        self._fill_backpack()
+        res = shield_bash(self.player, self._boss_with_loot(), random.Random(1))
+        self.assertTrue(res.target_killed)
+        self.assertIsNone(res.loot_gained)
+        self.assertTrue(any("inventory is full" in m for m in res.messages))
+
+    def test_full_inventory_loot_warns_on_fireball(self):
+        self._fill_backpack()
+        res = cast_fireball(self.player, self._boss_with_loot(), random.Random(1))
+        self.assertTrue(res.target_killed)
+        self.assertIsNone(res.loot_gained)
+        self.assertTrue(any("inventory is full" in m for m in res.messages))
+
+    def test_full_inventory_loot_warns_on_shadow_strike(self):
+        self._fill_backpack()
+        res = shadow_strike(self.player, self._boss_with_loot(), random.Random(1))
+        self.assertTrue(res.target_killed)
+        self.assertIsNone(res.loot_gained)
+        self.assertTrue(any("inventory is full" in m for m in res.messages))
+
+    def test_full_inventory_loot_warns_on_frost_nova(self):
+        self._fill_backpack()
+        res = frost_nova(self.player, self._boss_with_loot(), random.Random(1))
+        self.assertTrue(res.target_killed)
+        self.assertIsNone(res.loot_gained)
+        self.assertTrue(any("inventory is full" in m for m in res.messages))
+
+    def test_full_inventory_loot_warns_on_arcane_nova(self):
+        self._fill_backpack()
+        ok, results, _summary = arcane_nova(
+            self.player, [self._boss_with_loot()], rng=random.Random(1)
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(results), 1)
+        self.assertTrue(results[0].target_killed)
+        self.assertIsNone(results[0].loot_gained)
+        self.assertTrue(any("inventory is full" in m for m in results[0].messages))
+
+    def test_molten_recoil_reports_attacker_death(self):
+        self.player.hp = 1
+        molten = spawn_monster("skeleton", x=5, y=6, depth=1)
+        molten.hp = 28
+        molten.champion_affix = "Molten"
+        res = resolve_melee_attack(self.player, molten, random.Random(3))
+        self.assertEqual(self.player.hp, 0)
+        self.assertFalse(res.target_killed)
+        self.assertTrue(res.attacker_died)
+        self.assertTrue(any("molten burns" in m for m in res.messages))
+        # Control: a normal non-lethal exchange reports no attacker death.
+        oversight = resolve_melee_attack(
+            Player(name="Control", x=0, y=0), self.skeleton, random.Random(3)
+        )
+        self.assertFalse(oversight.attacker_died)
 
     def test_killing_monster_awards_xp_and_gold(self):
         self.skeleton.hp = 1
@@ -217,6 +296,8 @@ class TestCombat(unittest.TestCase):
         base_crit = self.player.effective_crit_chance
 
         # Equip amulet and boots
+        self.player.inventory.append(amulet)
+        self.player.inventory.append(boots)
         self.player.equip(amulet)
         self.player.equip(boots)
         self.assertEqual(self.player.equipped["amulet"], amulet)
@@ -227,6 +308,7 @@ class TestCombat(unittest.TestCase):
         self.assertAlmostEqual(self.player.effective_crit_chance, base_crit + 0.10)
 
         # Equip weapon
+        self.player.inventory.append(hammer)
         self.player.equip(hammer)
         self.assertEqual(self.player.equipped["weapon"], hammer)
         self.assertEqual(self.player.effective_attack, base_atk + 2 + 13)
@@ -248,6 +330,7 @@ class TestCombat(unittest.TestCase):
         hammer = create_item("hammer_thunder")
         self.assertIsNotNone(hammer)
         hammer.stats["stun_chance"] = 100
+        self.player.inventory.append(hammer)
         self.player.equip(hammer)  # type: ignore[arg-type]
         self.skeleton.hp = 1000
 
@@ -261,6 +344,7 @@ class TestCombat(unittest.TestCase):
         self.assertIsNotNone(dagger)
         dagger.stats["poison_chance"] = 100
         dagger.name = "Custom Fang"
+        self.player.inventory.append(dagger)
         self.player.equip(dagger)  # type: ignore[arg-type]
         self.skeleton.hp = 1000
 
@@ -272,6 +356,7 @@ class TestCombat(unittest.TestCase):
     def test_max_pool_equipment_caps_healing_and_clamps_on_unequip(self):
         ring = create_item("ring_vitality")
         self.assertIsNotNone(ring)
+        self.player.inventory.append(ring)
         self.player.equip(ring)  # type: ignore[arg-type]
         self.assertEqual(self.player.effective_max_hp, self.player.max_hp + 20)
 
@@ -289,6 +374,7 @@ class TestCombat(unittest.TestCase):
 
         mana_ring = create_item("ring_power")
         self.assertIsNotNone(mana_ring)
+        self.player.inventory.append(mana_ring)
         self.player.equip(mana_ring)  # type: ignore[arg-type]
         self.assertEqual(self.player.effective_max_mana, self.player.max_mana + 10)
         self.player.mana = self.player.effective_max_mana
@@ -341,6 +427,22 @@ class TestCombat(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.player.add_xp(-50)
         self.assertEqual(self.player.xp, before)
+
+    def test_equip_requires_ownership(self):
+        hammer = create_item("hammer_thunder")
+        self.assertFalse(hammer in self.player.inventory)
+        self.assertFalse(self.player.equip(hammer))
+        self.assertIsNone(self.player.equipped["weapon"])
+        self.player.inventory.append(hammer)
+        self.assertTrue(self.player.equip(hammer))
+        self.assertEqual(self.player.equipped["weapon"], hammer)
+
+    def test_use_item_rejects_non_integer_index(self):
+        self.player.inventory.append(create_item("potion_health"))
+        for bad in (None, "0", 1.5, True):
+            ok, msg = self.player.use_item(bad)  # type: ignore[arg-type]
+            self.assertFalse(ok)
+            self.assertEqual(msg, "Invalid item index.")
 
     def test_no_reward_for_attacking_corpse(self):
         self.skeleton.hp = 1

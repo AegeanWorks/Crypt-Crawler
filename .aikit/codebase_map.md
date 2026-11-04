@@ -9,8 +9,8 @@
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
 - **Total Top-Level Functions**: `53`
-- **Total Class Methods**: `177`
-- **Total Source Lines**: `8067`
+- **Total Class Methods**: `188`
+- **Total Source Lines**: `8199`
 
 ---
 
@@ -26,7 +26,7 @@
 ### [`crawler/combat.py`](crawler/combat.py)
 > *Turn-based tactical combat resolution for Crypt-Crawler.*
 
-**Size**: `512` lines (`17923` bytes)
+**Size**: `541` lines (`19114` bytes)
 
 **Classes:**
 - `class CombatResult`
@@ -82,7 +82,7 @@
 ### [`crawler/entities.py`](crawler/entities.py)
 > *Entities, items, inventory and stats for Crypt-Crawler.*
 
-**Size**: `832` lines (`27137` bytes)
+**Size**: `833` lines (`27193` bytes)
 
 **Classes:**
 - `class Item`
@@ -241,7 +241,7 @@
 ### [`tests/test_combat.py`](tests/test_combat.py)
 > *Unit tests for combat, leveling and inventory management.*
 
-**Size**: `409` lines (`17036` bytes)
+**Size**: `511` lines (`21595` bytes)
 
 **Classes:**
 - `class TestCombat`
@@ -249,6 +249,15 @@
   - Method `.test_player_stats_and_equipment()`
   - Method `.test_melee_attack_damages_target()`
   - Method `.test_take_damage_zero_and_negative_are_noops()`
+  - Method `.test_dead_attacker_cannot_deal_damage()`
+  - Method `._fill_backpack()`
+  - Method `._boss_with_loot()`
+  - Method `.test_full_inventory_loot_warns_on_bash()`
+  - Method `.test_full_inventory_loot_warns_on_fireball()`
+  - Method `.test_full_inventory_loot_warns_on_shadow_strike()`
+  - Method `.test_full_inventory_loot_warns_on_frost_nova()`
+  - Method `.test_full_inventory_loot_warns_on_arcane_nova()`
+  - Method `.test_molten_recoil_reports_attacker_death()`
   - Method `.test_killing_monster_awards_xp_and_gold()`
   - Method `.test_level_up()`
   - Method `.test_potion_healing()`
@@ -270,6 +279,8 @@
   - Method `.test_divine_aegis_draught_potion()`
   - Method `.test_unknown_hero_class_normalizes_to_paladin()`
   - Method `.test_add_xp_rejects_negative()`
+  - Method `.test_equip_requires_ownership()`
+  - Method `.test_use_item_rejects_non_integer_index()`
   - Method `.test_no_reward_for_attacking_corpse()`
   - Method `.test_full_inventory_loot_contract()`
   - Method `.test_vampiric_no_heal_on_kill()`
