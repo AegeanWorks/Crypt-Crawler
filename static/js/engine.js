@@ -2915,6 +2915,7 @@ export class GameEngine {
           traps: this.dungeon.traps.map((t) => ({
             x: t.x,
             y: t.y,
+            kind: t.kind || "spike",
             triggered: t.triggered,
             discovered: Boolean(t.discovered),
             disarmed: Boolean(t.disarmed),

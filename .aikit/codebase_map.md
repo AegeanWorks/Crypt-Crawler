@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `25`
 - **Total Classes**: `29`
-- **Total Top-Level Functions**: `53`
-- **Total Class Methods**: `188`
-- **Total Source Lines**: `8199`
+- **Total Top-Level Functions**: `54`
+- **Total Class Methods**: `189`
+- **Total Source Lines**: `8255`
 
 ---
 
@@ -360,13 +360,14 @@
 ### [`tests/test_inspect.py`](tests/test_inspect.py)
 > *Unit tests for headless inspection configuration and viewports.*
 
-**Size**: `44` lines (`1736` bytes)
+**Size**: `53` lines (`2285` bytes)
 
 **Classes:**
 - `class TestInspectConfig`
   - Method `.test_viewports_declared()`
   - Method `.test_failed_check_predicate_uses_falsy_not_identity()`
   - Method `.test_skip_is_vacuous_pass_for_optional_fixtures()`
+  - Method `.test_console_warnings_do_not_fail_gate()`
 
 ---
 
@@ -436,7 +437,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `1859` lines (`77219` bytes)
+**Size**: `1889` lines (`78452` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*
@@ -465,10 +466,11 @@
 ### [`tools/inspect_ui.py`](tools/inspect_ui.py)
 > *Headless browser visual inspection and UI auditing tool for Crypt-Crawler.*
 
-**Size**: `1589` lines (`91030` bytes)
+**Size**: `1606` lines (`91875` bytes)
 
 **Functions:**
 - `def check_failed(value)` - *Gate predicate: any falsy audit value fails, any truthy value passes.*
+- `def is_console_failure(entry)` - *README gate: console errors and uncaught exceptions fail; warnings don't.*
 - `def run_inspection(viewports, scenarios, out_dir)`
 - `def main()`
 

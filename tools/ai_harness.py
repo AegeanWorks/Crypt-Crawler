@@ -1537,6 +1537,36 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_resume", not harness.errors, harness.errors))
     page.context.close()
 
+    # Resume must restore trap variants, not just positions: a revealed dart that
+    # comes back as a spike lies to the player about the threat.
+    page = harness.open_page(seed)
+    trap_resume = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            if (!e.dungeon.traps.length) return { skipped: true };
+            const kinds = ["dart", "snare", "spike"];
+            e.dungeon.traps.forEach((t, i) => { t.kind = kinds[i % kinds.length]; });
+            const before = e.dungeon.traps.map((t) => t.kind);
+            e.saveGameState();
+            await e.start(null, 1, "paladin", true);
+            return {
+                skipped: false,
+                before,
+                after: (e.dungeon.traps || []).map((t) => t.kind),
+                transitioning: e.transitioning,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "resume_restores_trap_kinds",
+        trap_resume.get("skipped") is not True
+        and trap_resume["before"] == trap_resume["after"]
+        and trap_resume["transitioning"] is False,
+        trap_resume,
+    ))
+    checks.append(_check("no_page_errors_after_trap_resume", not harness.errors, harness.errors))
+    page.context.close()
+
     # Floor omens: deterministic per seed+depth, all reachable, and actually applied.
     page = harness.open_page(seed)
     omen = page.evaluate(

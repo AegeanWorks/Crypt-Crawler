@@ -1,7 +1,7 @@
 """Unit tests for headless inspection configuration and viewports."""
 
 import unittest
-from tools.inspect_ui import VIEWPORTS, check_failed
+from tools.inspect_ui import VIEWPORTS, check_failed, is_console_failure
 
 
 class TestInspectConfig(unittest.TestCase):
@@ -38,6 +38,15 @@ class TestInspectConfig(unittest.TestCase):
             bounty_xp.get("skip") is True or bounty_xp.get("leveled") is True
         )
         self.assertFalse(check_failed(objective.get("skip") is True or False))
+
+    def test_console_warnings_do_not_fail_gate(self):
+        self.assertTrue(is_console_failure({"type": "error"}))
+        self.assertTrue(is_console_failure({"type": "uncaught"}))
+        self.assertFalse(is_console_failure({"type": "warning"}))
+        self.assertFalse(is_console_failure({"type": "info"}))
+        # A warnings-only report passes the console gate.
+        report_errors = [{"viewport": "desktop", "type": "warning", "text": "x"}]
+        self.assertFalse(any(is_console_failure(e) for e in report_errors))
 
 
 if __name__ == "__main__":

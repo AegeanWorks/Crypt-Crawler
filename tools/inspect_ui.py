@@ -37,6 +37,11 @@ def check_failed(value: Any) -> bool:
     return not value
 
 
+def is_console_failure(entry: Dict[str, Any]) -> bool:
+    """README gate: console errors and uncaught exceptions fail; warnings don't."""
+    return entry.get("type") in ("error", "uncaught")
+
+
 def run_inspection(
     viewports: List[str],
     scenarios: List[str],
@@ -59,6 +64,7 @@ def run_inspection(
         "timestamp": time.time(),
         "url": base_url,
         "console_errors": [],
+        "console_warnings": [],
         "audit_checks": [],
         "screenshots": [],
     }
@@ -78,9 +84,13 @@ def run_inspection(
                 )
                 page = context.new_page()
 
-                # Collect console errors
+                # Collect console errors (gate) and warnings (advisory only)
                 def handle_console(msg: Any) -> None:
-                    if msg.type in ("error", "warning"):
+                    if msg.type == "warning":
+                        report["console_warnings"].append(
+                            {"viewport": vp_name, "type": msg.type, "text": msg.text}
+                        )
+                    elif is_console_failure({"type": msg.type}):
                         report["console_errors"].append(
                             {"viewport": vp_name, "type": msg.type, "text": msg.text}
                         )
@@ -1565,14 +1575,21 @@ def main() -> int:
     total_checks = report.get("total_checks", 0)
     print(f" Screenshots Captured: {len(report['screenshots'])}")
     print(f" Audit Checks Passed:  {total_checks - len(failed_checks)} / {total_checks}")
-    print(f" Console Errors:       {len(report['console_errors'])}")
+    console_failures = [e for e in report["console_errors"] if is_console_failure(e)]
+    print(f" Console Errors:       {len(console_failures)}")
+    print(f" Console Warnings:     {len(report['console_warnings'])}")
 
-    if report["console_errors"]:
-        print("\n [WARNING] Detected Browser Errors:")
-        for err in report["console_errors"]:
+    if console_failures:
+        print("\n [FAIL] Detected Browser Errors:")
+        for err in console_failures:
             print(f"   - [{err['viewport']}] {err['type']}: {err['text']}")
     else:
         print("\n [OK] Zero browser console errors or uncaught exceptions detected!")
+
+    if report["console_warnings"]:
+        print("\n [ADVISORY] Browser warnings (do not fail the gate):")
+        for warn in report["console_warnings"]:
+            print(f"   - [{warn['viewport']}] {warn['type']}: {warn['text']}")
 
     if failed_checks:
         print("\n [FAIL] Failing audit checks:")
@@ -1582,7 +1599,7 @@ def main() -> int:
         print(" [OK] Every audit check passed.")
 
     print("=" * 60)
-    return 0 if not report["console_errors"] and not failed_checks else 1
+    return 0 if not console_failures and not failed_checks else 1
 
 
 if __name__ == "__main__":
