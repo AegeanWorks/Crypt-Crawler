@@ -70,6 +70,28 @@ export const DIFFICULTIES = {
   hard: { id: "hard", name: "Hard", hp: 1.4, attack: 1.25, reward: 1.15 },
 };
 
+/**
+ * Engagement tuning mirror of `crawler/engagement.py:ENGAGEMENT_TUNING`.
+ * Single source of truth is the Python table; this mirror must match it.
+ * `tests/test_odds_parity.py` fails on drift.
+ */
+export const TUNING = {
+  chest: { relicRate: 0.14, jackpotRate: 0.20, jackpotMult: 2.4, omenCapMult: 3.0, baseMin: 17, baseRange: 14, depthBonus: 10 },
+  urn: { jackpotRate: 0.18, jackpotMult: 2.4, omenCapMult: 3.0, baseMin: 6, baseRange: 11, depthBonus: 4 },
+  surge: { hpRatio: 0.28, minDamage: 6, bonusMana: 2, bonusDef: 4, duration: 3, maxPerFloor: 1 },
+  streak: { decayTurns: 4, doubleAt: 2, doubleXp: 10, tripleAt: 3, tripleMana: 1, rampageAt: 5, rampageXp: 25, rampageGold: 5 },
+  combo: { base: 12, perDepth: 3 },
+};
+
+export function depthSeed(runSeed, depth) {
+  let h = (Number(runSeed) >>> 0) ^ (Math.imul(Number(depth) || 1, 0x9e3779b1) >>> 0);
+  h >>>= 0;
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b);
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+  h = (h ^ (h >>> 16)) >>> 0;
+  return h >>> 0;
+}
+
 
 export class GameEngine {
   constructor() {
@@ -92,6 +114,8 @@ export class GameEngine {
     this.kills = 0;
     this.killStreak = 0;
     this.turnsSinceKill = 0;
+    this.runSeed = null;
+    this.surgeFloor = 0;
     this.heroClass = "paladin";
     this.difficulty = "normal";
     this.gameOver = false;
@@ -146,6 +170,7 @@ export class GameEngine {
     this.turn = 1;
     this.killStreak = 0;
     this.turnsSinceKill = 0;
+    this.surgeFloor = 0;
     this.gameOver = false;
     this.victory = false;
     this.heroClass = heroClass || "paladin";
@@ -169,6 +194,8 @@ export class GameEngine {
         this.heroClass = saved.heroClass || this.player.hero_class || "paladin";
         this.difficulty = DIFFICULTIES[saved.difficulty] ? saved.difficulty : "normal";
         this.bounties = saved.bounties || this._generateOfflineBounties(this.depth);
+        this.runSeed = Number.isFinite(saved.runSeed) ? saved.runSeed : (this.dungeon.seed || null);
+        this.surgeFloor = Number.isFinite(saved.surgeFloor) ? saved.surgeFloor : 0;
         this.loreUnlocked = Array.from(new Set([
           ...(this.loreStart || []),
           ...loreArchive,
@@ -190,7 +217,9 @@ export class GameEngine {
     }
 
     try {
-      const url = `/api/new-game?seed=${seed || Date.now() % 1000000}&depth=${this.depth}&class=${this.heroClass}`;
+      const runSeed = seed || Date.now() % 1000000;
+      this.runSeed = runSeed;
+      const url = `/api/new-game?seed=${runSeed}&depth=${this.depth}&class=${this.heroClass}`;
       const res = await fetch(url);
       if (token !== this.runToken) return;
       if (!res.ok) throw new Error("Failed to load map from server");
@@ -201,12 +230,13 @@ export class GameEngine {
       this.player = data.player;
       this.monsters = data.monsters;
       this.merchantStock = data.merchant_stock || [];
-      this.bounties = data.bounties || this._generateOfflineBounties(this.depth);
+      this.bounties = data.bounties || this._generateOfflineBounties(this.depth, this.runSeed);
     } catch (err) {
       if (token !== this.runToken) return;
       console.warn("Server API fallback to offline procedural generator:", err);
-      this._generateOfflineState(seed, depth, this.heroClass);
-      this.bounties = this._generateOfflineBounties(this.depth);
+      if (!this.runSeed) this.runSeed = seed || Date.now() % 1000000;
+      this._generateOfflineState(this.runSeed, depth, this.heroClass);
+      this.bounties = this._generateOfflineBounties(this.depth, this.runSeed);
     }
 
     this._applyDifficulty();
@@ -924,9 +954,10 @@ export class GameEngine {
     this.ui.logMessage(`You descended into Depth B${newDepth}F! The catacombs grow colder...`, "system");
 
     try {
+      const floorSeed = depthSeed(this.runSeed || this.dungeon?.seed || 1, newDepth);
       let data = null;
       try {
-        const url = `/api/new-game?seed=${Date.now() % 1000000}&depth=${newDepth}&class=${this.heroClass}`;
+        const url = `/api/new-game?seed=${floorSeed}&depth=${newDepth}&class=${this.heroClass}`;
         const res = await fetch(url);
         if (token !== this.runToken) return;
         if (!res.ok) throw new Error("Failed to load map from server");
@@ -943,13 +974,13 @@ export class GameEngine {
         this.dungeon = new ClientDungeon(data.dungeon);
         this.monsters = data.monsters;
         this.merchantStock = data.merchant_stock || this.merchantStock;
-        this.bounties = data.bounties || this._generateOfflineBounties(this.depth);
+        this.bounties = data.bounties || this._generateOfflineBounties(this.depth, this.runSeed);
         this.player.x = data.dungeon.player_spawn[0];
         this.player.y = data.dungeon.player_spawn[1];
       } else {
         const prevPlayer = this.player;
-        this._generateOfflineState(Date.now() % 1000000, this.depth, this.heroClass);
-        this.bounties = this._generateOfflineBounties(this.depth);
+        this._generateOfflineState(floorSeed, this.depth, this.heroClass);
+        this.bounties = this._generateOfflineBounties(this.depth, this.runSeed);
         prevPlayer.x = this.dungeon.playerSpawn[0];
         prevPlayer.y = this.dungeon.playerSpawn[1];
         this.player = prevPlayer;
@@ -991,21 +1022,55 @@ export class GameEngine {
     this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
   }
 
-  _generateOfflineBounties(depth) {
-    return [
+  _generateOfflineBounties(depth, runSeed = null) {
+    const all = [
       { id: "bounty_urns", title: "Catacomb Purifier", desc: "Shatter 3 Burial Urns in the depths", target: 3, progress: 0, completed: false, reward_gold: 25 + depth * 10, reward_xp: 20 + depth * 5 },
       { id: "bounty_streak", title: "Frenzy of Blades", desc: "Achieve a x3 Kill Streak in rapid combat", target: 3, progress: 0, completed: false, reward_gold: 35 + depth * 10, reward_xp: 30 + depth * 5 },
+      { id: "bounty_champions", title: "Champion Slayer", desc: "Defeat an Elite Champion monster", target: 1, progress: 0, completed: false, reward_gold: 45 + depth * 15, reward_xp: 40 + depth * 10 },
       { id: "bounty_chests", title: "Vault Plunderer", desc: "Unlock 2 Hidden Treasure Chests", target: 2, progress: 0, completed: false, reward_gold: 30 + depth * 10, reward_xp: 25 + depth * 5 },
+      { id: "bounty_shrine", title: "Divine Reverence", desc: "Pray at an Ancient Shrine for blessing", target: 1, progress: 0, completed: false, reward_gold: 20 + depth * 5, reward_xp: 20 + depth * 5 },
       { id: "bounty_vault", title: "Seal Keeper", desc: "Open a sealed vault (requires 3 sigils)", target: 1, progress: 0, completed: false, reward_gold: 60 + depth * 20, reward_xp: 50 + depth * 10 },
     ];
+    // Deterministic 3-of-6 from (runSeed, depth): same contract as the server
+    // sampler (server uses its own RNG stream, so ids may differ per stream,
+    // but the shape — 3 distinct bounties, deterministic per seed+depth — holds).
+    let h = depthSeed(runSeed || 42, depth);
+    const mulberry = () => {
+      h |= 0; h = (h + 0x6d2b79f5) | 0;
+      let t = Math.imul(h ^ (h >>> 15), 1 | h);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const pool = all.slice();
+    const picked = [];
+    for (let i = 0; i < 3 && pool.length; i++) {
+      picked.push(pool.splice(Math.floor(mulberry() * pool.length), 1)[0]);
+    }
+    return picked;
+  }
+
+  _breakStreak(reason) {
+    if (!this.killStreak) return;
+    this.killStreak = 0;
+    this.turnsSinceKill = 0;
+    this.ui.updateStreak(0);
+    if (reason) this.ui.logMessage(`💔 Momentum broken: ${reason}.`, "system");
   }
 
   _triggerNearMissSurge() {
+    // Capped comeback: one real surge per floor, then flavor-only.
+    // (TUNING.surge.maxPerFloor; Python side documents the same cap.)
+    if (this.surgeFloor === this.depth) {
+      this.renderer.addFloatingText("ADRENALINE (spent)", this.player.x, this.player.y, this.renderer.warningColor);
+      this.ui.logMessage("⚡ Adrenaline already spent on this floor — the crypt offers no second wind.", "system");
+      return;
+    }
+    this.surgeFloor = this.depth;
     sounds.playNearMissSurge();
     this.renderer.shake(10, 260);
     this.ui.triggerAdrenalineVignette();
-    this.player.mana = Math.min(this.player.max_mana, this.player.mana + 2);
-    this.player.status_effects.shield_wall = Math.max(this.player.status_effects.shield_wall || 0, 3);
+    this.player.mana = Math.min(this.player.max_mana, this.player.mana + TUNING.surge.bonusMana);
+    this.player.status_effects.shield_wall = Math.max(this.player.status_effects.shield_wall || 0, TUNING.surge.duration);
     this._recalculatePlayerStats();
     this.renderer.addFloatingText("⚡ ADRENALINE SURGE!", this.player.x, this.player.y, "#e53e3e");
     this.ui.logMessage("⚡ NEAR-MISS ADRENALINE SURGE! Stared death in the face and rallied (+2 MP, +4 DEF Barrier)!", "crit");
@@ -1400,12 +1465,12 @@ export class GameEngine {
       urn.broken = true;
       sounds.playUrn();
       this.renderer.addParticles(nx, ny, "#9c4221", 10);
-      const isUrnCrit = Math.random() < 0.18;
+      const isUrnCrit = Math.random() < TUNING.urn.jackpotRate;
       const baseUrnGold = Math.floor(
-        (6 + Math.floor(Math.random() * 12)) * (this.omen?.goldMult || 1)
+        (TUNING.urn.baseMin + Math.floor(Math.random() * TUNING.urn.baseRange) + (this.depth - 1) * TUNING.urn.depthBonus) * (this.omen?.goldMult || 1)
       );
       const goldDrop = isUrnCrit
-        ? Math.min(Math.floor(baseUrnGold * 2.4), Math.floor((baseUrnGold / (this.omen?.goldMult || 1)) * 3.0))
+        ? Math.min(Math.floor(baseUrnGold * TUNING.urn.jackpotMult), Math.floor((baseUrnGold / (this.omen?.goldMult || 1)) * TUNING.urn.omenCapMult))
         : baseUrnGold;
       this.player.gold += goldDrop;
 
@@ -1484,20 +1549,21 @@ export class GameEngine {
         this.renderer.addFloatingText("MIMIC!", nx, ny, this.renderer.warningColor);
         this.renderer.addParticles(nx, ny, this.renderer.trapColor, 14);
         this.ui.logMessage("🦷 The chest was a mimic! It snaps shut and lunges from the lid!", "hit");
+        this._breakStreak("a mimic ambush");
         this.finishPlayerTurn();
         return;
       }
       chest.opened = true;
       const roll = Math.random();
       const baseGold = Math.floor(
-        (17 + Math.floor(Math.random() * 20) + (this.depth - 1) * 10)
+        (TUNING.chest.baseMin + Math.floor(Math.random() * TUNING.chest.baseRange) + (this.depth - 1) * TUNING.chest.depthBonus)
         * (this.omen?.goldMult || 1)
       );
       let goldFound = baseGold;
 
-      if (roll >= 0.14 && roll < 0.34) {
-        // Critical 2.4x Jackpot, omen-capped at 3.0x of base!
-        goldFound = Math.min(Math.floor(baseGold * 2.4), Math.floor((baseGold / (this.omen?.goldMult || 1)) * 3.0));
+      if (roll >= TUNING.chest.relicRate && roll < TUNING.chest.relicRate + TUNING.chest.jackpotRate) {
+        // Critical jackpot, omen-capped of base!
+        goldFound = Math.min(Math.floor(baseGold * TUNING.chest.jackpotMult), Math.floor((baseGold / (this.omen?.goldMult || 1)) * TUNING.chest.omenCapMult));
         sounds.playJackpot();
         this.renderer.shake(9, 240);
         this.renderer.addJackpotExplosion(nx, ny);
@@ -1513,7 +1579,7 @@ export class GameEngine {
       this.player.gold += goldFound;
       this.updateBountyProgress("bounty_chests", 1);
 
-      if (roll < 0.14 && this.player.inventory.length < 12) {
+      if (roll < TUNING.chest.relicRate && this.player.inventory.length < 12) {
         const pool = [
           { id: "potion_rejuvenation", name: "Draught of Rejuvenation", type: "potion", rarity: "rare", description: "Restores 30 HP & 20 Mana, cleanses afflictions.", stats: { heal_hp: 30, restore_mana: 20 } },
           { id: "potion_invulnerability", name: "Divine Aegis Draught", type: "potion", rarity: "rare", description: "Grants impenetrable Barrier (+6 DEF for 4 turns).", stats: { shield_wall_turns: 4 } },
@@ -1559,14 +1625,15 @@ export class GameEngine {
       this.player.hp = Math.max(0, this.player.hp - trapDmg);
       sounds.playHit(false);
       this.renderer.addFloatingText(`-${trapDmg} ${trapLabel}`, nx, ny, "#ff2222");
+      this._breakStreak("a trap");
 
       if (this.player.hp <= 0) {
         this.handlePlayerDeath("a concealed spike trap");
         return;
       }
 
-      // Check Near-Miss Adrenaline Surge on surviving trap
-      if (this.player.hp <= Math.floor(this.player.max_hp * 0.28) && trapDmg >= 6) {
+      // Check Near-Miss Adrenaline Surge on surviving trap (TUNING cap: 1/floor)
+      if (this.player.hp <= Math.floor(this.player.max_hp * TUNING.surge.hpRatio) && trapDmg >= TUNING.surge.minDamage) {
         this._triggerNearMissSurge();
       }
     }
@@ -1583,6 +1650,11 @@ export class GameEngine {
           return;
         }
       } else {
+        try {
+          const previewSeed = depthSeed(this.runSeed || this.dungeon?.seed || 1, this.depth + 1);
+          const preview = omenFor(previewSeed, this.depth + 1);
+          if (preview) this.ui.logMessage(`🕳️ The stairwell breathes ${preview.name} — B${this.depth + 1}F: ${preview.desc} Deeper gold runs richer.`, "system");
+        } catch (_) { /* preview is best-effort, never blocks descent */ }
         this.descendFloor();
         return;
       }
@@ -1604,7 +1676,7 @@ export class GameEngine {
   }
 
   _comboBonus() {
-    return 12 + this.depth * 3;
+    return TUNING.combo.base + this.depth * TUNING.combo.perDepth;
   }
 
   attackMonster(monster) {
@@ -2713,8 +2785,8 @@ export class GameEngine {
           this.ui.logMessage(`💢 ${monster.name} fights with desperate fury!`, "hit");
         }
 
-        // Check Near-Miss Adrenaline Surge on surviving heavy combat blow
-        if (this.player.hp > 0 && this.player.hp <= Math.floor(this.player.max_hp * 0.28) && dmg >= 6) {
+        // Check Near-Miss Adrenaline Surge on surviving heavy combat blow (TUNING cap: 1/floor)
+        if (this.player.hp > 0 && this.player.hp <= Math.floor(this.player.max_hp * TUNING.surge.hpRatio) && dmg >= TUNING.surge.minDamage) {
           this._triggerNearMissSurge();
         }
 
@@ -2896,6 +2968,8 @@ export class GameEngine {
         sigilCount: this.sigilCount,
         heroClass: this.heroClass,
         difficulty: this.difficulty,
+        runSeed: this.runSeed,
+        surgeFloor: this.surgeFloor,
         player: this.player,
         monsters: this.monsters,
         merchantStock: this.merchantStock,

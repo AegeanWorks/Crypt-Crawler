@@ -10,7 +10,7 @@
 - **Total Classes**: `31`
 - **Total Top-Level Functions**: `58`
 - **Total Class Methods**: `196`
-- **Total Source Lines**: `8646`
+- **Total Source Lines**: `8653`
 
 ---
 
@@ -419,7 +419,7 @@
 ### [`tests/test_odds_parity.py`](tests/test_odds_parity.py)
 > *Odds parity: stated README odds match coded odds in Python and shipped JS.*
 
-**Size**: `41` lines (`1571` bytes)
+**Size**: `48` lines (`2027` bytes)
 
 **Classes:**
 - `class TestOddsParity`

@@ -1688,7 +1688,7 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     checks.append(_check(
         "gilded_crypt_multiplies_chest_gold",
-        effects["chestOpened"] is True and effects["chestGold"] == 40,
+        effects["chestOpened"] is True and effects["chestGold"] == 36,
         effects,
     ))
     page.context.close()

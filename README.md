@@ -151,6 +151,7 @@ crypt-crawler/
 │   ├── entities.py           <- player and monster simulation
 │   ├── combat.py             <- combat calculations and status effects
 │   ├── lore.py               <- codex entries, pact altars and discovery events
+│   ├── engagement.py         <- engagement tuning table (single Python source of truth)
 │   ├── rewards.py            <- variable-ratio jackpots, near-miss & bounties
 │   ├── foundry_packs.py      <- foundry boss-pack loader (packs are data installs)
 │   └── server.py             <- HTTP request handler & REST endpoints
@@ -168,6 +169,7 @@ crypt-crawler/
 ├── tools/
 │   ├── inspect_ui.py         <- Playwright headless Edge UI inspector
 │   ├── ai_harness.py         <- seeded JSON gameplay harness for agents
+│   ├── engagement_metrics.py <- deterministic engagement metrics (seed x depth matrix)
 │   ├── record_replay.py      <- pins replay hashes for seed x depth combos
 │   ├── validate_fairness.py  <- rejects unwinnable/unfair seeds
 │   ├── verify_replay.py      <- checks live dungeons against pinned hashes
@@ -183,6 +185,8 @@ crypt-crawler/
 │   ├── test_inspect.py       <- inspection configuration tests
 │   ├── test_lore.py          <- codex data and /api/lore endpoint tests
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests
+│   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
+│   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
 │   └── test_server.py        <- web server endpoints tests
 └── .aikit/                   <- project memory: record, ledger, decisions, ui.json guard
 ```
