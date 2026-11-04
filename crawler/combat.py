@@ -17,6 +17,7 @@ class CombatResult:
     xp_gained: int = 0
     gold_gained: int = 0
     loot_gained: Optional[Item] = None
+    attacker_died: bool = False
     messages: List[str] = field(default_factory=list)
 
 
@@ -35,6 +36,14 @@ def resolve_melee_attack(
             is_critical=False,
             target_killed=False,
             messages=[f"{defender.name} has already fallen."],
+        )
+
+    if not attacker.is_alive:
+        return CombatResult(
+            damage_dealt=0,
+            is_critical=False,
+            target_killed=False,
+            messages=[f"{attacker.name} has already fallen."],
         )
 
     is_player_atk = isinstance(attacker, Player)
@@ -74,6 +83,7 @@ def resolve_melee_attack(
     killed = not defender.is_alive
 
     msgs: List[str] = []
+    attacker_died = False
     crit_txt = "CRITICAL HIT! " if is_crit else ""
     msgs.append(f"{attacker.name} strikes {defender.name} for {crit_txt}{actual_dmg} damage.")
     if enraged:
@@ -94,6 +104,9 @@ def resolve_melee_attack(
     if not killed and isinstance(defender, Monster) and defender.champion_affix == "Molten" and is_player_atk:
         recoil = attacker.take_damage(2)
         msgs.append(f"🔥 Molten aura scorched {attacker.name} for {recoil} burn damage!")
+        if not attacker.is_alive:
+            attacker_died = True
+            msgs.append(f"☠️ {attacker.name} succumbed to the molten burns!")
 
     if not killed and is_player_atk:
         player: Player = attacker  # type: ignore[assignment]
@@ -142,6 +155,7 @@ def resolve_melee_attack(
         xp_gained=xp,
         gold_gained=gold,
         loot_gained=loot,
+        attacker_died=attacker_died,
         messages=msgs,
     )
 
@@ -189,10 +203,13 @@ def shield_bash(
             msgs.append(f"🌟 LEVEL UP! You reached Level {player.level}!")
         if target.loot_drop and (target.is_boss or rng.random() < 0.65):
             dropped = create_item(target.loot_drop)
-            if dropped and len(player.inventory) < player.max_slots:
-                player.inventory.append(dropped)
-                loot = dropped
-                msgs.append(f"Found loot: {dropped.name}!")
+            if dropped:
+                if len(player.inventory) < player.max_slots:
+                    player.inventory.append(dropped)
+                    loot = dropped
+                    msgs.append(f"Found loot: {dropped.name}!")
+                else:
+                    msgs.append(f"{dropped.name} dropped, but your inventory is full!")
 
     return CombatResult(
         damage_dealt=dmg,
@@ -259,10 +276,13 @@ def cast_fireball(
             msgs.append(f"🌟 LEVEL UP! You reached Level {player.level}!")
         if target.loot_drop and (target.is_boss or rng.random() < 0.65):
             dropped = create_item(target.loot_drop)
-            if dropped and len(player.inventory) < player.max_slots:
-                player.inventory.append(dropped)
-                loot = dropped
-                msgs.append(f"Found loot: {dropped.name}!")
+            if dropped:
+                if len(player.inventory) < player.max_slots:
+                    player.inventory.append(dropped)
+                    loot = dropped
+                    msgs.append(f"Found loot: {dropped.name}!")
+                else:
+                    msgs.append(f"{dropped.name} dropped, but your inventory is full!")
 
     return CombatResult(
         damage_dealt=dmg,
@@ -351,10 +371,13 @@ def shadow_strike(
             msgs.append(f"🌟 LEVEL UP! You reached Level {player.level}!")
         if target.loot_drop and (target.is_boss or rng.random() < 0.65):
             dropped = create_item(target.loot_drop)
-            if dropped and len(player.inventory) < player.max_slots:
-                player.inventory.append(dropped)
-                loot = dropped
-                msgs.append(f"Found loot: {dropped.name}!")
+            if dropped:
+                if len(player.inventory) < player.max_slots:
+                    player.inventory.append(dropped)
+                    loot = dropped
+                    msgs.append(f"Found loot: {dropped.name}!")
+                else:
+                    msgs.append(f"{dropped.name} dropped, but your inventory is full!")
 
     return CombatResult(
         damage_dealt=dmg,
@@ -434,10 +457,13 @@ def frost_nova(
             msgs.append(f"🌟 LEVEL UP! You reached Level {player.level}!")
         if target.loot_drop and (target.is_boss or rng.random() < 0.65):
             dropped = create_item(target.loot_drop)
-            if dropped and len(player.inventory) < player.max_slots:
-                player.inventory.append(dropped)
-                loot = dropped
-                msgs.append(f"Found loot: {dropped.name}!")
+            if dropped:
+                if len(player.inventory) < player.max_slots:
+                    player.inventory.append(dropped)
+                    loot = dropped
+                    msgs.append(f"Found loot: {dropped.name}!")
+                else:
+                    msgs.append(f"{dropped.name} dropped, but your inventory is full!")
 
     return CombatResult(
         damage_dealt=dmg,
@@ -489,9 +515,12 @@ def arcane_nova(
                         msgs.append(f"🌟 LEVEL UP! You reached Level {player.level}!")
                     if m.loot_drop and (m.is_boss or rng.random() < 0.65):
                         dropped = create_item(m.loot_drop)
-                        if dropped and len(player.inventory) < player.max_slots:
-                            player.inventory.append(dropped)
-                            loot = dropped
+                        if dropped:
+                            if len(player.inventory) < player.max_slots:
+                                player.inventory.append(dropped)
+                                loot = dropped
+                            else:
+                                msgs.append(f"{dropped.name} dropped, but your inventory is full!")
                 results.append(
                     CombatResult(
                         damage_dealt=dmg,
