@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `25`
-- **Total Classes**: `29`
-- **Total Top-Level Functions**: `54`
-- **Total Class Methods**: `189`
-- **Total Source Lines**: `8255`
+- **Total Python Modules**: `29`
+- **Total Classes**: `31`
+- **Total Top-Level Functions**: `58`
+- **Total Class Methods**: `196`
+- **Total Source Lines**: `8646`
 
 ---
 
@@ -76,6 +76,16 @@
 
 **Functions:**
 - `def omen_for(seed, depth)` - *Python mirror of engine.js omenFor, extended to six omens.*
+
+---
+
+### [`crawler/engagement.py`](crawler/engagement.py)
+> *Engagement tuning table for Crypt-Crawler (single source of truth, Python side).*
+
+**Size**: `130` lines (`4238` bytes)
+
+**Functions:**
+- `def depth_seed(run_seed, depth)` - *Deterministic per-floor seed chaining a run across descents.*
 
 ---
 
@@ -151,7 +161,7 @@
 ### [`crawler/rewards.py`](crawler/rewards.py)
 > *Variable-ratio reward engine, dopamine loot schedules, and near-miss mechanics for Crypt-Crawler.*
 
-**Size**: `171` lines (`6177` bytes)
+**Size**: `227` lines (`8400` bytes)
 
 **Classes:**
 - `class RewardType`
@@ -161,6 +171,7 @@
 - `def roll_urn_reward(depth, rng, gold_mult)` - *Variable-ratio coin and surprise relic payout when shattering burial urns.*
 - `def check_near_miss_survival(current_hp, max_hp, damage_taken)` - *Near-miss feedback engine (Clark et al. 2009).*
 - `def generate_dungeon_bounties(depth, seed)` - *Generate 3 active contract bounties per floor (Zeigarnik Effect).*
+- `def roll_distribution(rolls, seed)` - *Experienced reward variance over seeded rolls (no browser needed).*
 
 ---
 
@@ -316,6 +327,20 @@
 
 ---
 
+### [`tests/test_engagement.py`](tests/test_engagement.py)
+> *Engagement tuning tests: DATA bounds, determinism, sampler contract.*
+
+**Size**: `47` lines (`2038` bytes)
+
+**Classes:**
+- `class TestEngagementTuning`
+  - Method `.test_tuning_bounds_are_sane()`
+  - Method `.test_depth_seed_is_deterministic()`
+  - Method `.test_bounty_sampler_returns_three_of_six()`
+  - Method `.test_roll_distribution_matches_stated_odds()`
+
+---
+
 ### [`tests/test_fairness.py`](tests/test_fairness.py)
 > *Fairness validator tests: fair seeds pass, broken maps are rejected.*
 
@@ -391,6 +416,19 @@
 
 ---
 
+### [`tests/test_odds_parity.py`](tests/test_odds_parity.py)
+> *Odds parity: stated README odds match coded odds in Python and shipped JS.*
+
+**Size**: `41` lines (`1571` bytes)
+
+**Classes:**
+- `class TestOddsParity`
+  - Method `.test_python_matches_tuning()`
+  - Method `.test_shipped_js_matches_tuning_rates()`
+  - Method `.test_readme_states_current_odds()`
+
+---
+
 ### [`tests/test_rewards.py`](tests/test_rewards.py)
 > *Unit tests for the variable-ratio reward engine and dopamine loot schedules.*
 
@@ -459,6 +497,17 @@
 - `def selftest(harness)` - *Prove the mechanics the harness claims to expose actually work.*
 - `def _write_output(payload, out)`
 - `def load_actions(argument)` - *An action list from inline JSON, or from a file when the value starts with `@`.*
+- `def main(argv)`
+
+---
+
+### [`tools/engagement_metrics.py`](tools/engagement_metrics.py)
+> *Engagement metrics for Crypt-Crawler (stdlib only, deterministic).*
+
+**Size**: `117` lines (`4732` bytes)
+
+**Functions:**
+- `def measure_seed(seed, depth, rolls)`
 - `def main(argv)`
 
 ---

@@ -107,6 +107,19 @@ Press `R` or the deck's **Search** button to spend a turn revealing armed traps 
 ### 🧳 Merchant
 Hermit Grimbold opens a two-tab shop on B2F and deeper. **Buy** spends gold on potions, gear and relics (15-140, rebalanced: Health 20, Hammer 115); **Sell** converts outclassed backpack loot into gold at a rarity-based price (common 10, rare 30, epic 60, legendary 100). The shop stays open after a sale, so a full 12-slot backpack can be cleared in one visit, and selling is refused once the shop is closed. The Crown of Eternity is a trophy, not stock: it never appears in the Sell tab. Chests pay 17+0-13 base with a 2.4x jackpot capped at 3.0x with omens; urns pay 6+0-10 with the same cap, so risk-for-power stays a real choice.
 
+### 🎰 Stated Odds (audited, never "feels more fun")
+| Source | Rate | Payout | Proof |
+|---|---|---|---|
+| Chest relic | 14% | base gold + rare relic | `python tools/engagement_metrics.py --seeds 42,777,12345 --depths 1,2,3` |
+| Chest jackpot | 20% (roll 0.14-0.34) | 2.4x, omen-capped 3.0x | `tests/test_odds_parity.py` reads `static/js/engine.js` |
+| Chest standard | 66% | base gold x omen | same as above |
+| Urn jackpot | 18% | 2.4x, omen-capped 3.0x | same as above |
+| Soul toll relic | 50% | one of 4 rares, if backpack fits | stated here, coded in `engine.js:resolveSoul` |
+| Mimic floor | 1-in-4 floors with chests | fight, no loot | `mimicChestIndex` hash |
+| Near-miss survival surge | <=28% HP + >=6 dmg | +2 MP, +4 DEF 3 turns, max 1/floor then flavor | `crawler/engagement.py:ENGAGEMENT_TUNING["surge"]` |
+
+Ethics line: tension yes, manipulation no. No empty chests, no low-HP farming (surge capped), no timers, no pay-to-win, no sunk-cost loops.
+
 ### 🛠️ AIKit Commands (run from the AIKit folder)
 | Role | Command |
 |---|---|

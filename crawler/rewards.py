@@ -10,6 +10,9 @@ import random
 from typing import Any, Dict, List, Optional, Tuple
 
 
+from crawler.engagement import ENGAGEMENT_TUNING
+
+
 class RewardType:
     STANDARD = "STANDARD"
     CRITICAL_JACKPOT = "CRITICAL_JACKPOT"
@@ -32,28 +35,33 @@ def roll_chest_reward(depth: int = 1, rng: Optional[random.Random] = None,
     Returns: (gold_awarded, reward_description, optional_item_id, reward_type)
     gold_mult carries the floor omen (Gilded 1.5, Ember Tithe 0.75); stacking
     with a jackpot is capped at 3.0x so Gilded+jackpot cannot explode.
+    Numbers come from ENGAGEMENT_TUNING (single source of truth).
     """
     if rng is None:
         rng = random.Random()
 
-    base_gold = 17 + rng.randint(0, 13) + (depth - 1) * 10
+    tune = ENGAGEMENT_TUNING["chest"]
+    base_gold = tune["base_min"] + rng.randint(0, tune["base_range"] - 1) + (depth - 1) * tune["depth_bonus"]
 
     roll = rng.random()
 
-    # 14% Chance: Rare Relic Artifact Drop
-    if roll < 0.14:
+    # Rare Relic Artifact Drop (tunable rate)
+    if roll < tune["relic_rate"]:
         drop_id = rng.choice(EXPLOIT_RELIC_DROPS)
         desc = "★ ANCIENT RELIC CACHE UNLOCKED! Discovered hidden artifact!"
-        return int(base_gold * min(gold_mult, 3.0)), desc, drop_id, RewardType.RARE_RELIC_DROP
+        return int(base_gold * min(gold_mult, tune["omen_cap_mult"])), desc, drop_id, RewardType.RARE_RELIC_DROP
 
-    # 20% Chance: Critical Gold Jackpot (2.4x payout, capped with omen at 3.0x)
-    if roll < 0.34:
-        # Simpler exact rule: jackpot 2.4x, omen-capped total 3.0x of base.
-        jackpot_gold = min(int(base_gold * 2.4 * gold_mult), int(base_gold * 3.0))
+    # Critical Gold Jackpot (tunable rate + mult, omen-capped)
+    if roll < tune["relic_rate"] + tune["jackpot_rate"]:
+        # Simpler exact rule: jackpot mult, omen-capped total of base.
+        jackpot_gold = min(
+            int(base_gold * tune["jackpot_mult"] * gold_mult),
+            int(base_gold * tune["omen_cap_mult"]),
+        )
         desc = f"★★★ CRITICAL TREASURE JACKPOT! 2.4X PAYOUT (+{jackpot_gold} Gold) ★★★"
         return jackpot_gold, desc, None, RewardType.CRITICAL_JACKPOT
 
-    # 66% Chance: Standard Payout
+    # Standard Payout
     return int(base_gold * gold_mult), f"Recovered dungeon chest coins (+{int(base_gold * gold_mult)} Gold).", None, RewardType.STANDARD
 
 
@@ -63,12 +71,16 @@ def roll_urn_reward(depth: int = 1, rng: Optional[random.Random] = None,
     if rng is None:
         rng = random.Random()
 
-    base_gold = 6 + rng.randint(0, 10) + (depth - 1) * 4
+    tune = ENGAGEMENT_TUNING["urn"]
+    base_gold = tune["base_min"] + rng.randint(0, tune["base_range"] - 1) + (depth - 1) * tune["depth_bonus"]
     roll = rng.random()
 
-    # 18% Chance: Critical Urn Jackpot (2.4x, omen-capped at 3.0x)
-    if roll < 0.18:
-        jackpot = min(int(base_gold * 2.4 * gold_mult), int(base_gold * 3.0))
+    # Critical Urn Jackpot (tunable rate + mult, omen-capped)
+    if roll < tune["jackpot_rate"]:
+        jackpot = min(
+            int(base_gold * tune["jackpot_mult"] * gold_mult),
+            int(base_gold * tune["omen_cap_mult"]),
+        )
         return jackpot, f"✨ CRITICAL URN JACKPOT! (+{jackpot} Gold)!", True
 
     return int(base_gold * gold_mult), f"Shattered burial urn (+{int(base_gold * gold_mult)} Gold).", False
@@ -79,20 +91,23 @@ def check_near_miss_survival(current_hp: int, max_hp: int, damage_taken: int) ->
 
     Surviving a near-fatal blow (remaining HP <= 28% of max HP after taking >= 6 damage)
     triggers an adrenaline surge, converting near-death loss aversion into an intense dopamine rush.
+    Numbers come from ENGAGEMENT_TUNING. Callers enforce max_per_floor
+    (one real comeback per floor, then flavor-only).
     """
     if current_hp <= 0:
         return None
 
+    tune = ENGAGEMENT_TUNING["surge"]
     hp_ratio = current_hp / max(1, max_hp)
-    if hp_ratio <= 0.28 and damage_taken >= 6:
+    if hp_ratio <= tune["hp_ratio"] and damage_taken >= tune["min_damage"]:
         # Near-miss triggered
         return {
             "type": "NEAR_MISS_SURGE",
             "hp_remaining": current_hp,
             "message": "⚡ NEAR-MISS ADRENALINE SURGE! Stared death in the eyes and stood firm (+2 MP, +4 DEF barrier)!",
-            "bonus_mana": 2,
-            "bonus_def": 4,
-            "duration": 3,
+            "bonus_mana": tune["bonus_mana"],
+            "bonus_def": tune["bonus_def"],
+            "duration": tune["duration"],
         }
     return None
 
@@ -169,3 +184,44 @@ def generate_dungeon_bounties(depth: int = 1, seed: Optional[int] = None) -> Lis
 
     selected = rng.sample(all_bounties, 3)
     return selected
+
+
+def roll_distribution(
+    rolls: int = 10000, seed: int = 1234
+) -> Dict[str, Any]:
+    """Experienced reward variance over seeded rolls (no browser needed).
+
+    Returns observed chest relic/jackpot/standard rates and urn jackpot
+    rate plus mean gold, for `tools/engagement_metrics.py` and tests.
+    Lives here (not in engagement.py) to avoid an import cycle:
+    rewards -> engagement (DATA only), never the reverse.
+    """
+    rng = random.Random(seed)
+    chest_counts = {"relic": 0, "jackpot": 0, "standard": 0}
+    chest_gold = 0
+    for _ in range(rolls):
+        _gold, _desc, _item, rtype = roll_chest_reward(depth=1, rng=rng)
+        chest_gold += _gold
+        if rtype == RewardType.CRITICAL_JACKPOT:
+            chest_counts["jackpot"] += 1
+        elif rtype == RewardType.RARE_RELIC_DROP:
+            chest_counts["relic"] += 1
+        else:
+            chest_counts["standard"] += 1
+    urn_jackpots = 0
+    urn_gold = 0
+    for _ in range(rolls):
+        _gold, _desc, crit = roll_urn_reward(depth=1, rng=rng)
+        urn_gold += _gold
+        if crit:
+            urn_jackpots += 1
+    return {
+        "rolls": rolls,
+        "seed": seed,
+        "chest_relic_rate": chest_counts["relic"] / rolls,
+        "chest_jackpot_rate": chest_counts["jackpot"] / rolls,
+        "chest_standard_rate": chest_counts["standard"] / rolls,
+        "chest_mean_gold": chest_gold / rolls,
+        "urn_jackpot_rate": urn_jackpots / rolls,
+        "urn_mean_gold": urn_gold / rolls,
+    }
