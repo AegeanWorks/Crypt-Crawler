@@ -187,7 +187,8 @@ crypt-crawler/
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
-│   └── test_server.py        <- web server endpoints tests
+│   ├── test_server.py        <- web server endpoints tests
+│   └── test_swarm_fixes.py   <- swarm-triage verified regression locks
 └── .aikit/                   <- project memory: record, ledger, decisions, ui.json guard
 ```
 
