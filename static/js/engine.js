@@ -194,7 +194,7 @@ export class GameEngine {
         this.heroClass = saved.heroClass || this.player.hero_class || "paladin";
         this.difficulty = DIFFICULTIES[saved.difficulty] ? saved.difficulty : "normal";
         this.bounties = saved.bounties || this._generateOfflineBounties(this.depth);
-        this.runSeed = Number.isFinite(saved.runSeed) ? saved.runSeed : (this.dungeon.seed || null);
+        this.runSeed = Number.isFinite(saved.runSeed) ? saved.runSeed : (Number.isFinite(this.dungeon?.seed) ? this.dungeon.seed : null);
         this.surgeFloor = Number.isFinite(saved.surgeFloor) ? saved.surgeFloor : 0;
         this.loreUnlocked = Array.from(new Set([
           ...(this.loreStart || []),
@@ -234,7 +234,7 @@ export class GameEngine {
     } catch (err) {
       if (token !== this.runToken) return;
       console.warn("Server API fallback to offline procedural generator:", err);
-      if (!this.runSeed) this.runSeed = (seed === null || seed === undefined || seed === "" ? Date.now() % 1000000 : Number(seed));
+      if (!Number.isFinite(this.runSeed)) this.runSeed = (seed === null || seed === undefined || seed === "" ? Date.now() % 1000000 : Number(seed));
       this._generateOfflineState(this.runSeed, depth, this.heroClass);
       this.bounties = this._generateOfflineBounties(this.depth, this.runSeed);
     }
@@ -330,7 +330,7 @@ export class GameEngine {
     this.dungeon = new ClientDungeon({
       width: w,
       height: h,
-      seed: seed || 1234,
+      seed: Number.isFinite(seed) ? seed : 1234,
       depth: depth,
       tiles: tiles,
       player_spawn: spawn,
@@ -500,7 +500,7 @@ export class GameEngine {
           },
         );
         try {
-          const offOmen = omenFor(seed || 1234, depth);
+          const offOmen = omenFor(Number.isFinite(seed) ? seed : 1234, depth);
           if (depth === 2 && (offOmen.id === "restless_dead" || offOmen.id === "hollow_silence")) {
             this.monsters.push({
               name: "Hollow Choir", type: "boss_choir",
@@ -954,7 +954,8 @@ export class GameEngine {
     this.ui.logMessage(`You descended into Depth B${newDepth}F! The catacombs grow colder...`, "system");
 
     try {
-      const floorSeed = depthSeed(this.runSeed || this.dungeon?.seed || 1, newDepth);
+      const _chainSeed = Number.isFinite(this.runSeed) ? this.runSeed : (Number.isFinite(this.dungeon?.seed) ? this.dungeon.seed : 1);
+      const floorSeed = depthSeed(_chainSeed, newDepth);
       let data = null;
       try {
         const url = `/api/new-game?seed=${floorSeed}&depth=${newDepth}&class=${this.heroClass}`;
@@ -1034,7 +1035,8 @@ export class GameEngine {
     // Deterministic 3-of-6 from (runSeed, depth): same contract as the server
     // sampler (server uses its own RNG stream, so ids may differ per stream,
     // but the shape — 3 distinct bounties, deterministic per seed+depth — holds).
-    let h = depthSeed(runSeed || 42, depth);
+    // Note: 0 is a valid deterministic seed; use nullish checks, never `||`.
+    let h = depthSeed(Number.isFinite(runSeed) ? runSeed : 42, depth);
     const mulberry = () => {
       h |= 0; h = (h + 0x6d2b79f5) | 0;
       let t = Math.imul(h ^ (h >>> 15), 1 | h);
@@ -1651,7 +1653,8 @@ export class GameEngine {
         }
       } else {
         try {
-          const previewSeed = depthSeed(this.runSeed || this.dungeon?.seed || 1, this.depth + 1);
+          const _prevSeed = Number.isFinite(this.runSeed) ? this.runSeed : (Number.isFinite(this.dungeon?.seed) ? this.dungeon.seed : 1);
+          const previewSeed = depthSeed(_prevSeed, this.depth + 1);
           const preview = omenFor(previewSeed, this.depth + 1);
           if (preview) this.ui.logMessage(`🕳️ The stairwell breathes ${preview.name} — B${this.depth + 1}F: ${preview.desc} Deeper gold runs richer.`, "system");
         } catch (_) { /* preview is best-effort, never blocks descent */ }
@@ -2488,7 +2491,7 @@ export class GameEngine {
       atk += 4;
     }
     if (this.player.status_effects && this.player.status_effects.shield_wall) {
-      def += 6;
+      def += TUNING.surge.bonusDef;
     }
 
     this.player.attack = atk;

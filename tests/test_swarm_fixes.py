@@ -55,6 +55,14 @@ class TestSwarmFixes(unittest.TestCase):
         js = ENGINE.read_text(encoding="utf-8")
         # `seed || Date.now()` treats 0 as missing; must use nullish check.
         self.assertTrue("seed || Date.now()" not in js, "falsy seed check remains")
+        # All runSeed/seed fallbacks must be nullish-safe (0 is valid).
+        self.assertNotIn("this.runSeed ||", js, "runSeed falsy fallback remains")
+        self.assertNotIn("runSeed || 42", js, "bounty seed falsy fallback remains")
+        self.assertNotIn("seed || 1234", js, "offline seed falsy fallback remains")
+        self.assertNotIn("dungeon.seed ||", js, "dungeon seed falsy fallback remains")
+        self.assertNotIn("if (!this.runSeed)", js, "runSeed falsy guard remains")
+        self.assertIn("Number.isFinite(this.runSeed)", js, "runSeed nullish guard missing")
+        self.assertIn("Number.isFinite(runSeed)", js, "bounty nullish guard missing")
 
 
 if __name__ == "__main__":

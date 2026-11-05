@@ -58,7 +58,7 @@ def roll_chest_reward(depth: int = 1, rng: Optional[random.Random] = None,
             int(base_gold * tune["jackpot_mult"] * gold_mult),
             int(base_gold * tune["omen_cap_mult"]),
         )
-        desc = f"★★★ CRITICAL TREASURE JACKPOT! 2.4X PAYOUT (+{jackpot_gold} Gold) ★★★"
+        desc = f"★★★ CRITICAL TREASURE JACKPOT! {tune['jackpot_mult']}X PAYOUT (+{jackpot_gold} Gold) ★★★"
         return jackpot_gold, desc, None, RewardType.CRITICAL_JACKPOT
 
     # Standard Payout
@@ -117,8 +117,9 @@ def generate_dungeon_bounties(depth: int = 1, seed: Optional[int] = None) -> Lis
 
     Incomplete objectives create persistent engagement tension that drives exploration.
     """
+    tune_b = ENGAGEMENT_TUNING["bounties"]
     actual_seed = 42 if seed is None else seed
-    rng = random.Random(actual_seed + depth * 31337)
+    rng = random.Random(actual_seed + depth * tune_b["seed_stride"])
     all_bounties = [
         {
             "id": "bounty_urns",
@@ -182,7 +183,7 @@ def generate_dungeon_bounties(depth: int = 1, seed: Optional[int] = None) -> Lis
         },
     ]
 
-    selected = rng.sample(all_bounties, 3)
+    selected = rng.sample(all_bounties, tune_b["count"])
     return selected
 
 

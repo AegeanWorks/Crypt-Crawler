@@ -9,8 +9,8 @@
 - **Total Python Modules**: `30`
 - **Total Classes**: `32`
 - **Total Top-Level Functions**: `58`
-- **Total Class Methods**: `203`
-- **Total Source Lines**: `8714`
+- **Total Class Methods**: `204`
+- **Total Source Lines**: `8753`
 
 ---
 
@@ -82,7 +82,7 @@
 ### [`crawler/engagement.py`](crawler/engagement.py)
 > *Engagement tuning table for Crypt-Crawler (single source of truth, Python side).*
 
-**Size**: `130` lines (`4238` bytes)
+**Size**: `130` lines (`4250` bytes)
 
 **Functions:**
 - `def depth_seed(run_seed, depth)` - *Deterministic per-floor seed chaining a run across descents.*
@@ -161,7 +161,7 @@
 ### [`crawler/rewards.py`](crawler/rewards.py)
 > *Variable-ratio reward engine, dopamine loot schedules, and near-miss mechanics for Crypt-Crawler.*
 
-**Size**: `227` lines (`8400` bytes)
+**Size**: `228` lines (`8492` bytes)
 
 **Classes:**
 - `class RewardType`
@@ -419,12 +419,13 @@
 ### [`tests/test_odds_parity.py`](tests/test_odds_parity.py)
 > *Odds parity: stated README odds match coded odds in Python and shipped JS.*
 
-**Size**: `48` lines (`2027` bytes)
+**Size**: `78` lines (`3573` bytes)
 
 **Classes:**
 - `class TestOddsParity`
   - Method `.test_python_matches_tuning()`
   - Method `.test_shipped_js_matches_tuning_rates()`
+  - Method `.test_python_uses_tuning_not_literals()`
   - Method `.test_readme_states_current_odds()`
 
 ---
@@ -475,7 +476,7 @@
 ### [`tests/test_swarm_fixes.py`](tests/test_swarm_fixes.py)
 > *Swarm-triage regression locks: verified true findings only (failing-first).*
 
-**Size**: `61` lines (`2931` bytes)
+**Size**: `69` lines (`3600` bytes)
 
 **Classes:**
 - `class TestSwarmFixes`

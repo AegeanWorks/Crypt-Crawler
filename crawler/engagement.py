@@ -111,8 +111,8 @@ ODDS_PARITY_NOTE = (
     "reference; the shipped browser engine (`static/js/engine.js` chest "
     "/ urn branches) must use the same rates, multipliers and caps. "
     "`tests/test_odds_parity.py` reads both files and fails on drift. "
-    "Known gap fixed in Commit B: JS chest base uses 0-19 vs py 0-13; "
-    "JS must move to the table above."
+    "Fixed in Commit B: JS chest/urn bases now read TUNING "
+    "(chest 17+0-13, urn 6+0-10) matching py randint bounds."
 )
 
 
