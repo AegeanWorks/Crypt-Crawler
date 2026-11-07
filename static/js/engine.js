@@ -2675,6 +2675,7 @@ export class GameEngine {
       if (monster.type === "boss_lich" && !monster.drainCharged && isVisible && dist <= 5 && Math.random() < 0.35) {
         monster.drainCharged = true;
         monster.intent = "DRAIN";
+        sounds.playTelegraph("drain");
         this.renderer.addFloatingText("INHALE…", monster.x, monster.y, "#b794f4");
         this.ui.logMessage("💀 Malakor inhales… Soul Drain incoming! Break line of sight or step away!", "crit");
         continue;
@@ -2712,6 +2713,7 @@ export class GameEngine {
       if (monster.type === "boss_choir" && !monster.hymnCharged && isVisible && dist <= 4 && Math.random() < 0.3) {
         monster.hymnCharged = true;
         monster.intent = "HYMN";
+        sounds.playTelegraph("hymn");
         this.renderer.addFloatingText("HUMMING…", monster.x, monster.y, "#d6bcfa");
         this.ui.logMessage("🎵 The Hollow Choir hums one note… a verse is coming! Move or break sight!", "crit");
         continue;
@@ -2754,6 +2756,7 @@ export class GameEngine {
       if (monster.type === "boss_choir" && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
         monster.phase_three = true;
         monster.intent = "SILENCE";
+        sounds.playTelegraph("hymn");
         this.renderer.addFloatingText("SILENCE…", monster.x, monster.y, "#a0aec0");
         this.ui.logMessage("🤫 The Choir falls silent… a stunning verse is coming! Strike or step away!", "crit");
       }
@@ -2791,6 +2794,7 @@ export class GameEngine {
         );
         this.player.hp = Math.max(0, this.player.hp - dmg);
         this.player._hitFlash = performance.now();
+        sounds.playBow();
         sounds.playHit(false);
         this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#e2e8f0");
         this.renderer.addFloatingText(`-${dmg}`, this.player.x, this.player.y, "#ff3333");

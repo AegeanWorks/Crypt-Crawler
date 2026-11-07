@@ -114,6 +114,9 @@ Press `R` or the deck's **Search** button to spend a turn revealing armed traps 
 ### 🏛️ Room Themes
 Each generated room carries one of five themes — chapel, ossuary, gallery, urn crypt or choke — and leaves a faint floor emblem at its centre (cross, skull, arches, urn, chevrons), so a floor reads at a glance even before you hover a prop. Choke rooms hide more traps and gallery rooms fewer; the emblem itself is cosmetic and changes no rule.
 
+### 🔊 Audio Cues
+Skeletal Archers play a bow-release twang before the impact, and the Hollow Choir's hum and Malakor's inhale play a rising telegraph tone as they charge, so an off-screen windup is audible before it lands. The header speaker button mutes SFX without touching saves.
+
 ### 💾 Saves & Resume
 The run autosaves after every turn under `crypt_crawler_save_v2`. On load the game resumes only a save whose `version` matches the shipped format (currently 2); a save from a newer or unknown version is refused with a console warning and left in storage, so a build downgrade cannot half-load or corrupt a run. Death and victory clear the save.
 
@@ -191,6 +194,7 @@ crypt-crawler/
 ├── tests/
 │   ├── __init__.py
 │   ├── test_ai_harness.py    <- harness validation and UI inventory tests
+│   ├── test_audio_cues.py    <- bow-release and boss-telegraph audio cues
 │   ├── test_canvas_fit.py    <- canvas aspect-ratio and pointer-mapping contract
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_dungeon.py       <- procedural generation tests

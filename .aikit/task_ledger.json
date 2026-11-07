@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-034",
+    "task_id": "CC-035",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794080644.8984122,
+    "updated_at": 1794081519.17003,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-10",
-      "phase": "reforge stage 1",
-      "phase_num": 3,
-      "description": "Reforge stage 1: window 2, 2 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793383464.4060106,
-      "timestamp_str": "2026-10-30 21:04:24",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-10",
-      "phase": "reforge stage 1",
-      "phase_num": 3,
-      "description": "Reforge stage 1: stage 1 host review reviewed; run completed; coverage 2/2",
-      "files_affected": [],
-      "status": "completed",
-      "timestamp": 1793383484.0128508,
-      "timestamp_str": "2026-10-30 21:04:44",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "CC-029",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Engagement loop fairness + tuning + metrics plan (Stage 3)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793809332.8317015,
-      "timestamp_str": "2026-11-04 19:22:12",
-      "agent": "kilo:eng",
-      "impact_assessment": {
-        "why": "Port CyberPulse engagement principles without manipulation; fix seed, parity, tunability first",
-        "benefits": "Deterministic multi-floor sessions, stated-vs-coded odds match, measurable loop",
-        "risks": "contract: additive tuning table + seed chain; dependency: none; concurrency: none; state: additive ledger fields, old saves default",
-        "mitigation": "Parity tests read shipped JS constants; validator + layout_hash re-pin; full gates; no push"
-      },
-      "plan_digest": "0a65fc8bacd19fba21a9e92287c2d72e83d9b748a5c24914eb3b1f85de0a3cee"
-    },
     {
       "task_id": "CC-029",
       "phase": "phase 4",
@@ -304,6 +264,50 @@
         "state": "uncommitted and green",
         "next": "commit, complete CC-034, then cycle 6",
         "evidence": "143 tests, harness 72/72, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-034",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-034' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794080664.3627503,
+      "timestamp_str": "2026-11-07 22:44:24",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-035",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Audio: add a bow-release cue before archer impacts and rising telegraph cues for the Choir hum/silence and Malakor inhale, prove with a failing-first oscillator-recording selftest, a source test and real before/after sessions",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794081506.2287035,
+      "timestamp_str": "2026-11-07 22:58:26",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Recording the shipped audio module showed the archer only scheduled the generic 160 Hz impact and the two avoidable boss windups scheduled nothing, so an arrow sounded like a melee hit and off-screen telegraphed attacks were silent",
+        "benefits": "The bow release is audible before damage; both boss windups are audible before they resolve; SFX mute still suppresses all cues",
+        "risks": "contract: audio.js gains playBow/playTelegraph, engine.js calls them at three telegraph sites and one archer site; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: audio.js and engine.js in the game-ui surface",
+        "mitigation": "Failing-first cue check recorded bow [160], hymn [] and drain [] on HEAD; after [880,160], [196], [110]; played sessions with screenshots and event JSON; inspector at three viewports; full gates"
+      },
+      "plan_digest": "f374556a68d68a48358ce64487815d56fbd71bb06dfacca879ab2c48e84914a4"
+    },
+    {
+      "task_id": "CC-035",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Audio cues shipped: playBow 880->220 before archer impact; playTelegraph 196 (hymn, hum+silence) / 110 (drain) on Choir and Malakor windups; selftest 74/74 with ranged_and_telegraph_cues_fire; tests/test_audio_cues.py. Played: archer [880,160] 65->62 HP, Choir [196], Malakor [110]; before [160], [], []. Unit 145 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-047, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794081519.17003,
+      "timestamp_str": "2026-11-07 22:58:39",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-035, then cycle 7 (graphics/effects or UI polish)",
+        "evidence": "145 tests, harness 74/74, inspector 75/75, gates 5/5"
       }
     }
   ]

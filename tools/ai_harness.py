@@ -1816,6 +1816,88 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_mob_turns", not harness.errors, harness.errors))
     page.context.close()
 
+    # Ranged attacks and boss telegraphs need an entrance cue, not only an impact
+    # sound. Record the oscillator starts the shipped audio module schedules.
+    page = harness.open_page(seed)
+    cues = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            const { sounds } = await import('/js/audio.js');
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const events = [];
+            const orig = AC.prototype.createOscillator;
+            AC.prototype.createOscillator = function () {
+                const osc = orig.call(this);
+                const param = osc.frequency;
+                const setValue = param.setValueAtTime.bind(param);
+                param.setValueAtTime = (value, when) => {
+                    events.push({ freq: Math.round(value), type: osc.type });
+                    return setValue(value, when);
+                };
+                return osc;
+            };
+            sounds.playStep();  // initialise the shared context before the probes
+            events.length = 0;
+            let run = null;
+            for (let y = 1; y < d.height - 1 && !run; y += 1) {
+                for (let x = 1; x < d.width - 5; x += 1) {
+                    let clear = true;
+                    for (let i = 0; i < 5; i += 1) {
+                        if (!d.isWalkable(x + i, y)) { clear = false; break; }
+                    }
+                    if (clear) { run = [x, y]; break; }
+                }
+            }
+            if (!run) return { found: false };
+            const [rx, ry] = run;
+            const p = e.player;
+            p.x = rx + 4; p.y = ry; p.hp = p.max_hp;
+            d.updateFOV(p.x, p.y, 7);
+            e.omen = { id: "calm", name: "calm", desc: "", atkMult: 1, fov: 7,
+                       goldMult: 1, extraFoe: 0 };
+            const mk = (type, x) => ({
+                name: type, type, x, y: ry, hp: 40, max_hp: 40, attack: 10, defense: 0,
+                xp_reward: 0, gold_reward: 0, loot_drop: null,
+                is_boss: type === "boss_lich", is_champion: false,
+                champion_affix: null, status_effects: {},
+            });
+            e.monsters = [mk("archer", rx)];
+            e.processEnemyTurns();
+            const bow = events.slice();
+            events.length = 0;
+            const realRandom = Math.random;
+            Math.random = () => 0.1;
+            p.hp = p.max_hp;
+            e.monsters = [mk("boss_choir", rx + 1)];
+            e.processEnemyTurns();
+            const hymn = events.slice();
+            events.length = 0;
+            p.hp = p.max_hp;
+            e.monsters = [mk("boss_lich", rx + 1)];
+            e.processEnemyTurns();
+            const drain = events.slice();
+            Math.random = realRandom;
+            AC.prototype.createOscillator = orig;
+            return { found: true, bow, hymn, drain };
+        }"""
+    )
+    bow_freqs = [entry["freq"] for entry in cues.get("bow", [])]
+    hymn_freqs = [entry["freq"] for entry in cues.get("hymn", [])]
+    drain_freqs = [entry["freq"] for entry in cues.get("drain", [])]
+    checks.append(_check(
+        "ranged_and_telegraph_cues_fire",
+        cues.get("found") is True
+        and 880 in bow_freqs
+        and 160 in bow_freqs
+        and bow_freqs.index(880) < bow_freqs.index(160)
+        and 196 in hymn_freqs
+        and 110 in drain_freqs,
+        cues,
+    ))
+    checks.append(_check("no_page_errors_after_audio_cues", not harness.errors, harness.errors))
+    page.context.close()
+
     # Twin hits must be readable: two adjacent attackers in one enemy phase have to
     # produce two stacked damage numbers that add up to the HP actually lost.
     page = harness.open_page(seed)

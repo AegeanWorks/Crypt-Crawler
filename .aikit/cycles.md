@@ -153,3 +153,32 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(save): refuse unsupported save versions`.
+
+## Cycle 6 — Bow release and boss telegraph audio cues (2026-11-07)
+
+- **Area**: Audio cues.
+- **Find**: Instrumenting `AudioContext.createOscillator` showed the Skeletal Archer scheduled
+  only the impact (160 Hz) and the Hollow Choir's hum / Malakor's inhale scheduled nothing. The
+  two avoidable windups were log-only, and an arrow sounded like a melee hit.
+- **Analyze**: Add two synth cues and wire the three call sites; no visual, rule, save or RNG
+  change. Killed: a distinct hex cue for the necromancer (the fireball sound is already audible;
+  keep the cycle to silent events).
+- **Fix**: `playBow()` (880 -> 220 Hz) before the archer impact; `playTelegraph(kind)` (196 Hz
+  hymn, 110 Hz drain) on the Choir hum, Choir silence phase and Malakor inhale. Selftest
+  `ranged_and_telegraph_cues_fire` records the scheduled frequencies; `tests/test_audio_cues.py`
+  locks the synth and call-site contract.
+- **Screenshots** (same scenes, seed 42 B2F / seed 4242 B3F, 1920x1080; the cues are audio, so
+  the pairs also carry the before/after oscillator logs):
+  - archer: `.inspect/cycles/c6/before-archer.png` / `after-archer.png` (log "looses a bone
+    arrow"; before events [160], after [880, 160])
+  - Choir: `before-choir.png` / `after-choir.png` (log "hums one note"; before [], after [196])
+  - Malakor: `before-lich.png` / `after-lich.png` (log "Malakor inhales"; before [], after [110])
+  - command: `python .inspect/cycles/play_c6.py before|after` (before uses HEAD audio/engine)
+- **Played run**: real Playwright sessions with `waitTurn`; archer at (31,21) vs player (30,18)
+  hit for 3 (65 -> 62); Choir hummed on turn 3 and Malakor inhaled on turn 2; no page errors.
+  The JSON event logs are in `before.txt` / `after.txt`.
+- **Gates**: `python -m unittest discover -s tests` -> 145 OK;
+  `python tools/ai_harness.py selftest` -> 74 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(audio): cue bow releases and boss telegraphs`.
