@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-038",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794084788.836939,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794084837.177113
   },
   "checkpoints": [
-    {
-      "task_id": "CC-032",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Enemies: give the Dread Necromancer its advertised ranged hex, align bestiary/README/guide, prove with two selftest checks and a full played encounter",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794078473.1929636,
-      "timestamp_str": "2026-11-07 22:07:53",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Dread Necromancers spawn from B2F with a staff-and-runes sprite and a bestiary that promises spells from afar, but processEnemyTurns had no branch for them, so they walked into melee (selftest: necroHit 0, stayed false at range 4)",
-        "benefits": "B2F gains a real ranged caster with close-the-gap or break-LOS counterplay; the bestiary no longer lies; enemy variety grows without a new subsystem",
-        "risks": "contract: enemy turn order gains a necromancer branch before the archer branch; dependency: none; concurrency: none; state: no save/RNG/layout change; UI: engine.js and ui.js in the game-ui surface",
-        "mitigation": "Two failing-first selftest checks (range cast + adjacent melee), same-state before/after at B2F 36,16 vs 37,19, full played encounter, inspector at three viewports, full gates"
-      },
-      "plan_digest": "609255b48677a2e011be5853c5e490f3d129720e16d68c08a4945704e9e0d6b7"
-    },
     {
       "task_id": "CC-032",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-038, then cycle 10",
         "evidence": "152 tests, harness 77/77, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-038",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-038' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794084837.177115,
+      "timestamp_str": "2026-11-07 23:53:57",
+      "agent": "opencode:cycles"
     }
   ]
 }
