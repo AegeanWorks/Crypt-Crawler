@@ -2522,13 +2522,17 @@ export class GameEngine {
     this.dungeon.updateFOV(this.player.x, this.player.y, this._effectiveFov());
 
     // 1. Tick Player Status Effects
-    this._tickPlayerStatuses();
+    const statusDeath = this._tickPlayerStatuses();
+    if (statusDeath) {
+      this.handlePlayerDeath(statusDeath);
+      return;
+    }
 
     // 2. Enemy AI Turns
     this.processEnemyTurns();
 
-    // 3. Tick Monster Status Effects
-    this._tickMonsterStatuses();
+    // 3. Tick Monster Status Effects (only while the hero still stands)
+    if (this.player.hp > 0) this._tickMonsterStatuses();
 
     // 4. Check player death
     if (this.player.hp <= 0) {
@@ -2549,7 +2553,7 @@ export class GameEngine {
   }
 
   _tickPlayerStatuses() {
-    if (!this.player.status_effects) return;
+    if (!this.player.status_effects) return null;
     const effects = this.player.status_effects;
 
     if (effects.poison) {
@@ -2558,6 +2562,7 @@ export class GameEngine {
       this.ui.logMessage("Venom burns in your veins! (-3 HP)", "hit");
       effects.poison -= 1;
       if (effects.poison <= 0) delete effects.poison;
+      if (this.player.hp <= 0) return "poison";
     }
     if (effects.burn) {
       this.player.hp = Math.max(0, this.player.hp - 4);
@@ -2565,6 +2570,7 @@ export class GameEngine {
       this.ui.logMessage("Fire singes your armor! (-4 HP)", "hit");
       effects.burn -= 1;
       if (effects.burn <= 0) delete effects.burn;
+      if (this.player.hp <= 0) return "burn";
     }
     if (effects.shield_wall) {
       effects.shield_wall -= 1;
@@ -2580,6 +2586,7 @@ export class GameEngine {
         this.ui.logMessage("Blessing of Might expired.", "system");
       }
     }
+    return null;
   }
 
   _tickMonsterStatuses() {
@@ -2606,6 +2613,7 @@ export class GameEngine {
     const newMonsters = [];
     for (const monster of this.monsters) {
       if (monster.hp <= 0) continue;
+      if (this.player.hp <= 0) break;
 
       // Handle Stun
       if (monster.status_effects && monster.status_effects.stun) {
@@ -2666,7 +2674,7 @@ export class GameEngine {
           this.renderer.addFloatingText(`-${drain} DRAIN`, this.player.x, this.player.y, "#b794f4");
           this.renderer.addFloatingText("+10 HP", monster.x, monster.y, "#9f7aea");
           this.ui.logMessage(`💀 Malakor unleashes Soul Drain! Drained ${drain} HP to empower himself!`, "hit");
-          if (this.player.hp <= 0) { this.handlePlayerDeath("Malakor's soul drain"); return; }
+          if (this.player.hp <= 0) { this.handlePlayerDeath("Malakor's soul drain"); break; }
         } else {
           this.ui.logMessage("💨 Malakor's drain fizzles — you broke line of sight!", "system");
         }
@@ -2704,7 +2712,7 @@ export class GameEngine {
           this.renderer.addShockwave(monster.x, monster.y, "#d6bcfa", 80);
           this.renderer.addFloatingText(`-${hymn} HYMN`, this.player.x, this.player.y, "#d6bcfa");
           this.ui.logMessage(`🎵 The Hollow Choir resolves its verse for ${hymn} damage!`, "hit");
-          if (this.player.hp <= 0) { this.handlePlayerDeath("the Hollow Choir's verse"); return; }
+          if (this.player.hp <= 0) { this.handlePlayerDeath("the Hollow Choir's verse"); break; }
         } else {
           this.ui.logMessage("🎵 The verse breaks against stone — you avoided the hymn!", "system");
         }
@@ -2778,7 +2786,7 @@ export class GameEngine {
         this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#b794f4");
         this.renderer.addFloatingText(`-${dmg} HEX`, this.player.x, this.player.y, "#d6bcfa");
         this.ui.logMessage(`${monster.name} chants a grave bolt for ${dmg} damage!`, "hit");
-        if (this.player.hp <= 0) { this.handlePlayerDeath("a grave bolt"); return; }
+        if (this.player.hp <= 0) { this.handlePlayerDeath("a grave bolt"); break; }
         continue;
       }
 
@@ -2799,6 +2807,7 @@ export class GameEngine {
         this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#e2e8f0", "arrow");
         this.renderer.addFloatingText(`-${dmg}`, this.player.x, this.player.y, "#ff3333");
         this.ui.logMessage(`${monster.name} looses a bone arrow for ${dmg} damage!`, "hit");
+        if (this.player.hp <= 0) break;
         continue;
       }
 
@@ -2853,6 +2862,7 @@ export class GameEngine {
           this.player.gold -= stolen;
           this.ui.logMessage(`🪙 Sneaky Goblin stole ${stolen} gold from your coin pouch!`, "hit");
         }
+        if (this.player.hp <= 0) break;
       } else if (isVisible && dist <= 7) {
         // Step toward player; hounds lunge and Swift champions sprint,
         // closing two tiles per turn.

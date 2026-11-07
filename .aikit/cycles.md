@@ -263,3 +263,34 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(combat): hold the death ledger for the killing blow`.
+
+## Cycle 10 — A dead hero cannot be attacked or robbed (2026-11-08)
+
+- **Area**: Combat feel (death handling).
+- **Find**: Poison ticked first, then the enemy phase ran anyway. At 1 HP with poison, the
+  goblin attacked for 98 and stole 9 gold after the hero was already dead; the ledger said
+  "in mortal combat". Two adjacent killers both acted after the first killed the hero.
+  Failing checks: `poison_death_skips_the_enemy_turn` (goblin attack in the log) and
+  `death_stops_later_enemies` (`first: true, second: true`).
+- **Analyze**: `_tickPlayerStatuses` had no return, `finishPlayerTurn` checked death only after
+  the enemy phase, and `processEnemyTurns` never stopped mid-loop. Fix all three; keep the
+  state changes and death beat from ADR-050. Killed: reviving/undoing the poison tick (the state
+  is correct; only the post-death actions are wrong).
+- **Fix**: status tick returns `poison`/`burn`, `finishPlayerTurn` passes it to
+  `handlePlayerDeath` and returns, monster status ticks stop while dead, enemy loop breaks on
+  `hp <= 0` (top, archer, melee; boss/necromancer branches break), new `tests/test_death_cause.py`
+  and two selftest checks.
+- **Screenshots** (same seed 42 B1F, player 13,15 at 1 HP with poison 3, goblin 13,14):
+  - early: `.inspect/cycles/c10/before-poison-early.png` (goblin `-98` + theft, gold 16) vs
+    `after-poison-early.png` (only `-3 POISON`, gold 25)
+  - ledger: `before-poison-modal.png` ("in mortal combat", gold 16) vs
+    `after-poison-modal.png` ("You fell to poison.", gold 25)
+  - command: `python .inspect/cycles/play_c10.py before|after` (before uses HEAD engine.js)
+- **Played run**: real `waitTurn` death. Before: hp 0, gold 25 -> 16, log "Sneaky Goblin attacks
+  you for 98 damage!" and "stole 9 gold"; after: hp 0, gold 25, log only "Venom burns in your
+  veins! (-3 HP)", modal "You fell to poison."; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 155 OK;
+  `python tools/ai_harness.py selftest` -> 81 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(combat): stop enemies and name the cause after a status death`.

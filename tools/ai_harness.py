@@ -1997,6 +1997,97 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_death", not harness.errors, harness.errors))
     page.context.close()
 
+    # A dead hero cannot be attacked or robbed, and the cause must name the status.
+    page = harness.open_page(seed)
+    poisoned = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const p = e.player;
+            e.dungeon.updateFOV(p.x, p.y, 7);
+            const spot = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .find(([dx, dy]) => e.dungeon.isWalkable(p.x + dx, p.y + dy));
+            if (!spot) return { found: false };
+            e.monsters = [{
+                name: 'Poison Goblin', type: 'goblin', x: p.x + spot[0], y: p.y + spot[1],
+                hp: 99, max_hp: 99, attack: 999, defense: 0, xp_reward: 0, gold_reward: 0,
+                loot_drop: null, is_boss: false, is_champion: false, champion_affix: null,
+                status_effects: {},
+            }];
+            p.hp = 1;
+            p.status_effects = { poison: 3 };
+            const gold = p.gold;
+            e.finishPlayerTurn();
+            return {
+                found: true,
+                gameOver: e.gameOver,
+                hp: p.hp,
+                goldBefore: gold,
+                goldAfter: p.gold,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .map((el) => el.textContent),
+            };
+        }"""
+    )
+    page.wait_for_timeout(900)
+    poison_modal = page.evaluate(
+        """() => document.getElementById('modalBody')?.textContent || ''"""
+    )
+    checks.append(_check(
+        "poison_death_skips_the_enemy_turn",
+        poisoned.get("found") is True
+        and poisoned["gameOver"] is True
+        and poisoned["goldAfter"] == poisoned["goldBefore"]
+        and not any("Poison Goblin attacks" in line for line in poisoned["log"])
+        and "poison" in poison_modal.lower(),
+        {**poisoned, "modal": poison_modal[:180]},
+    ))
+    checks.append(_check("no_page_errors_after_poison_death", not harness.errors, harness.errors))
+    page.context.close()
+
+    # One killer is enough: a second adjacent enemy must not act after the hero falls.
+    page = harness.open_page(seed)
+    many = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const p = e.player;
+            e.dungeon.updateFOV(p.x, p.y, 7);
+            const spots = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .filter(([dx, dy]) => e.dungeon.isWalkable(p.x + dx, p.y + dy));
+            if (spots.length < 2) return { found: false };
+            const mk = (name, dx, dy) => ({
+                name, type: 'skeleton', x: p.x + dx, y: p.y + dy,
+                hp: 99, max_hp: 99, attack: 999, defense: 0, xp_reward: 0, gold_reward: 0,
+                loot_drop: null, is_boss: false, is_champion: false, champion_affix: null,
+                status_effects: {},
+            });
+            e.monsters = [
+                mk('First Killer', spots[0][0], spots[0][1]),
+                mk('Second Killer', spots[1][0], spots[1][1]),
+            ];
+            p.hp = 1;
+            e.finishPlayerTurn();
+            const log = Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                .map((el) => el.textContent);
+            return {
+                found: true,
+                gameOver: e.gameOver,
+                hp: p.hp,
+                first: log.some((line) => line.includes('First Killer attacks')),
+                second: log.some((line) => line.includes('Second Killer attacks')),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "death_stops_later_enemies",
+        many.get("found") is True
+        and many["gameOver"] is True
+        and many["first"] is True
+        and many["second"] is False,
+        many,
+    ))
+    checks.append(_check("no_page_errors_after_multi_killer", not harness.errors, harness.errors))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)

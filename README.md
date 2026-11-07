@@ -89,7 +89,7 @@ The passive is printed on each class card before you choose, and the in-game gui
 Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; or poison with a dagger/Shadow Strike, then detonate it with fire.
 
 ### 💥 Combat Feedback
-When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible.
+When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible. Poison or burn that finishes the hero ends the turn immediately and names the status as the cause; no later enemy acts after the hero falls.
 
 ### 🏹 Projectiles
 Bone arrows render as fletched arrows rotated along their flight; spells keep a glowing head with a short tapered trail, so a physical ranged hit reads differently from a hex or a fireball.
@@ -205,6 +205,7 @@ crypt-crawler/
 │   ├── test_chronicle_fade.py <- scrolled chronicle fades its top edge
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger
+│   ├── test_death_cause.py   <- status causes end the turn and name the cause
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_fairness.py      <- fairness validator tests
 │   ├── test_foundry_packs.py <- foundry pack integration tests

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `37`
-- **Total Classes**: `39`
+- **Total Python Modules**: `38`
+- **Total Classes**: `40`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `226`
-- **Total Source Lines**: `9290`
+- **Total Class Methods**: `230`
+- **Total Source Lines**: `9419`
 
 ---
 
@@ -359,6 +359,20 @@
 
 ---
 
+### [`tests/test_death_cause.py`](tests/test_death_cause.py)
+> *Death-cause contract: status deaths end the turn and are named.*
+
+**Size**: `38` lines (`1423` bytes)
+
+**Classes:**
+- `class TestDeathCause`
+  - Method `.setUp()`
+  - Method `.test_status_ticks_return_their_cause()`
+  - Method `.test_status_death_short_circuits_the_enemy_turn()`
+  - Method `.test_enemy_loop_stops_when_the_hero_falls()`
+
+---
+
 ### [`tests/test_dungeon.py`](tests/test_dungeon.py)
 > *Unit tests for procedural dungeon generation and pathfinding.*
 
@@ -588,7 +602,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2205` lines (`91966` bytes)
+**Size**: `2296` lines (`95804` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

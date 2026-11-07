@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-038",
+    "task_id": "CC-039",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794084788.836939,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794086285.2498448,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794084837.177113
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-032",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Dread Necromancer hex shipped: range 2-5 with LOS casts a grave bolt and holds, adjacent staff-melees; bestiary/README/guide aligned; selftest 70/70 with necromancer_hexes_from_range and necromancer_melees_when_adjacent. Played run 65->41 HP from four hexes while closing, five strikes killed it for 45 XP/49 gold, finished 15 HP, no page errors. Unit 139 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-044, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794078492.4218283,
-      "timestamp_str": "2026-11-07 22:08:12",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-032, then cycle 4",
-        "evidence": "139 tests, harness 70/70, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-032",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-032' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794078513.6777782,
-      "timestamp_str": "2026-11-07 22:08:33",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-033",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794084837.177115,
       "timestamp_str": "2026-11-07 23:53:57",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-039",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Combat feel: a dead hero cannot be attacked or robbed and a status death names its cause; stop the enemy phase on hp<=0, return poison/burn from the status tick, prove with failing-first selftest checks, a source test and a real poison-death before/after",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794086260.7513165,
+      "timestamp_str": "2026-11-08 00:17:40",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "finishPlayerTurn ticked poison first but ran the enemy phase anyway, so at 1 HP the goblin attacked for 98 and stole 9 gold after death; the ledger blamed mortal combat and two adjacent killers both acted",
+        "benefits": "Death cause is truthful, gold/state stop at the moment of death, only one killer acts; the ADR-050 death beat still applies",
+        "risks": "contract: _tickPlayerStatuses returns a cause, finishPlayerTurn early-returns, processEnemyTurns breaks on hp<=0; dependency: none; concurrency: none; state: no save-format change, post-death writes stop; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing checks read the goblin attack + theft and second: true; after gold 25, log only poison, cause poison; source test; inspector at three viewports; full gates"
+      },
+      "plan_digest": "5cc625671068b7f72eec3c2cd5ecc903706ed6640c28328b831b716c7d641da9"
+    },
+    {
+      "task_id": "CC-039",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Death handling fixed: status tick returns poison/burn, finishPlayerTurn early-returns with the cause, monster ticks stop while dead, enemy loop breaks on hp<=0; tests/test_death_cause.py + 2 selftest checks (81 total). Before: goblin 98 + 9 gold theft, ledger 'in mortal combat', gold 16; after: only -3 poison, ledger 'poison', gold 25; second killer skipped. Unit 155 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-051, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794086285.2498448,
+      "timestamp_str": "2026-11-08 00:18:05",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-039, then cycle 11",
+        "evidence": "155 tests, harness 81/81, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }
