@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-045",
+    "task_id": "CC-046",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794094788.0987756,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794095908.9544773,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794094825.6240509
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-039",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Death handling fixed: status tick returns poison/burn, finishPlayerTurn early-returns with the cause, monster ticks stop while dead, enemy loop breaks on hp<=0; tests/test_death_cause.py + 2 selftest checks (81 total). Before: goblin 98 + 9 gold theft, ledger 'in mortal combat', gold 16; after: only -3 poison, ledger 'poison', gold 25; second killer skipped. Unit 155 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-051, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794086285.2498448,
-      "timestamp_str": "2026-11-08 00:18:05",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-039, then cycle 11",
-        "evidence": "155 tests, harness 81/81, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-039",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-039' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794086334.6130002,
-      "timestamp_str": "2026-11-08 00:18:54",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-040",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794094825.624053,
       "timestamp_str": "2026-11-08 02:40:25",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-046",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Combat feel: gate the execute skull and EXECUTE hover suffix to the rogue and apply the 1.25x bonus to the hover range, prove with a failing-first source test and paladin/rogue hover before/after plus a real attack",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794095884.2515154,
+      "timestamp_str": "2026-11-08 02:58:04",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The skull and EXECUTE suffix appeared for every class at <=30% HP even though only the rogue has the +25% passive, and the rogue's preview ignored the bonus (before ~5-8 vs actual ~10)",
+        "benefits": "Only the rogue sees an execute window, and its hover range matches the actual bonus; other classes see the plain range; the engine's damage rule is unchanged",
+        "risks": "contract: renderer consumes player.hero_class for the marker/tooltip; dependency: none; concurrency: none; state: no save/rule change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Failing source test before the fix (no heroClass gate); paladin/rogue hover captures at 60/200 HP; rogue damage selftest unchanged; inspector at three viewports; full gates"
+      },
+      "plan_digest": "329a36519452dee7743b197a25fd3b5fa952efe4ea238ceeea04aa3a07d31b00"
+    },
+    {
+      "task_id": "CC-046",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Execute feedback fixed: _drawMonster gets heroClass and draws the skull only for rogue; tooltip execute gate + 1.25x range; tests/test_execute_marker.py (167 unit). Paladin 60/200: before EXECUTE+skull, after plain ~5-6; rogue: before ~5-8 EXECUTE, after ~7-10 EXECUTE with skull. Real hover/attacks, no page errors. Harness 93/93, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-058, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794095908.9544773,
+      "timestamp_str": "2026-11-08 02:58:28",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-046, then cycle 18 (enemies/bosses)",
+        "evidence": "167 tests, harness 93/93, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

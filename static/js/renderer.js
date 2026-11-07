@@ -316,7 +316,7 @@ export class DungeonRenderer {
     // 3. Draw Monsters (only if in active FOV)
     for (const monster of monsters) {
       if (monster.hp > 0 && dungeon.isVisible(monster.x, monster.y)) {
-        this._drawMonster(ctx, monster, ts, timestamp);
+        this._drawMonster(ctx, monster, ts, timestamp, player.hero_class || "paladin");
       }
     }
 
@@ -1099,7 +1099,7 @@ export class DungeonRenderer {
     ctx.restore();
   }
 
-  _drawMonster(ctx, monster, ts, timestamp) {
+  _drawMonster(ctx, monster, ts, timestamp, heroClass = "paladin") {
     const px = monster.x * ts;
     const py = monster.y * ts;
     const bob = Math.sin(timestamp * 0.005 + monster.x * 2) * 2;
@@ -1715,7 +1715,7 @@ export class DungeonRenderer {
       ctx.font = "bold 9px sans-serif";
       ctx.fillText(intent, px + ts - 12, py + 1);
     }
-    if (!monster.is_boss && monster.max_hp > 0 && monster.hp > 0 && monster.hp / monster.max_hp <= 0.3) {
+    if (heroClass === "rogue" && !monster.is_boss && monster.max_hp > 0 && monster.hp > 0 && monster.hp / monster.max_hp <= 0.3) {
       // Execution range: matches the rogue Executioner passive (+25% below 30%).
       ctx.font = "bold 9px sans-serif";
       ctx.fillText("💀", px + 2, py + 1);
@@ -2465,11 +2465,15 @@ export class DungeonRenderer {
       // Tactical strike preview from the current hero stats (display only).
       let preview = null;
       if (player && Number.isFinite(player.attack)) {
-        const lo = Math.max(1, Math.floor((Math.max(1, player.attack - monster.defense)) * 0.85));
-        const hi = Math.max(lo, Math.floor((Math.max(1, player.attack - monster.defense)) * 1.15));
+        const execute = player.hero_class === "rogue"
+          && monster.max_hp > 0 && monster.hp <= monster.max_hp * 0.3;
+        const mult = execute ? 1.25 : 1;
+        const base = Math.max(1, player.attack - monster.defense);
+        const lo = Math.max(1, Math.floor(base * 0.85 * mult));
+        const hi = Math.max(lo, Math.floor(base * 1.15 * mult));
         const critPct = Math.round((player.crit_chance ?? 0.15) * 100);
         preview = `Strike ~${lo}-${hi} • Crit ${critPct}%`;
-        if (monster.hp <= monster.max_hp * 0.3) preview += " • EXECUTE 💀";
+        if (execute) preview += " • EXECUTE 💀";
       }
       const affix = monster.champion_affix || (monster.is_boss ? "Boss" : "");
       const cardW = 148;

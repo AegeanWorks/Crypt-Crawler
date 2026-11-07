@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `42`
-- **Total Classes**: `44`
+- **Total Python Modules**: `43`
+- **Total Classes**: `45`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `244`
-- **Total Source Lines**: `9816`
+- **Total Class Methods**: `247`
+- **Total Source Lines**: `9841`
 
 ---
 
@@ -464,6 +464,19 @@
   - Method `.test_depth_seed_is_deterministic()`
   - Method `.test_bounty_sampler_returns_three_of_six()`
   - Method `.test_roll_distribution_matches_stated_odds()`
+
+---
+
+### [`tests/test_execute_marker.py`](tests/test_execute_marker.py)
+> *Execute feedback contract: the skull and bonus preview belong to the rogue.*
+
+**Size**: `25` lines (`831` bytes)
+
+**Classes:**
+- `class TestExecuteMarker`
+  - Method `.setUp()`
+  - Method `.test_map_skull_is_rogue_only()`
+  - Method `.test_tooltip_execute_and_range_are_rogue_only()`
 
 ---
 

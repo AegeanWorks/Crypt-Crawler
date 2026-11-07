@@ -95,7 +95,7 @@ The passive is printed on each class card before you choose, and the in-game gui
 Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; or poison with a dagger/Shadow Strike, then detonate it with fire.
 
 ### 💥 Combat Feedback
-When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible. Poison or burn that finishes the hero ends the turn immediately and names the status as the cause; no later enemy acts after the hero falls.
+When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible. The skull marker and **EXECUTE** hover suffix appear only for the rogue — the class with the Executioner passive — and the hover strike range includes the +25% execute bonus; other classes see the plain range. Poison or burn that finishes the hero ends the turn immediately and names the status as the cause; no later enemy acts after the hero falls.
 
 ### 🏹 Projectiles
 Bone arrows render as fletched arrows rotated along their flight; spells keep a glowing head with a short tapered trail, so a physical ranged hit reads differently from a hex or a fireball.
@@ -219,6 +219,7 @@ crypt-crawler/
 │   ├── test_deck_costs.py    <- deck dimming matches the engine mana costs
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_enemy_pathing.py <- blocked melee steps detour around props
+│   ├── test_execute_marker.py <- skull/EXECUTE preview belongs to the rogue
 │   ├── test_fairness.py      <- fairness validator tests
 │   ├── test_foundry_packs.py <- foundry pack integration tests
 │   ├── test_inspect.py       <- inspection configuration tests

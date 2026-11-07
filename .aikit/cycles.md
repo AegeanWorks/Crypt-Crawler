@@ -455,3 +455,32 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(progression): show Choir Echo kills in the bestiary`.
+
+## Cycle 17 — Execute feedback is rogue-only (2026-11-08)
+
+- **Area**: Combat feel (execute feedback accuracy).
+- **Find**: The skull marker and the hover "EXECUTE 💀" suffix appeared for every class at
+  <=30% HP, though only the rogue's Executioner passive grants +25%; the hover range also
+  ignored the bonus. Paladin saw a promise the engine did not keep; rogue saw "~5-8" when the
+  execute hit could reach ~10.
+- **Analyze**: Pass the hero class into the monster draw and gate the marker/suffix; apply the
+  1.25x to the preview range. The damage rule itself is unchanged and already covered. Observed
+  but out of scope: the champion title/affix overlap on long names (future UI cycle).
+- **Fix**: `_drawMonster(..., heroClass)` skull only for rogue; tooltip `execute` gate, 1.25x
+  range, suffix only for rogue; `tests/test_execute_marker.py`.
+- **Screenshots** (same seed 42 B1F, Swift Crypt Skeleton at 60/200 HP, player adjacent, hover,
+  1920x1080):
+  - paladin: `.inspect/cycles/c17/before-paladin-execute.png` (EXECUTE + skull) vs
+    `after-paladin-execute.png` (no EXECUTE, no skull; "Strike ~5-6 • Crit 15%")
+  - rogue: `before-rogue-execute.png` ("~5-8 • EXECUTE") vs `after-rogue-execute.png`
+    ("~7-10 • EXECUTE", skull retained)
+  - full pages: `before-<class>-full.png`, `after-<class>-full.png`
+  - command: `python .inspect/cycles/play_c17.py before|after` (before uses HEAD renderer.js)
+- **Played run**: real hover and attack on the 60/200 target. Paladin 6 damage, rogue 7 damage
+  from their base attacks; the +25% execute rule itself remains proven by
+  `rogue_executioner_boosts_low_hp_targets`. No page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 167 OK;
+  `python tools/ai_harness.py selftest` -> 93 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(combat): show the execute window only to the rogue`.
