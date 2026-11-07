@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-039",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794086285.2498448,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794086334.6129985
   },
   "checkpoints": [
-    {
-      "task_id": "CC-033",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Levels: draw an explored-room floor emblem per room theme (chapel/ossuary/gallery/urn crypt/choke) so the generator's theme DATA reads on the map, guard with a theme/glyph drift test and record three matched before/after pairs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794079543.8305135,
-      "timestamp_str": "2026-11-07 22:25:43",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The generator assigns five room themes and uses choke/gallery trap density, but renderer.js never read room_themes; chapel, ossuary and urn crypt rooms render as identical plain floors, so the theme is invisible outside the layout hash",
-        "benefits": "Rooms read at a glance, the theme DATA becomes visible, and the map gets identity without adding HUD text or obscuring props",
-        "risks": "contract: renderer reads dungeon.rooms/room_themes and adds two display-only helpers; dependency: none; concurrency: none; state: no save/RNG/rule change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Three matched seed-42 room captures before/after; tests/test_room_themes.py locks one palette colour and one glyph branch per ROOM_THEMES entry; inspector at three viewports; full gates"
-      },
-      "plan_digest": "a78858e3ac3c477c531b2730311d00b37844a1cd302ada482ab687b3567dc1b3"
-    },
     {
       "task_id": "CC-033",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-039, then cycle 11",
         "evidence": "155 tests, harness 81/81, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-039",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-039' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794086334.6130002,
+      "timestamp_str": "2026-11-08 00:18:54",
+      "agent": "opencode:cycles"
     }
   ]
 }
