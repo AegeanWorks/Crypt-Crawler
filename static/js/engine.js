@@ -2955,25 +2955,34 @@ export class GameEngine {
   }
 
   handlePlayerDeath(cause = "unknown") {
+    if (this.gameOver) return;
     this.gameOver = true;
     this.unlockLore(this.loreEvents?.death, true);
     sounds.stopMusic();
     this.clearSavedRun();
     this.recordRunEnd(false);
-    this.ui.showModal(
-      "💀 YOU PERISHED IN THE CRYPT",
-      `<p>Your torch flickers and dies... You fell to ${cause}.</p>
-       <br>
-       <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; border: 1px solid #742a2a;">
-         <p><strong>Final Depth:</strong> B${this.depth}F</p>
-         <p><strong>Turns Survived:</strong> ${this.turn}</p>
-         <p><strong>Monsters Slain:</strong> ${this.kills}</p>
-         <p><strong>Gold Gathered:</strong> ${this.player.gold} 🪙</p>
-       </div>
-       <br>
-        <p>Click below to enter the catacombs anew.</p>`
-    );
-    this.ui.btnModalClose.textContent = "Enter the Catacombs Anew";
+    this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
+    // Let the killing blow land: show the death feedback, then the ledger.
+    this.renderer.addFloatingText("☠ YOU PERISHED", this.player.x, this.player.y, "#fc8181");
+    this.renderer.shake(10, 500);
+    const deathToken = this.runToken;
+    setTimeout(() => {
+      if (deathToken !== this.runToken) return;
+      this.ui.showModal(
+        "💀 YOU PERISHED IN THE CRYPT",
+        `<p>Your torch flickers and dies... You fell to ${cause}.</p>
+         <br>
+         <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; border: 1px solid #742a2a;">
+           <p><strong>Final Depth:</strong> B${this.depth}F</p>
+           <p><strong>Turns Survived:</strong> ${this.turn}</p>
+           <p><strong>Monsters Slain:</strong> ${this.kills}</p>
+           <p><strong>Gold Gathered:</strong> ${this.player.gold} 🪙</p>
+         </div>
+         <br>
+          <p>Click below to enter the catacombs anew.</p>`
+      );
+      this.ui.btnModalClose.textContent = "Enter the Catacombs Anew";
+    }, 750);
   }
 
   handleVictory() {

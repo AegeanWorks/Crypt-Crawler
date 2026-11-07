@@ -1946,6 +1946,57 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_stacked_hits", not harness.errors, harness.errors))
     page.context.close()
 
+    # The killing blow deserves a beat: death feedback first, the modal after.
+    page = harness.open_page(seed)
+    death = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const p = e.player;
+            e.dungeon.updateFOV(p.x, p.y, 7);
+            const spot = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .find(([dx, dy]) => e.dungeon.isWalkable(p.x + dx, p.y + dy));
+            if (!spot) return { found: false };
+            e.monsters = [{
+                name: 'Death Dummy', type: 'skeleton', x: p.x + spot[0], y: p.y + spot[1],
+                hp: 99, max_hp: 99, attack: 999, defense: 0, xp_reward: 0, gold_reward: 0,
+                loot_drop: null, is_boss: false, is_champion: false, champion_affix: null,
+                status_effects: {},
+            }];
+            p.hp = 1;
+            e.finishPlayerTurn();
+            return {
+                found: true,
+                gameOver: e.gameOver,
+                modal: e.ui.isModalOpen(),
+                hudHp: document.getElementById('hpText')?.textContent || '',
+                floats: e.renderer.floatingTexts.map((f) => f.text),
+            };
+        }"""
+    )
+    page.wait_for_timeout(900)
+    late = page.evaluate(
+        """() => ({
+            modal: window.gameEngine.ui.isModalOpen(),
+            title: document.getElementById('modalTitle')?.textContent || '',
+        })"""
+    )
+    checks.append(_check(
+        "death_shows_the_killing_blow_before_the_modal",
+        death.get("found") is True
+        and death["gameOver"] is True
+        and death["modal"] is False
+        and death["hudHp"].startswith("0 /")
+        and any("PERISHED" in text for text in death["floats"]),
+        death,
+    ))
+    checks.append(_check(
+        "death_modal_arrives_after_the_beat",
+        late["modal"] is True and "PERISHED" in late["title"],
+        late,
+    ))
+    checks.append(_check("no_page_errors_after_death", not harness.errors, harness.errors))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)

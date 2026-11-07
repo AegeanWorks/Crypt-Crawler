@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `36`
-- **Total Classes**: `38`
+- **Total Python Modules**: `37`
+- **Total Classes**: `39`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `223`
-- **Total Source Lines**: `9210`
+- **Total Class Methods**: `226`
+- **Total Source Lines**: `9290`
 
 ---
 
@@ -346,6 +346,19 @@
 
 ---
 
+### [`tests/test_death_beat.py`](tests/test_death_beat.py)
+> *Death beat contract: feedback and HUD first, the ledger after a short pause.*
+
+**Size**: `29` lines (`1001` bytes)
+
+**Classes:**
+- `class TestDeathBeat`
+  - Method `.setUp()`
+  - Method `.test_death_updates_the_hud_before_the_modal()`
+  - Method `.test_death_modal_is_delayed()`
+
+---
+
 ### [`tests/test_dungeon.py`](tests/test_dungeon.py)
 > *Unit tests for procedural dungeon generation and pathfinding.*
 
@@ -575,7 +588,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2154` lines (`89953` bytes)
+**Size**: `2205` lines (`91966` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

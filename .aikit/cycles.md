@@ -235,3 +235,31 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(gfx): render bone arrows as arrows, spells as streaks`.
+
+## Cycle 9 — The killing blow gets a beat (2026-11-07)
+
+- **Area**: Combat feel (death feedback).
+- **Find**: `handlePlayerDeath` opened the ledger in the same frame as the fatal hit. The
+  before capture 150ms after death is already the modal, hiding the `-98` float, and the HUD
+  still reads 65/65 because `finishPlayerTurn` returns before `ui.updateHero`. The failing
+  selftest read `modal: true` at t=0 and no PERISHED float.
+- **Analyze**: Centralize the beat in `handlePlayerDeath`; keep `gameOver`, save clearing and
+  run recording immediate, show the HUD at zero, and delay only the modal. Killed: delaying
+  the state change (would let a dead hero act) and animating the modal itself (out of scope).
+- **Fix**: `ui.updateHero` before feedback, `☠ YOU PERISHED` float + 500ms shake, 750ms
+  `runToken`-guarded modal delay; inspector gameover scenario waits 0.9s; new
+  `tests/test_death_beat.py` and two selftest checks.
+- **Screenshots** (same seed 42 B1F, player 13,15 at 1 HP vs goblin 13,14):
+  - before: `.inspect/cycles/c9/before-death-early.png` (modal at 150ms, HUD 65/65)
+  - after: `.inspect/cycles/c9/after-death-early.png` (canvas at 150ms, HUD 0/65,
+    `☠ YOU PERISHED` + `-98`, red vignette)
+  - modal at 1s: `before-death-modal.png` / `after-death-modal.png`
+  - command: `python .inspect/cycles/play_c9.py before|after` (before uses HEAD engine.js)
+- **Played run**: real `waitTurn` death. Before: gameOver, modal true, HUD 65/65, no PERISHED.
+  After: gameOver true, modal false, HUD "0 / 65", PERISHED float; modal true at 1s with
+  "YOU PERISHED IN THE CRYPT"; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 152 OK;
+  `python tools/ai_harness.py selftest` -> 77 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(combat): hold the death ledger for the killing blow`.

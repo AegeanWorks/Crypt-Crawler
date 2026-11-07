@@ -1497,7 +1497,7 @@ def run_inspection(
                     if "gameover" in scenarios or "all" in scenarios:
                         print("      Driving Scenario: Death Modal...")
                         page.evaluate("() => window.gameEngine.handlePlayerDeath('a crypt wraith')")
-                        time.sleep(0.3)
+                        time.sleep(0.9)
                         death_shot = out_dir / "gameover_modal.png"
                         page.screenshot(path=str(death_shot), full_page=True)
                         report["screenshots"].append(
