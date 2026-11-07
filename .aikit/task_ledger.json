@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-041",
+    "task_id": "CC-042",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794088994.252368,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794090762.926281,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794089045.2657955
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-035",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Audio cues shipped: playBow 880->220 before archer impact; playTelegraph 196 (hymn, hum+silence) / 110 (drain) on Choir and Malakor windups; selftest 74/74 with ranged_and_telegraph_cues_fire; tests/test_audio_cues.py. Played: archer [880,160] 65->62 HP, Choir [196], Malakor [110]; before [160], [], []. Unit 145 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-047, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794081519.17003,
-      "timestamp_str": "2026-11-07 22:58:39",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-035, then cycle 7 (graphics/effects or UI polish)",
-        "evidence": "145 tests, harness 74/74, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-035",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-035' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794081545.5080118,
-      "timestamp_str": "2026-11-07 22:59:05",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-036",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794089045.2657974,
       "timestamp_str": "2026-11-08 01:04:05",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-042",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] UI readability: fix the deck affordability table so the rogue's 10-MP Fireball and mage's 10-MP Nova are dimmed at 8-9 MP, with a failing-first selftest, a cost parity test and same-state deck before/after",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794090736.4378374,
+      "timestamp_str": "2026-11-08 01:32:16",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The affordance table keyed costs by button id, but slot 4 is class-dependent: rogue Fireball and mage Nova cost 10 while the table said 8, so at 8-9 MP both looked enabled and lacked aria-disabled; only the engine refused the cast",
+        "benefits": "The deck now tells the truth at a glance and marks unaffordable 10-MP spells aria-disabled; the engine remains the authority",
+        "risks": "contract: two UI cost values change, stale slot-4 assertion corrected; dependency: none; concurrency: none; state: no save/rule change; UI: ui.js in the game-ui surface",
+        "mitigation": "Failing checks at 8/9 not dimmed; after dimmed+aria and clear at 10; cost parity test; real rogue/mage deck captures and forced-click refusal; inspector at three viewports; full gates"
+      },
+      "plan_digest": "c1edaaa7476f062149d04df24784f1a98b233f2b69bc2a4e7fc2195ee4e683af"
+    },
+    {
+      "task_id": "CC-042",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Deck affordance fixed: rogue/mage btnActionHeal cost 10; test_deck_costs.py + 2 selftest checks (89 total); stale test_swarm_fixes slot-4 assertion corrected with intent preserved. At seed 42 turn 1 with 8 MP: rogue Fireball and mage Nova bright -> dimmed/aria-disabled; Heal/Frost/Barrier stay bright; forced clicks still log the engine refusal. Unit 160 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-054, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794090762.926281,
+      "timestamp_str": "2026-11-08 01:32:42",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-042, then cycle 14 (graphics/effects)",
+        "evidence": "160 tests, harness 89/89, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

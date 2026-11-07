@@ -78,7 +78,7 @@ New Game offers **Normal** and **Hard**. Hard multiplies enemy max HP by 1.4, en
 | Shadow Rogue | Executioner | +25% attack damage to foes below 30% HP |
 | Arcane Mage | Arcane Focus | Spells deal +15% damage |
 
-The passive is printed on each class card before you choose, and the in-game guide repeats it.
+The passive is printed on each class card before you choose, and the in-game guide repeats it. The action deck also dims any ability the current mana cannot pay for and marks it `aria-disabled`, so a 10-MP Fireball or Nova never looks castable at 8-9 MP.
 
 ### 🔥 Status Combos
 | Setup | Follow-up | Effect |
@@ -208,6 +208,7 @@ crypt-crawler/
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger
 │   ├── test_death_cause.py   <- status causes end the turn and name the cause
+│   ├── test_deck_costs.py    <- deck dimming matches the engine mana costs
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_enemy_pathing.py <- blocked melee steps detour around props
 │   ├── test_fairness.py      <- fairness validator tests

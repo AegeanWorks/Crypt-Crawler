@@ -346,3 +346,32 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(levels): persist room themes across save and resume`.
+
+## Cycle 13 — Deck affordability matches the real costs (2026-11-08)
+
+- **Area**: UI readability (action deck).
+- **Find**: The dimming table keyed costs by button id, but slot 4 is class-dependent: rogue
+  Fireball and mage Nova both cost 10 MP while the table said 8. At 8-9 MP the buttons looked
+  enabled and lacked `aria-disabled`; only the cast-time check refused them. Failing checks:
+  `rogue_slot4_is_dimmed_below_10_mana` / `mage_slot4_is_dimmed_below_10_mana` (8/9 not dimmed).
+- **Analyze**: Correct the two costs and lock the slot-4 parity; the engine stays the authority.
+  The old `test_swarm_fixes` assertion that `btnActionHeal: 10` never appears was stale because
+  slot 4 changed class; corrected to check the engine's Heal-8 rule and both Heal slots, intent
+  preserved. Killed: a new shared cost module (two values, no new abstraction).
+- **Fix**: rogue/mage `btnActionHeal: 10`; `tests/test_deck_costs.py`; two selftest checks
+  (dimmed + aria at 8/9, clear at 10).
+- **Screenshots** (same seed 42 B1F, turn 1, 8 MP, 1920x1080):
+  - rogue: `.inspect/cycles/c13/before-rogue-deck.png` (Fireball bright) vs
+    `after-rogue-deck.png` (Fireball dimmed, Heal still bright)
+  - mage: `before-mage-deck.png` (Fireball dimmed, Nova bright) vs `after-mage-deck.png`
+    (both dimmed, Frost/Barrier bright)
+  - full pages: `before-<class>-full.png`, `after-<class>-full.png`
+  - command: `python .inspect/cycles/play_c13.py before|after` (before uses HEAD ui.js)
+- **Played run**: real rogue/mage sessions at 8 MP. Before: `dimmed: false`, `aria: null`, forced
+  click logs "Not enough mana ... (Needs 10 MP)". After: `dimmed: true`, `aria: "true"`,
+  Playwright normally refuses the click; forced click still logs the same refusal. No page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 160 OK;
+  `python tools/ai_harness.py selftest` -> 89 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(ui): dim the right spells in the action deck`.

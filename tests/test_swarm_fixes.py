@@ -32,9 +32,13 @@ class TestSwarmFixes(unittest.TestCase):
 
     def test_heal_costs_match_engine(self):
         ui = UI.read_text(encoding="utf-8")
-        # Engine + Python charge 8 MP for Divine Healing on every class.
-        self.assertTrue("btnActionHeal: 8" in ui, "heal 8 missing")
-        self.assertTrue("btnActionHeal: 10" not in ui, "stale heal 10 remains")
+        engine = ENGINE.read_text(encoding="utf-8")
+        # Divine Healing is 8 MP on every class that has it. Slot IDs are
+        # class-dependent: paladin slot 4 is Heal (btnActionHeal), rogue slot 5 is
+        # Heal (btnActionShieldWall); rogue/mage slot 4 are 10-MP Fireball/Nova.
+        self.assertIn("Not enough mana for Divine Healing! (Needs 8 MP)", engine)
+        self.assertIn("btnActionHeal: 8", ui)
+        self.assertIn("btnActionShieldWall: 8", ui)
 
     def test_surge_docs_match_barrier(self):
         from crawler.engagement import ENGAGEMENT_TUNING

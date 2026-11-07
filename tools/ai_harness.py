@@ -1623,6 +1623,42 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_theme_resume", not harness.errors, harness.errors))
     page.context.close()
 
+    # Deck affordability must match the shipped mana checks: the rogue's slot 4
+    # is Fireball (10) and the mage's slot 4 is Nova (10), not the 8 the old table said.
+    for hero_class in ("rogue", "mage"):
+        page = harness.open_page(seed, hero_class=hero_class)
+        afford = page.evaluate(
+            """() => {
+                const e = window.gameEngine;
+                const btn = document.getElementById('btnActionHeal');
+                const snap = (mana) => {
+                    e.player.mana = mana;
+                    e.ui.updateHero(e.player, e.turn, e.depth, e.kills);
+                    return {
+                        mana,
+                        dimmed: btn.classList.contains('deck-unaffordable'),
+                        aria: btn.getAttribute('aria-disabled'),
+                    };
+                };
+                return { eight: snap(8), nine: snap(9), ten: snap(10), title: btn.title };
+            }"""
+        )
+        checks.append(_check(
+            f"{hero_class}_slot4_is_dimmed_below_10_mana",
+            afford["eight"]["dimmed"] is True
+            and afford["nine"]["dimmed"] is True
+            and afford["eight"]["aria"] == "true"
+            and afford["ten"]["dimmed"] is False
+            and afford["ten"]["aria"] is None,
+            afford,
+        ))
+        checks.append(_check(
+            f"no_page_errors_after_{hero_class}_affordability",
+            not harness.errors,
+            harness.errors,
+        ))
+        page.context.close()
+
     # Floor omens: deterministic per seed+depth, all reachable, and actually applied.
     page = harness.open_page(seed)
     omen = page.evaluate(

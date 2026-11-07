@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `39`
-- **Total Classes**: `41`
+- **Total Python Modules**: `40`
+- **Total Classes**: `42`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `234`
-- **Total Source Lines**: `9533`
+- **Total Class Methods**: `237`
+- **Total Source Lines**: `9612`
 
 ---
 
@@ -373,6 +373,19 @@
 
 ---
 
+### [`tests/test_deck_costs.py`](tests/test_deck_costs.py)
+> *Deck affordability parity: the dimmed slots must match the engine mana costs.*
+
+**Size**: `39` lines (`1307` bytes)
+
+**Classes:**
+- `class TestDeckCosts`
+  - Method `.setUp()`
+  - Method `.test_rogue_and_mage_slot4_costs_match_the_engine()`
+  - Method `.test_paladin_slot4_heal_stays_at_eight()`
+
+---
+
 ### [`tests/test_dungeon.py`](tests/test_dungeon.py)
 > *Unit tests for procedural dungeon generation and pathfinding.*
 
@@ -599,7 +612,7 @@
 ### [`tests/test_swarm_fixes.py`](tests/test_swarm_fixes.py)
 > *Swarm-triage regression locks: verified true findings only (failing-first).*
 
-**Size**: `69` lines (`3600` bytes)
+**Size**: `73` lines (`3849` bytes)
 
 **Classes:**
 - `class TestSwarmFixes`
@@ -616,7 +629,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2376` lines (`99169` bytes)
+**Size**: `2412` lines (`100684` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*
