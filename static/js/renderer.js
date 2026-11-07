@@ -156,13 +156,14 @@ export class DungeonRenderer {
     });
   }
 
-  addProjectile(startX, startY, targetX, targetY, color = "#f6ad55") {
+  addProjectile(startX, startY, targetX, targetY, color = "#f6ad55", kind = "bolt") {
     this.projectiles.push({
       sx: startX * this.tileSize + this.tileSize / 2,
       sy: startY * this.tileSize + this.tileSize / 2,
       tx: targetX * this.tileSize + this.tileSize / 2,
       ty: targetY * this.tileSize + this.tileSize / 2,
       color,
+      kind,
       progress: 0,
       speed: 0.09,
     });
@@ -2115,6 +2116,7 @@ export class DungeonRenderer {
 
       const currX = p.sx + (p.tx - p.sx) * p.progress;
       const currY = p.sy + (p.ty - p.sy) * p.progress;
+      const angle = Math.atan2(p.ty - p.sy, p.tx - p.sx);
 
       // Emit flight sparks
       if (Math.random() < 0.6) {
@@ -2131,12 +2133,41 @@ export class DungeonRenderer {
       }
 
       ctx.save();
+      ctx.strokeStyle = p.color;
       ctx.fillStyle = p.color;
       ctx.shadowColor = p.color;
-      ctx.shadowBlur = 8;
-      ctx.beginPath();
-      ctx.arc(currX, currY, 5, 0, Math.PI * 2);
-      ctx.fill();
+      if (p.kind === "arrow") {
+        // A bone arrow reads as a physical shot: shaft, barbed head, fletching.
+        ctx.translate(currX, currY);
+        ctx.rotate(angle);
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.moveTo(-12, 0);
+        ctx.lineTo(8, 0);
+        ctx.moveTo(8, 0);
+        ctx.lineTo(3, -4);
+        ctx.moveTo(8, 0);
+        ctx.lineTo(3, 4);
+        ctx.moveTo(-12, 0);
+        ctx.lineTo(-16, -4);
+        ctx.moveTo(-12, 0);
+        ctx.lineTo(-16, 4);
+        ctx.stroke();
+      } else {
+        // Spells keep a glowing head with a short tapered trail.
+        ctx.globalAlpha = 0.35;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(currX - Math.cos(angle) * 20, currY - Math.sin(angle) * 20);
+        ctx.lineTo(currX, currY);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(currX, currY, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
 
       if (p.progress >= 1.0) {

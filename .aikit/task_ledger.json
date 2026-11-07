@@ -1,69 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-036",
+    "task_id": "CC-037",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794082509.944209,
+    "updated_at": 1794083659.9470217,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-030",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Canvas fit and click-to-move: keep the 760:540 bitmap ratio, map pointer input through the drawn content box, guard with tests and harness selftest checks, record before/after evidence",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794076171.3897266,
-      "timestamp_str": "2026-11-07 21:29:31",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "At 1440x900 and 1920x1080 the canvas element was 100% tall while the bitmap was letterboxed, leaving 116-140px black bands and a smaller map; pointer mapping used the full element rect, so off-center clicks decoded one or more tiles off and band clicks moved the hero",
-        "benefits": "The frame hugs the map at every viewport, tiles grow 54px -> 66px at 1920x1080, click-to-move lands on the visible tile and band clicks are inert",
-        "risks": "contract: _getTileAtPointer returns null in a letterbox band; dependency: none; concurrency: none; state: no save or RNG change; UI: style.css and engine.js in the game-ui surface",
-        "mitigation": "Three selftest checks failed first (gap 116, 5,17 -> 5,18, band decode); CSS/mapping source contract test; inspector at three viewports; full unit and aikit gates"
-      },
-      "plan_digest": "84dc8c8b533053326f64e1f08ffa3795bc6a5eb6e08ef25a3fd5a3d430e7158f"
-    },
-    {
-      "task_id": "CC-030",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Canvas fit shipped: aspect-ratio 760:540 with 1100px cap, letterbox-aware _getTileAtPointer, tests/test_canvas_fit.py, three selftest checks, before/after at 1920x1080 and a real click run (5,21 -> step to 6,25, turn 2; band click inert). Unit 139 OK, harness 66/66, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-042, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794076180.1151505,
-      "timestamp_str": "2026-11-07 21:29:40",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit then cycle 2",
-        "open": "UI guard finish deferred (surface + tools/tests move together, ADR-039 precedent)",
-        "evidence": "139 tests, harness 66/66, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-031",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Combat feel: stack simultaneous damage numbers at the same tile so twin hits are legible, prove with a selftest check and a real two-goblin turn",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794077104.8308587,
-      "timestamp_str": "2026-11-07 21:45:04",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Two enemies striking in one enemy phase spawn damage floats at the same x/y with identical velocity and life, so the canvas shows one number while the player loses two hits; the combat log names both but the map does not",
-        "benefits": "Twin hits read as two numbers whose sum equals the HP lost, while single hits, loot and heals keep their position",
-        "risks": "contract: addFloatingText offsets concurrent floats by 18px; dependency: none; concurrency: none; state: no save or RNG change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Selftest check failed first (two floats y=1021, distinct 1, damage 10); same-state before/after screenshots at turn 3 with a real two-goblin phase; inspector at three viewports; full gates"
-      },
-      "plan_digest": "36fd22b507ba1c6b573d0b89444e1edbe68903145ef722e1932bcaec03704921"
-    },
     {
       "task_id": "CC-030",
       "phase": "superseded",
@@ -308,6 +255,50 @@
         "state": "uncommitted and green",
         "next": "commit, complete CC-036, then cycle 8 (graphics/effects)",
         "evidence": "148 tests, harness 74/74, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-036",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-036' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794082534.48786,
+      "timestamp_str": "2026-11-07 23:15:34",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-037",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Graphics: give projectiles an identity (fletched bone arrow vs glowing spell bolt with a trailing streak), prove with a matched frozen-flight archer/hex pair and a shape contract test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794083639.188605,
+      "timestamp_str": "2026-11-07 23:33:59",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Every projectile was the same 5px glowing orb with sparks, so a Skeletal Archer's arrow and a Dread Necromancer's hex looked identical in flight and the map could not distinguish physical from magical ranged attacks",
+        "benefits": "Arrows read as arrows, spells read as streaking bolts; the damage/timing contract is untouched",
+        "risks": "contract: addProjectile gains an optional kind defaulting to bolt; dependency: none; concurrency: none; state: no save/rule/RNG/speed change; UI: renderer.js and engine.js in the game-ui surface",
+        "mitigation": "Matched before/after at seed 42 B2F, projectile frozen at progress 0.51; tests/test_projectile_style.py locks both shapes and the archer call; inspector at three viewports; full gates"
+      },
+      "plan_digest": "3761e8d9a966a3311001afe0cbb147e03b7afb9df8154a8ce9b5abba86842a1c"
+    },
+    {
+      "task_id": "CC-037",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Projectile identity shipped: kind=bolt default, arrow shape for bone arrows (20px fletched shaft rotated to flight), 20px tapered trail for bolts; archer passes arrow. tests/test_projectile_style.py. Matched before/after at progress 0.51: orb -> fletched arrow, orb -> orb+trail; played archer 4 dmg / hex 7 dmg, no page errors. Unit 150 OK, harness 74/74, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-049, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794083659.9470217,
+      "timestamp_str": "2026-11-07 23:34:19",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-037, then cycle 9",
+        "evidence": "150 tests, harness 74/74, inspector 75/75, gates 5/5"
       }
     }
   ]

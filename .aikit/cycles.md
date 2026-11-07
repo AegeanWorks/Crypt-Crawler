@@ -207,3 +207,31 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(ui): fade the scrolled chronicle top edge`.
+
+## Cycle 8 — Physical arrows vs spell bolts (2026-11-07)
+
+- **Area**: Graphics and effects.
+- **Find**: The Skeletal Archer's bone arrow and the Dread Necromancer's grave bolt both
+  rendered as the same 5px glowing orb with sparks. At flight progress 0.51 the before captures
+  are indistinguishable.
+- **Analyze**: `addProjectile` carried only a color; `_renderProjectiles` drew one orb. Add a
+  `kind` and two shapes, display-only. Killed: changing projectile speed/impact (it is cosmetic
+  and the damage is applied on the turn, so timing must not move).
+- **Fix**: `addProjectile(..., kind = "bolt")`; `_renderProjectiles` draws `arrow` as a 20px
+  fletched shaft rotated along the flight and `bolt` as an orb with a 20px tapered trail; the
+  archer passes `"arrow"`. `tests/test_projectile_style.py` locks both shapes and the call.
+- **Screenshots** (same seed 42 B2F, player 4 tiles from the target, projectile frozen at
+  progress 0.51, 1920x1080):
+  - archer: `.inspect/cycles/c8/before-archer-zoom.png` (glowing orb) vs
+    `after-archer-zoom.png` (fletched arrow)
+  - hex: `before-hex-zoom.png` (orb) vs `after-hex-zoom.png` (orb + trail)
+  - full pages: `before-archer.png`, `after-archer.png`, `before-hex.png`, `after-hex.png`
+  - command: `python .inspect/cycles/play_c8.py before|after` (before uses HEAD renderer/engine)
+- **Played run**: real `waitTurn` sessions; the archer hit for 4 and the necromancer for 7 in
+  `after.txt`, with matching chronicle lines and no page errors; the frozen frame is only for
+  the comparison shot.
+- **Gates**: `python -m unittest discover -s tests` -> 150 OK;
+  `python tools/ai_harness.py selftest` -> 74 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(gfx): render bone arrows as arrows, spells as streaks`.

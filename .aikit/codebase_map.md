@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `35`
-- **Total Classes**: `37`
+- **Total Python Modules**: `36`
+- **Total Classes**: `38`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `220`
-- **Total Source Lines**: `9182`
+- **Total Class Methods**: `223`
+- **Total Source Lines**: `9210`
 
 ---
 
@@ -470,6 +470,19 @@
   - Method `.test_shipped_js_matches_tuning_rates()`
   - Method `.test_python_uses_tuning_not_literals()`
   - Method `.test_readme_states_current_odds()`
+
+---
+
+### [`tests/test_projectile_style.py`](tests/test_projectile_style.py)
+> *Projectile style contract: arrows read physical, spells keep a glowing trail.*
+
+**Size**: `28` lines (`967` bytes)
+
+**Classes:**
+- `class TestProjectileStyle`
+  - Method `.setUp()`
+  - Method `.test_renderer_has_arrow_and_bolt_shapes()`
+  - Method `.test_archer_fires_the_arrow_shape()`
 
 ---
 

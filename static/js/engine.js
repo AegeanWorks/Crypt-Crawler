@@ -2796,7 +2796,7 @@ export class GameEngine {
         this.player._hitFlash = performance.now();
         sounds.playBow();
         sounds.playHit(false);
-        this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#e2e8f0");
+        this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#e2e8f0", "arrow");
         this.renderer.addFloatingText(`-${dmg}`, this.player.x, this.player.y, "#ff3333");
         this.ui.logMessage(`${monster.name} looses a bone arrow for ${dmg} damage!`, "hit");
         continue;

@@ -91,6 +91,9 @@ Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; 
 ### 💥 Combat Feedback
 When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost.
 
+### 🏹 Projectiles
+Bone arrows render as fletched arrows rotated along their flight; spells keep a glowing head with a short tapered trail, so a physical ranged hit reads differently from a hex or a fireball.
+
 ### 🎭 Floor Omens, Mobs and Story
 Every floor carries one omen chosen deterministically from the seed: **Blood Moon** (enemies strike 25% harder), **Deep Fog** (lantern 5 tiles, or 7 near a wall sconce), **Gilded Crypt** (+50% chest and urn gold), **Restless Dead** (one extra enemy), **Ember Tithe** (chests pay 25% less, shrines heal +15) or **Hollow Silence** (more traps, disarm XP x2). The header pill names it, the chronicle announces it, and the journal keeps it.
 
@@ -211,6 +214,7 @@ crypt-crawler/
 │   ├── test_save_version.py  <- one save version constant, unsupported saves refused
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
+│   ├── test_projectile_style.py <- arrows read physical, spell bolts keep a trail
 │   ├── test_server.py        <- web server endpoints tests
 │   └── test_swarm_fixes.py   <- swarm-triage verified regression locks
 └── .aikit/                   <- project memory: record, ledger, decisions, ui.json guard
