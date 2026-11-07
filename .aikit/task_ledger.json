@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-046",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794095908.9544773,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794095939.7654197
   },
   "checkpoints": [
-    {
-      "task_id": "CC-040",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Enemies: add a BFS detour when the greedy melee step is blocked by a chest/urn/corner, prove with a failing-first selftest check, a source test and a real chest-blocked played run before/after",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794087557.7566044,
-      "timestamp_str": "2026-11-08 00:39:17",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "A visible melee enemy with a real chest between it and the hero stalled forever: _stepToward only tries one x and one y step, so the skeleton at (9,7) with chest (10,7) and player (11,7) never moved in six turns, distance 2, damage 0",
-        "benefits": "Melee foes walk around props and corners and attack; greedy movement stays preferred in the open; ranged enemies keep hold-range behavior",
-        "risks": "contract: processEnemyTurns gains _stepTowardPath fallback for normal and hound/Swift second steps; dependency: none; concurrency: none; state: no save/rule change; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing check moved false/distance 2/damage 0; after moved to (11,8), distance 1, 3 attacks; source test; real six-turn wait before/after; inspector at three viewports; full gates"
-      },
-      "plan_digest": "f133f9590c8a361fe0c55b063bc1e9ba66f52e78f0e29282636d84ee8b505e79"
-    },
     {
       "task_id": "CC-040",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-046, then cycle 18 (enemies/bosses)",
         "evidence": "167 tests, harness 93/93, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-046",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-046' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794095939.7654216,
+      "timestamp_str": "2026-11-08 02:58:59",
+      "agent": "opencode:cycles"
     }
   ]
 }
