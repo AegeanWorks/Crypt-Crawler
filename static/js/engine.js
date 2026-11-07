@@ -70,6 +70,9 @@ export const DIFFICULTIES = {
   hard: { id: "hard", name: "Hard", hp: 1.4, attack: 1.25, reward: 1.15 },
 };
 
+/** Persisted save format. Bump only with a migration; the loader refuses other versions. */
+export const SAVE_VERSION = 2;
+
 /**
  * Engagement tuning mirror of `crawler/engagement.py:ENGAGEMENT_TUNING`.
  * Single source of truth is the Python table; this mirror must match it.
@@ -2998,7 +3001,7 @@ export class GameEngine {
     if (this.gameOver || this.victory || !this.player || !this.dungeon) return;
     try {
       const state = {
-        version: 2,
+        version: SAVE_VERSION,
         savedAt: Date.now(),
         turn: this.turn,
         depth: this.depth,
@@ -3057,6 +3060,13 @@ export class GameEngine {
       if (!raw) return null;
       const data = JSON.parse(raw);
       if (!data || !data.player || !data.dungeon) return null;
+      if (data.version !== SAVE_VERSION) {
+        console.warn(
+          `Refusing unsupported save version ${data.version}; expected ${SAVE_VERSION}. `
+          + "The stored save was left untouched."
+        );
+        return null;
+      }
       return data;
     } catch (err) {
       console.warn("Failed to parse saved game:", err);

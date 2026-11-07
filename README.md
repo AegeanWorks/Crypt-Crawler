@@ -114,6 +114,9 @@ Press `R` or the deck's **Search** button to spend a turn revealing armed traps 
 ### 🏛️ Room Themes
 Each generated room carries one of five themes — chapel, ossuary, gallery, urn crypt or choke — and leaves a faint floor emblem at its centre (cross, skull, arches, urn, chevrons), so a floor reads at a glance even before you hover a prop. Choke rooms hide more traps and gallery rooms fewer; the emblem itself is cosmetic and changes no rule.
 
+### 💾 Saves & Resume
+The run autosaves after every turn under `crypt_crawler_save_v2`. On load the game resumes only a save whose `version` matches the shipped format (currently 2); a save from a newer or unknown version is refused with a console warning and left in storage, so a build downgrade cannot half-load or corrupt a run. Death and victory clear the save.
+
 ### 🧳 Merchant
 Hermit Grimbold opens a two-tab shop on B2F and deeper. **Buy** spends gold on potions, gear and relics (15-140, rebalanced: Health 20, Hammer 115); **Sell** converts outclassed backpack loot into gold at a rarity-based price (common 10, rare 30, epic 60, legendary 100). The shop stays open after a sale, so a full 12-slot backpack can be cleared in one visit, and selling is refused once the shop is closed. The Crown of Eternity is a trophy, not stock: it never appears in the Sell tab. Chests pay 17+0-13 base with a 2.4x jackpot capped at 3.0x with omens; urns pay 6+0-10 with the same cap, so risk-for-power stays a real choice.
 
@@ -197,6 +200,7 @@ crypt-crawler/
 │   ├── test_lore.py          <- codex data and /api/lore endpoint tests
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests
 │   ├── test_room_themes.py   <- every generated room theme has a rendered emblem
+│   ├── test_save_version.py  <- one save version constant, unsupported saves refused
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
 │   ├── test_server.py        <- web server endpoints tests

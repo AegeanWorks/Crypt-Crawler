@@ -125,3 +125,31 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(levels): draw a floor emblem for every room theme`.
+
+## Cycle 5 — Save version refusal (2026-11-07)
+
+- **Area**: Progression and saves.
+- **Find**: `saveGameState` wrote `version: 2`, but `loadSavedRun` never checked it. Repro:
+  `unsupported_save_version_is_refused` read `acceptedFuture: true`; a real reload with a
+  `version: 99` save resumed Turn 3 / seed 42 with no warning.
+- **Analyze**: The shipped writer and loader must share one version constant and the loader must
+  refuse anything else without mutating storage (project guideline). No migration is needed: v1
+  lived under a different key. Killed: a migration table (no older version can reach this key).
+- **Fix**: `SAVE_VERSION = 2` exported, writer uses it, loader refuses `data.version !==
+  SAVE_VERSION` with a console warning and no `setItem`/`removeItem`; new
+  `tests/test_save_version.py` and selftest check.
+- **Screenshots** (same real reload, 1920x1080; save taken at Turn 3, seed 42, then version
+  forced to 99):
+  - before: `.inspect/cycles/c5/before-reload-top.png` (resumed Turn 3, Ember Tithe)
+  - after: `.inspect/cycles/c5/after-reload-top.png` (fresh Turn 1, Blood Moon)
+  - full pages: `before-reload-full.png`, `after-reload-full.png`
+  - command: `python .inspect/cycles/play_c5.py before|after` (before uses HEAD engine.js)
+- **Played run**: real page reload after waiting two turns and saving. Before: turn 3, runSeed 42,
+  log "Resumed your ongoing dungeon run from crystal memory.", disk version 99. After: turn 1,
+  runSeed 81401, log starts at "Entered Depth B1F...", console warning "Refusing unsupported
+  save version 99; expected 2. The stored save was left untouched.", no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 143 OK;
+  `python tools/ai_harness.py selftest` -> 72 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(save): refuse unsupported save versions`.

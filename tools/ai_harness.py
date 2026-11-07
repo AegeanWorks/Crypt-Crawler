@@ -1567,6 +1567,41 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_trap_resume", not harness.errors, harness.errors))
     page.context.close()
 
+    # A save written by a newer engine must be refused whole, not half-loaded,
+    # and the raw value must survive so the player can still recover it.
+    page = harness.open_page(seed)
+    version_guard = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            e.saveGameState();
+            const key = 'crypt_crawler_save_v2';
+            const data = JSON.parse(localStorage.getItem(key));
+            data.version = 99;
+            const future = JSON.stringify(data);
+            localStorage.setItem(key, future);
+            const acceptedFuture = e.loadSavedRun();
+            const rawAfter = localStorage.getItem(key);
+            data.version = 2;
+            localStorage.setItem(key, JSON.stringify(data));
+            const acceptedCurrent = e.loadSavedRun();
+            localStorage.removeItem(key);
+            return {
+                acceptedFuture: acceptedFuture !== null,
+                rawUnchanged: rawAfter === future,
+                acceptedCurrent: acceptedCurrent !== null,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "unsupported_save_version_is_refused",
+        version_guard["acceptedFuture"] is False
+        and version_guard["rawUnchanged"] is True
+        and version_guard["acceptedCurrent"] is True,
+        version_guard,
+    ))
+    checks.append(_check("no_page_errors_after_save_version", not harness.errors, harness.errors))
+    page.context.close()
+
     # Floor omens: deterministic per seed+depth, all reachable, and actually applied.
     page = harness.open_page(seed)
     omen = page.evaluate(
