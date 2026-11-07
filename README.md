@@ -59,6 +59,9 @@ python aikit.py ui abort crypt-crawler
 ### 📱 Mobile Layout
 Below 768px the three panels stack into one vertically scrolling column; the action deck and the on-screen movement D-pad stay fully visible above it, and the header wraps instead of overflowing sideways.
 
+### 🖥️ Canvas Fit & Click-to-Move
+The canvas keeps its native 760:540 ratio, so the frame hugs the drawn map instead of leaving black letterbox bands; on a 1920x1080 screen it fills up to 1100px wide (about 66px tiles). Clicking a visible tile moves one step toward it, and clicks outside the drawn bitmap are ignored, so the pointer never maps into fog or rock.
+
 ### 🎲 Seeds
 The class-selection screen accepts an optional positive run seed; leave it blank for a random run. The same seed, class and difficulty reproduce the same dungeon, and the Records modal shows the current seed with a **Copy Seed** button so a run can be replayed or shared.
 

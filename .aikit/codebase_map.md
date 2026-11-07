@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `30`
-- **Total Classes**: `32`
-- **Total Top-Level Functions**: `58`
-- **Total Class Methods**: `204`
-- **Total Source Lines**: `8753`
+- **Total Python Modules**: `31`
+- **Total Classes**: `33`
+- **Total Top-Level Functions**: `59`
+- **Total Class Methods**: `208`
+- **Total Source Lines**: `8873`
 
 ---
 
@@ -246,6 +246,23 @@
   - Method `.test_inventory_names_real_controls_choices_and_handlers()`
   - Method `.test_inventory_is_deterministic_and_deduplicated()`
   - Method `.test_ui_contract_points_at_the_inventory_and_tests()`
+
+---
+
+### [`tests/test_canvas_fit.py`](tests/test_canvas_fit.py)
+> *Canvas fit contract: the element box hugs the 760x540 bitmap and clicks use it.*
+
+**Size**: `47` lines (`1687` bytes)
+
+**Classes:**
+- `class TestCanvasFit`
+  - Method `.setUp()`
+  - Method `.test_canvas_keeps_bitmap_aspect_ratio()`
+  - Method `.test_mobile_canvas_keeps_bitmap_aspect_ratio()`
+  - Method `.test_pointer_mapping_uses_the_drawn_content_box()`
+
+**Functions:**
+- `def rule_for(css, selector)`
 
 ---
 
@@ -493,7 +510,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `1889` lines (`78452` bytes)
+**Size**: `1962` lines (`81868` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

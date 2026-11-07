@@ -1753,6 +1753,79 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     checks.append(_check("no_page_errors_after_mob_turns", not harness.errors, harness.errors))
     page.context.close()
+
+    # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
+    # player sees, including when a tall box letterboxes the bitmap vertically.
+    page = harness.open_page(seed)
+    pointer = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const style = getComputedStyle(e.canvas);
+            const aspect = e.canvas.width / e.canvas.height;
+            const fit = (rect) => {
+                let cw = rect.width, ch = rect.height;
+                if (style.objectFit === 'contain') {
+                    if (cw / ch > aspect) cw = ch * aspect; else ch = cw / aspect;
+                }
+                return { cw, ch, offX: (rect.width - cw) / 2, offY: (rect.height - ch) / 2 };
+            };
+            const rect0 = e.canvas.getBoundingClientRect();
+            const f0 = fit(rect0);
+            const defaultGap = Math.max(rect0.width - f0.cw, rect0.height - f0.ch);
+
+            e.canvas.style.width = '600px';
+            e.canvas.style.height = '600px';
+            const rect = e.canvas.getBoundingClientRect();
+            const f = fit(rect);
+            const ts = e.renderer.tileSize;
+            const camX = Math.floor(e.canvas.width / 2 - e.player.x * ts - ts / 2);
+            const camY = Math.floor(e.canvas.height / 2 - e.player.y * ts - ts / 2);
+            let target = null;
+            for (let y = 0; y < e.dungeon.height; y += 1) {
+                for (let x = 0; x < e.dungeon.width; x += 1) {
+                    if (!e.dungeon.isExplored(x, y)) continue;
+                    if (!target || Math.abs(y - e.player.y) > Math.abs(target.y - e.player.y)) {
+                        target = { x, y };
+                    }
+                }
+            }
+            const scale = f.cw / e.canvas.width;
+            const clientX = rect.left + f.offX + (camX + target.x * ts + ts / 2) * scale;
+            const clientY = rect.top + f.offY + (camY + target.y * ts + ts / 2) * scale;
+            const decoded = e._getTileAtPointer({ clientX, clientY });
+            const band = e._getTileAtPointer({
+                clientX: rect.left + rect.width / 2,
+                clientY: rect.top + f.offY / 2,
+            });
+            e.canvas.style.width = '';
+            e.canvas.style.height = '';
+            return {
+                defaultGap: Math.round(defaultGap),
+                objectFit: style.objectFit,
+                target,
+                decoded: decoded ? { x: decoded.x, y: decoded.y } : null,
+                bandDecoded: band ? { x: band.x, y: band.y } : null,
+                letterbox: Math.round(f.offY),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "canvas_hugs_its_bitmap",
+        pointer["objectFit"] == "contain" and pointer["defaultGap"] <= 1,
+        {"objectFit": pointer["objectFit"], "gap": pointer["defaultGap"]},
+    ))
+    checks.append(_check(
+        "click_maps_to_the_visible_tile",
+        pointer["decoded"] == pointer["target"],
+        {"target": pointer["target"], "decoded": pointer["decoded"], "letterbox": pointer["letterbox"]},
+    ))
+    checks.append(_check(
+        "click_outside_the_bitmap_is_ignored",
+        pointer["bandDecoded"] is None,
+        {"bandDecoded": pointer["bandDecoded"], "letterbox": pointer["letterbox"]},
+    ))
+    checks.append(_check("no_page_errors_after_pointer", not harness.errors, harness.errors))
+    page.context.close()
     return checks
 
 

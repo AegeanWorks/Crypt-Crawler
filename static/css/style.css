@@ -446,9 +446,12 @@ body.theme-dark {
 }
 
 #gameCanvas {
+  /* Keep the element box the same 760:540 ratio as the bitmap so the border hugs
+     the drawn map (object-fit: contain otherwise leaves black letterbox bands). */
   width: 100%;
-  height: 100%;
-  max-width: 900px;
+  height: auto;
+  aspect-ratio: 760 / 540;
+  max-width: min(1100px, calc((100vh - 160px) * 760 / 540));
   max-height: calc(100vh - 160px);
   object-fit: contain;
   background: #000;
@@ -1201,7 +1204,8 @@ body.theme-dark {
 
   #gameCanvas {
     width: 100%;
-    height: 100%;
+    height: auto;
+    aspect-ratio: 760 / 540;
     max-height: 360px;
   }
 

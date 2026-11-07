@@ -804,10 +804,21 @@ export class GameEngine {
   _getTileAtPointer(e) {
     if (!this.player || !this.dungeon) return null;
     const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const mouseX = (e.clientX - rect.left) * scaleX;
-    const mouseY = (e.clientY - rect.top) * scaleY;
+    // `object-fit: contain` may letterbox the bitmap inside the element box, so map
+    // the pointer through the drawn content box (and ignore clicks in the bands).
+    const bufferAspect = this.canvas.width / this.canvas.height;
+    const boxAspect = rect.width / rect.height;
+    const drawWidth = boxAspect > bufferAspect ? rect.height * bufferAspect : rect.width;
+    const drawHeight = boxAspect > bufferAspect ? rect.height : rect.width / bufferAspect;
+    const offsetX = (rect.width - drawWidth) / 2;
+    const offsetY = (rect.height - drawHeight) / 2;
+    const pointerX = e.clientX - rect.left - offsetX;
+    const pointerY = e.clientY - rect.top - offsetY;
+    if (pointerX < 0 || pointerY < 0 || pointerX > drawWidth || pointerY > drawHeight) {
+      return null;
+    }
+    const mouseX = pointerX * (this.canvas.width / drawWidth);
+    const mouseY = pointerY * (this.canvas.height / drawHeight);
 
     const ts = this.renderer.tileSize;
     const camX = Math.floor(this.canvas.width / 2 - this.player.x * ts - ts / 2);
