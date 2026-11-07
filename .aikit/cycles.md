@@ -375,3 +375,28 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(ui): dim the right spells in the action deck`.
+
+## Cycle 14 — Cavern floor and wall contrast (2026-11-08)
+
+- **Area**: Graphics and effects (biome readability).
+- **Find**: The B2F cavern palette put visible floors at `#0e1c20`/`#0a1619` and walls at
+  `#122629`; a real four-step walk showed the room as a near-black void with faint grid lines.
+  The floor luminance was ~0.010 versus the crypt's ~0.019, so the room shape was unreadable
+  even without the CRT overlay.
+- **Analyze**: Raise only the visible cavern palette, leave unexplored/water/torchlight alone.
+  Killed: changing the torchlight radius (Deep Fog/positional light already owns that rule) and
+  the CRT overlay (optional, page-wide).
+- **Fix**: visible walls `#1b3a40` / grid `#2a565e` / lichen `#2f6b70`; visible floors
+  `#14343a`/`#102c31` / grid `#24535c`; `tests/test_cavern_contrast.py` locks relative luminance
+  (floor >= 0.02, wall >= 0.025, unexplored < half).
+- **Screenshots** (same seed 42 B2F, rogue, four steps (6,26) -> (8,24), turn 5, HP 48, 1920x1080):
+  - before: `.inspect/cycles/c14/before-cavern-full.png` / `before-cavern-zoom.png`
+  - after: `after-cavern-full.png` / `after-cavern-zoom.png` (readable teal floor/wall grid)
+  - command: `python .inspect/cycles/play_c14.py before|after` (before uses HEAD renderer.js)
+- **Played run**: real `stepPlayer` walk through the B2F spawn room (four steps, turn 5, HP 48);
+  before near-black floor, after readable room shape; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 162 OK;
+  `python tools/ai_harness.py selftest` -> 89 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(gfx): lift the cavern floor and wall contrast`.

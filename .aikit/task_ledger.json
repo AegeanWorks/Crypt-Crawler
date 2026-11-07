@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-042",
+    "task_id": "CC-043",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794090762.926281,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794092051.7719374,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794090808.9930553
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-036",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Chronicle fade shipped: wrapper + :has(is-scrolled) top gradient, scroll listener and per-append toggle; tests/test_chronicle_fade.py. Matched capture at seed 42 turn 9/19 entries/scrollTop 137: before hard glyph shear, after soft fade; inspector 75/75, 0 console errors. Unit 148 OK, harness 74/74, aikit check 5/5. checklists: passed. ADR-048, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794082509.944209,
-      "timestamp_str": "2026-11-07 23:15:09",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-036, then cycle 8 (graphics/effects)",
-        "evidence": "148 tests, harness 74/74, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-036",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-036' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794082534.48786,
-      "timestamp_str": "2026-11-07 23:15:34",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-037",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794090808.9930582,
       "timestamp_str": "2026-11-08 01:33:28",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-043",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Graphics: lift the B2F cavern visible floor/wall/grid palette so the room shape is readable in the dark biome, prove with a same-path before/after pair, a luminance contract test and a real four-step play",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794092015.28806,
+      "timestamp_str": "2026-11-08 01:53:35",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The B2F cavern visible floor (#0e1c20/#0a1619) and walls (#122629) were so dark that a real walk showed a near-black void with faint grid lines; floor luminance ~0.010 vs crypt ~0.013, and the room shape was unreadable even without the CRT overlay",
+        "benefits": "B2F rooms read as teal stone at a glance while unexplored tiles stay black and the cavern mood/water/torchlight are preserved",
+        "risks": "contract: only the visible cavern palette changes; dependency: none; concurrency: none; state: no save/rule change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Same-path before/after at seed 42 B2F rogue turn 5 HP 48; tests/test_cavern_contrast.py luminance floors; inspector at three viewports; full gates"
+      },
+      "plan_digest": "1b64c40af00f9af45cd3121644afb72c55923bd584bed720ab832f1cefa8dfcd"
+    },
+    {
+      "task_id": "CC-043",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Cavern contrast shipped: visible walls #1b3a40/grid #2a565e, floors #14343a/#102c31/grid #24535c; unexplored stays #0b1a1d/#08181b; tests/test_cavern_contrast.py (floor>=0.02, wall>=0.025, unexplored<half). Same-path seed 42 B2F rogue turn 5 HP 48: near-black -> readable teal room; no page errors. Unit 162 OK, harness 89/89, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-055, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794092051.7719374,
+      "timestamp_str": "2026-11-08 01:54:11",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-043, then cycle 15 (audio cues)",
+        "evidence": "162 tests, harness 89/89, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

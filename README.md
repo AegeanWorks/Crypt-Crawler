@@ -65,6 +65,9 @@ The canvas keeps its native 760:540 ratio, so the frame hugs the drawn map inste
 ### 📜 Chronicle Readability
 The Dungeon Chronicle auto-scrolls to the newest line. Scroll it back and the top edge fades instead of shearing the top line mid-glyph, so the oldest visible line reads as history rather than damage.
 
+### 🕯️ Biome Readability
+The crypt, cavern and inferno biomes keep distinct palettes; the B2F cavern's visible floor and wall stones are bright enough to read the room shape at a glance, while unexplored tiles stay black and the water shimmers keep the dark-cavern mood.
+
 ### 🎲 Seeds
 The class-selection screen accepts an optional positive run seed; leave it blank for a random run. The same seed, class and difficulty reproduce the same dungeon, and the Records modal shows the current seed with a **Copy Seed** button so a run can be replayed or shared.
 
@@ -204,6 +207,7 @@ crypt-crawler/
 │   ├── test_ai_harness.py    <- harness validation and UI inventory tests
 │   ├── test_audio_cues.py    <- bow-release and boss-telegraph audio cues
 │   ├── test_canvas_fit.py    <- canvas aspect-ratio and pointer-mapping contract
+│   ├── test_cavern_contrast.py <- B2F cavern floor/wall readability floor
 │   ├── test_chronicle_fade.py <- scrolled chronicle fades its top edge
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `40`
-- **Total Classes**: `42`
-- **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `237`
-- **Total Source Lines**: `9612`
+- **Total Python Modules**: `41`
+- **Total Classes**: `43`
+- **Total Top-Level Functions**: `60`
+- **Total Class Methods**: `240`
+- **Total Source Lines**: `9650`
 
 ---
 
@@ -276,6 +276,22 @@
 
 **Functions:**
 - `def rule_for(css, selector)`
+
+---
+
+### [`tests/test_cavern_contrast.py`](tests/test_cavern_contrast.py)
+> *Cavern contrast contract: B2F floors/walls stay readable in the dark biome.*
+
+**Size**: `38` lines (`1446` bytes)
+
+**Classes:**
+- `class TestCavernContrast`
+  - Method `.setUp()`
+  - Method `.test_visible_cavern_floor_and_wall_are_readable()`
+  - Method `.test_unexplored_cavern_stays_black()`
+
+**Functions:**
+- `def _luminance(hex_color)`
 
 ---
 

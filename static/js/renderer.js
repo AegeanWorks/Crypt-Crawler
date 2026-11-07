@@ -354,14 +354,14 @@ export class DungeonRenderer {
 
     if (tile === TileType.WALL) {
       if (biome === "cavern") {
-        ctx.fillStyle = isVis ? "#122629" : "#091517";
+        ctx.fillStyle = isVis ? "#1b3a40" : "#0b1a1d";
         ctx.fillRect(px, py, ts, ts);
-        ctx.strokeStyle = isVis ? "#1e3c40" : "#112225";
+        ctx.strokeStyle = isVis ? "#2a565e" : "#13292d";
         ctx.lineWidth = 1;
         ctx.strokeRect(px + 1, py + 1, ts - 2, ts - 2);
         // Bioluminescent cyan lichen
         if ((x * 7 + y * 13) % 4 === 0) {
-          ctx.fillStyle = isVis ? "#234e52" : "#132729";
+          ctx.fillStyle = isVis ? "#2f6b70" : "#163538";
           ctx.fillRect(px + 2, py + ts - 5, ts - 4, 3);
         }
       } else if (biome === "inferno") {
@@ -415,9 +415,9 @@ export class DungeonRenderer {
       const altColor = (x + y) % 2 === 0;
 
       if (biome === "cavern") {
-        ctx.fillStyle = isVis ? (altColor ? "#0e1c20" : "#0a1619") : "#060e10";
+        ctx.fillStyle = isVis ? (altColor ? "#14343a" : "#102c31") : "#08181b";
         ctx.fillRect(px, py, ts, ts);
-        ctx.strokeStyle = isVis ? "#172e35" : "#0e1c21";
+        ctx.strokeStyle = isVis ? "#24535c" : "#12282d";
         ctx.lineWidth = 1;
         ctx.strokeRect(px, py, ts, ts);
 
