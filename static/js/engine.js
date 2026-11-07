@@ -795,7 +795,7 @@ export class GameEngine {
          <p>Conquer Depth B3F and slay <strong>Arch-Lich Malakor</strong> to claim the <em>Crown of Eternity</em>!</p>
          <br>
          <p><strong>Floor Omens:</strong> every floor carries one omen — Blood Moon (enemies hit 25% harder), Deep Fog (lantern 5 tiles, or 7 near a sconce), Gilded Crypt (+50% chest and urn gold), Restless Dead (one extra enemy), Ember Tithe (chests pay 25% less, shrines heal +15) or Hollow Silence (more traps, disarm XP x2). The omen pill in the header always names the current one. Watch for telegraphs: Malakor inhales before draining, the Choir hums before its verse, and the Warden hardens at low health.</p>
-         <p><strong>Enemies:</strong> Skeletal Archers shoot across open rooms, Crypt Hounds lunge two tiles a turn, and Pact-Bound Wraiths rise from Avarice.</p>
+         <p><strong>Enemies:</strong> Skeletal Archers shoot across open rooms, Dread Necromancers hex from five tiles unless you close the gap, Crypt Hounds lunge two tiles a turn, and Pact-Bound Wraiths rise from Avarice.</p>
          <p><strong>Shortcuts:</strong> <strong>?</strong> opens this guide, <strong>R</strong> searches for traps, <strong>Escape</strong> closes any dialog, and the 🎞️ button toggles reduced motion (persisted).</p>`
       );
     });
@@ -2753,6 +2753,27 @@ export class GameEngine {
         monster.intent = "SILENCE";
         this.renderer.addFloatingText("SILENCE…", monster.x, monster.y, "#a0aec0");
         this.ui.logMessage("🤫 The Choir falls silent… a stunning verse is coming! Strike or step away!", "crit");
+      }
+
+      // Dread Necromancer: a caster that holds range and hexes instead of
+      // walking into melee; a broken line of sight or a hug closes the window.
+      if (
+        monster.type === "necromancer" && isVisible && dist > 1 && dist <= 5
+        && this._hasLineOfSight(monster.x, monster.y, this.player.x, this.player.y)
+      ) {
+        const baseDmg = Math.max(1, monster.attack - this.player.defense);
+        const dmg = Math.max(
+          1,
+          Math.floor(baseDmg * (0.8 + Math.random() * 0.4) * (this.omen?.atkMult || 1))
+        );
+        this.player.hp = Math.max(0, this.player.hp - dmg);
+        this.player._hitFlash = performance.now();
+        sounds.playSpell("fireball");
+        this.renderer.addProjectile(monster.x, monster.y, this.player.x, this.player.y, "#b794f4");
+        this.renderer.addFloatingText(`-${dmg} HEX`, this.player.x, this.player.y, "#d6bcfa");
+        this.ui.logMessage(`${monster.name} chants a grave bolt for ${dmg} damage!`, "hit");
+        if (this.player.hp <= 0) { this.handlePlayerDeath("a grave bolt"); return; }
+        continue;
       }
 
       // Skeletal Archer: fires from a distance instead of closing to melee.

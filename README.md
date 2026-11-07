@@ -37,7 +37,7 @@ python tools/ai_harness.py play --seed 42 --class paladin --difficulty hard --ac
 python tools/ai_harness.py play --script run.json
 python tools/ai_harness.py selftest
 ```
-`catalog` prints the classes, their passives, the five deck abilities, every action field, the pact choices, the difficulty keys and the state keys. `play` drives the shipped JavaScript engine in headless Edge, installs a seeded `Math.random`, and prints one JSON object per run: each step plus the final state (player, monsters, props, log tail, `layout_hash`). Because the RNG is seeded, the same seed, class, difficulty and action list reproduce the same dungeon, so an agent can test a mechanic, change the code, and diff the result; `layout_hash` fingerprints every seeded decision, including rooms, biome, omen, room themes, monsters, props, merchants, traps plus trap kinds, and sconces. `selftest` proves the harness and the mechanics it exposes (layout determinism, deck labels per class, class passives, sconce light, difficulty scaling and resume, all three pact bargains surviving turns, boss damage, save round-trip, Scroll of Inferno consumption, number-row hotkeys casting instead of moving, numpad movement, single-flight floor descent and new-run precedence) and exits non-zero on any failure. Script file shape:
+`catalog` prints the classes, their passives, the five deck abilities, every action field, the pact choices, the difficulty keys and the state keys. `play` drives the shipped JavaScript engine in headless Edge, installs a seeded `Math.random`, and prints one JSON object per run: each step plus the final state (player, monsters, props, log tail, `layout_hash`). Because the RNG is seeded, the same seed, class, difficulty and action list reproduce the same dungeon, so an agent can test a mechanic, change the code, and diff the result; `layout_hash` fingerprints every seeded decision, including rooms, biome, omen, room themes, monsters, props, merchants, traps plus trap kinds, and sconces. `selftest` proves the harness and the mechanics it exposes (layout determinism, deck labels per class, class passives, sconce light, difficulty scaling and resume, all three pact bargains surviving turns, boss damage, Dread Necromancer hexing at range, save round-trip, Scroll of Inferno consumption, number-row hotkeys casting instead of moving, numpad movement, single-flight floor descent and new-run precedence) and exits non-zero on any failure. Script file shape:
 ```json
 {"seed": 42, "depth": 1, "class": "rogue", "difficulty": "hard",
  "actions": [{"action": "move", "dx": 1, "dy": 0}, {"action": "ability", "slot": 2}]}
@@ -96,6 +96,7 @@ Wall sconces are real light sources: standing within two tiles restores the lant
 | Enemy | From | Behaviour |
 |---|---|---|
 | Skeletal Archer | B2F | Fires a bone arrow up to 4 tiles when it has line of sight; does not close to melee |
+| Dread Necromancer | B2F | Chants a grave bolt up to 5 tiles with line of sight; corner it to force melee |
 | Crypt Hound | B2F | Lunges two tiles per turn and never lets the scent go |
 | Gilded Mimic | any chest | Disguised as a chest; opening it springs a scaled fight instead of loot |
 | Pact-Bound Wraith | any | Raised in pairs by the Pact of Avarice and hunts the debtor |

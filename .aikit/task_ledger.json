@@ -1,49 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-031",
+    "task_id": "CC-032",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794077115.2853217,
+    "updated_at": 1794078492.4218283,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 20",
-      "phase_num": 3,
-      "description": "Reforge stage 20: window 60, 3 commit(s), 9 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793382866.5696077,
-      "timestamp_str": "2026-10-30 20:54:26",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 21",
-      "phase_num": 3,
-      "description": "Reforge stage 21: window 63, 3 commit(s), 12 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793382915.5078158,
-      "timestamp_str": "2026-10-30 20:55:15",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 22",
-      "phase_num": 3,
-      "description": "Reforge stage 22: window 66, 3 commit(s), 18 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793383050.809065,
-      "timestamp_str": "2026-10-30 20:57:30",
-      "agent": "opencode"
-    },
     {
       "task_id": "reforge:run-9",
       "phase": "reforge stage 23",
@@ -271,6 +238,50 @@
         "state": "uncommitted and green",
         "next": "commit, complete CC-031, then cycle 3",
         "evidence": "139 tests, harness 68/68, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-031",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-031' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794077131.3740919,
+      "timestamp_str": "2026-11-07 21:45:31",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-032",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Enemies: give the Dread Necromancer its advertised ranged hex, align bestiary/README/guide, prove with two selftest checks and a full played encounter",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794078473.1929636,
+      "timestamp_str": "2026-11-07 22:07:53",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Dread Necromancers spawn from B2F with a staff-and-runes sprite and a bestiary that promises spells from afar, but processEnemyTurns had no branch for them, so they walked into melee (selftest: necroHit 0, stayed false at range 4)",
+        "benefits": "B2F gains a real ranged caster with close-the-gap or break-LOS counterplay; the bestiary no longer lies; enemy variety grows without a new subsystem",
+        "risks": "contract: enemy turn order gains a necromancer branch before the archer branch; dependency: none; concurrency: none; state: no save/RNG/layout change; UI: engine.js and ui.js in the game-ui surface",
+        "mitigation": "Two failing-first selftest checks (range cast + adjacent melee), same-state before/after at B2F 36,16 vs 37,19, full played encounter, inspector at three viewports, full gates"
+      },
+      "plan_digest": "609255b48677a2e011be5853c5e490f3d129720e16d68c08a4945704e9e0d6b7"
+    },
+    {
+      "task_id": "CC-032",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Dread Necromancer hex shipped: range 2-5 with LOS casts a grave bolt and holds, adjacent staff-melees; bestiary/README/guide aligned; selftest 70/70 with necromancer_hexes_from_range and necromancer_melees_when_adjacent. Played run 65->41 HP from four hexes while closing, five strikes killed it for 45 XP/49 gold, finished 15 HP, no page errors. Unit 139 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-044, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794078492.4218283,
+      "timestamp_str": "2026-11-07 22:08:12",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-032, then cycle 4",
+        "evidence": "139 tests, harness 70/70, inspector 75/75, gates 5/5"
       }
     }
   ]

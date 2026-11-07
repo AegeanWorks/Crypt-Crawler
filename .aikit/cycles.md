@@ -66,3 +66,36 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75,
   0 console errors; `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(combat): stack simultaneous damage numbers`.
+
+## Cycle 3 — Dread Necromancer ranged identity (2026-11-07)
+
+- **Area**: Enemies/bosses.
+- **Find**: The server spawns Dread Necromancers from B2F and the bestiary claimed they chant
+  spells from afar, but the shipped engine had no necromancer branch. At range 4 the selftest
+  read `necroHit: 0, necroStayed: false`: it walked one tile closer instead of casting; behind a
+  chest it stood idle because the step was blocked.
+- **Analyze**: `static/js/engine.js:processEnemyTurns` handles archers, hounds, the Choir and
+  Malakor but not the necromancer. Add one ranged branch plus text alignment; no new subsystem,
+  save field or RNG change. Killed: a mana-shield mechanic (would need every damage path
+  refactored; the bestiary now states the shipped rule instead).
+- **Fix**: at visible range 2-5 with LOS the necromancer chants a grave bolt (enemy damage roll,
+  purple projectile, `-N HEX` float, log) and holds position; adjacent it still staff-melees.
+  Bestiary, README enemy table and in-game guide updated. Selftest checks
+  `necromancer_hexes_from_range` and `necromancer_melees_when_adjacent`.
+- **Screenshots** (same seed 42, B2F, paladin, normal, player 36,16, necromancer 37,19):
+  - before: `.inspect/cycles/c3/before-hex-full.png` / `before-hex-zoom.png` (necro steps to
+    36,19, no projectile, HP stays 65)
+  - after: `.inspect/cycles/c3/after-hex-full.png` / `after-hex-zoom.png` (necro holds, purple
+    bolt, `-6 HEX`, HP 59, log line)
+  - command: `python .inspect/cycles/play_c3.py before|after` (the before run uses HEAD engine.js)
+- **Played run** (`.inspect/cycles/play_c3_fight.py`, real Playwright session, 1920x1080):
+  equipped the Forged Iron Sword (ATK 12), waited at range: hexes took 65 -> 59 -> 53 -> 46 -> 41
+  while the necromancer held at (37,19); closed to (36,19); staff melees then five strikes killed
+  it (necro HP 37 -> 28 -> 18 -> 10 -> 1 -> 0) for 45 XP and 49 gold, player finished at 15 HP
+  with Zeal +3. Logs: "Dread Necromancer chants a grave bolt for 6 damage!", "Defeated Dread
+  Necromancer! Gained 45 XP, 49 Gold." No page errors (`fight-hex.png`, `fight-final.png`).
+- **Gates**: `python -m unittest discover -s tests` -> 139 OK;
+  `python tools/ai_harness.py selftest` -> 70 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75,
+  0 console errors; `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(enemies): make the Dread Necromancer hex from range`.

@@ -1693,7 +1693,8 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
-    # New mob AI: archers fire without closing, hounds cover two tiles a turn.
+    # New mob AI: archers fire without closing, hounds cover two tiles a turn,
+    # and the Dread Necromancer hexes from range instead of walking into melee.
     page = harness.open_page(seed)
     mobs = page.evaluate(
         """() => {
@@ -1732,12 +1733,28 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
             p.hp = p.max_hp;
             e.monsters = [mk("hound", rx + 1)];
             e.processEnemyTurns();
+            const houndX = e.monsters[0].x;
+
+            p.hp = p.max_hp;
+            e.monsters = [mk("necromancer", rx)];
+            const necroBefore = p.hp;
+            e.processEnemyTurns();
+            const necroHit = necroBefore - p.hp;
+            const necroStayed = e.monsters[0].x === rx;
+
+            p.hp = p.max_hp;
+            e.monsters = [mk("necromancer", rx + 3)];
+            const meleeBefore = p.hp;
+            e.processEnemyTurns();
             return {
                 found: true,
                 archerHit,
                 archerStayed,
-                houndX: e.monsters[0].x,
+                houndX,
                 expectedHoundX: rx + 3,
+                necroHit,
+                necroStayed,
+                necroMelee: meleeBefore - p.hp,
             };
         }"""
     )
@@ -1749,6 +1766,16 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check(
         "crypt_hound_covers_two_tiles",
         mobs.get("found") is True and mobs["houndX"] == mobs["expectedHoundX"],
+        mobs,
+    ))
+    checks.append(_check(
+        "necromancer_hexes_from_range",
+        mobs.get("found") is True and mobs["necroHit"] > 0 and mobs["necroStayed"] is True,
+        mobs,
+    ))
+    checks.append(_check(
+        "necromancer_melees_when_adjacent",
+        mobs.get("found") is True and mobs["necroMelee"] > 0,
         mobs,
     ))
     checks.append(_check("no_page_errors_after_mob_turns", not harness.errors, harness.errors))

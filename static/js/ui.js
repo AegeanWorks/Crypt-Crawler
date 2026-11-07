@@ -701,7 +701,7 @@ export class UIController {
       { id: "goblin", name: "Sneaky Goblin", icon: "👺", desc: "Devious looter that pilfers coins upon strike. Low defense.", weakness: "Ranged / Piercing" },
       { id: "spider", name: "Venomous Brood-Spider", icon: "🕷️", desc: "Spits debilitating neurotoxin. Cleansing prayers counteract poison.", weakness: "Fire / Cleanse" },
       { id: "bat", name: "Cave Bat", icon: "🦇", desc: "Erratic flyer that darts through the dark. Fragile but hard to pin down.", weakness: "Ranged / Fire" },
-      { id: "necromancer", name: "Dread Necromancer", icon: "🧙‍♂️", desc: "Chants dark spells from afar. High mana shields.", weakness: "Melee Rush" },
+      { id: "necromancer", name: "Dread Necromancer", icon: "🧙‍♂️", desc: "Chants grave bolts from up to five tiles away; corner it to force a weaker staff blow.", weakness: "Close the gap / Break LOS" },
       { id: "wraith", name: "Pact-Bound Wraith", icon: "👻", desc: "A debt given shape. Rises from a Pact of Avarice and hunts the debtor.", weakness: "Holy / Fire" },
       { id: "archer", name: "Skeletal Archer", icon: "🏹", desc: "Keeps its distance and looses bone arrows across open rooms.", weakness: "Melee / Smoke" },
       { id: "hound", name: "Crypt Hound", icon: "🐺", desc: "Lunges two tiles a turn and never lets the scent go.", weakness: "Fire / Stun" },
