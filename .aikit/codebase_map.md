@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `41`
-- **Total Classes**: `43`
+- **Total Python Modules**: `42`
+- **Total Classes**: `44`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `241`
-- **Total Source Lines**: `9753`
+- **Total Class Methods**: `244`
+- **Total Source Lines**: `9816`
 
 ---
 
@@ -260,6 +260,19 @@
   - Method `.test_cue_synths_exist_with_distinct_frequencies()`
   - Method `.test_enemy_telegraphs_and_bow_release_call_the_cues()`
   - Method `.test_trap_search_disarm_and_kinds_have_their_own_cues()`
+
+---
+
+### [`tests/test_bestiary.py`](tests/test_bestiary.py)
+> *Bestiary coverage: every killable enemy type has a Records row.*
+
+**Size**: `31` lines (`1030` bytes)
+
+**Classes:**
+- `class TestBestiary`
+  - Method `.setUp()`
+  - Method `.test_every_killable_type_has_a_records_row()`
+  - Method `.test_choir_echo_is_a_real_spawned_type()`
 
 ---
 
@@ -646,7 +659,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2502` lines (`104365` bytes)
+**Size**: `2534` lines (`105567` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

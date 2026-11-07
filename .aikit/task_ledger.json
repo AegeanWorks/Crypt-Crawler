@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-044",
+    "task_id": "CC-045",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794093378.7923892,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794094788.0987756,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794093422.4049232
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-038",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Death beat shipped: ui.updateHero before feedback, PERISHED float + 500ms shake, 750ms runToken-guarded ledger modal; inspector death wait 0.9s; tests/test_death_beat.py + 3 selftest checks. Before: modal at 150ms, HUD 65/65; after: HUD 0/65 + PERISHED float, modal at 1s; no page errors. Unit 152 OK, harness 77/77, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-050, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794084788.836939,
-      "timestamp_str": "2026-11-07 23:53:08",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-038, then cycle 10",
-        "evidence": "152 tests, harness 77/77, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-038",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-038' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794084837.177115,
-      "timestamp_str": "2026-11-07 23:53:57",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-039",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794093422.404925,
       "timestamp_str": "2026-11-08 02:17:02",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-045",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Progression: add the Choir Echo to the Records bestiary so its recorded kills are visible, prove with a failing-first Records check, a roster test and a same-state Records before/after after a real echo kill",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794094759.351487,
+      "timestamp_str": "2026-11-08 02:39:19",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "choir_echo is a killable split/spawned enemy and recordMonsterDefeat stores its kills, but bestiaryDefs had no row; a run with one echo kill showed Monsters Slain 1 while the codex ended in Unknown Entity rows",
+        "benefits": "Every recorded kill type has a visible codex row; Choir split children no longer vanish from progression; the Records totals and codex agree",
+        "risks": "contract: one bestiary definition added; dependency: none; concurrency: none; state: no save/rule change; UI: ui.js in the game-ui surface",
+        "mitigation": "Failing check rows [] despite slain 2; after one row Slayed: 2; roster test; real echo kill then Records before/after; inspector at three viewports; full gates"
+      },
+      "plan_digest": "67c422cd7e661f04f993772f0713f6c59e92d02170ffd856be10047dc9a87226"
+    },
+    {
+      "task_id": "CC-045",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Choir Echo bestiary row shipped; tests/test_bestiary.py + records_show_choir_echo_kills (93 checks). Real seed 42 B2F echo kill (shipped spawn helper, split posts crowded) -> record slain 1; Records before Unknown Entity, after 'Choir Echo - Slayed: 1'. Unit 165 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-057, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794094788.0987756,
+      "timestamp_str": "2026-11-08 02:39:48",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-045, then cycle 17 (combat feel)",
+        "evidence": "165 tests, harness 93/93, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

@@ -1423,6 +1423,38 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_seed_flow", not harness.errors, harness.errors))
     page.context.close()
 
+    # A Choir Echo is a killable enemy (the Choir splits into them) and must have
+    # its own bestiary row, not vanish from the Records modal.
+    page = harness.open_page(seed)
+    page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const rec = e.loadRecords();
+            rec.bestiary = rec.bestiary || {};
+            rec.bestiary.choir_echo = { slain: 2 };
+            e.saveRecords(rec);
+        }"""
+    )
+    page.click("#btnRecords")
+    page.wait_for_timeout(200)
+    echo_record = page.evaluate(
+        """() => ({
+            body: document.getElementById('modalBody')?.textContent || '',
+            rows: Array.from(document.querySelectorAll('.bestiary-item'))
+                .map((el) => el.textContent.trim())
+                .filter((text) => text.includes('Choir Echo')),
+        })"""
+    )
+    checks.append(_check(
+        "records_show_choir_echo_kills",
+        "Choir Echo" in echo_record["body"]
+        and "Slayed: 2" in echo_record["body"]
+        and len(echo_record["rows"]) == 1,
+        echo_record,
+    ))
+    checks.append(_check("no_page_errors_after_echo_record", not harness.errors, harness.errors))
+    page.context.close()
+
     # A deterministic mimic chest springs a fight instead of paying loot.
     page = harness.open_page(2, depth=1)
     mimic_setup = page.evaluate(

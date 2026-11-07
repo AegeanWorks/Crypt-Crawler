@@ -716,6 +716,7 @@ export class UIController {
       { id: "boss_lich", name: "Arch-Lich Malakor", icon: "👑", desc: "Lord of the Sunken Crypt. Inhales before draining — break sight to avoid it.", weakness: "Crown of Eternity" },
       { id: "vault_warden", name: "Elder Vault Warden", icon: "🛡️", desc: "Oathbound guardian posted at the sealed vault from depth two. Enrages at half health, hardens at a quarter.", weakness: "Kite / Frost" },
       { id: "boss_choir", name: "Hollow Choir", icon: "🎵", desc: "Vault cantors on restless floors. Hums before a verse, splits when wounded, silences at the end.", weakness: "Break LOS / Burst" },
+      { id: "choir_echo", name: "Choir Echo", icon: "🎶", desc: "A splinter of the Hollow Choir. Splits from the mother hymn at half health and repeats her verse.", weakness: "Burst / Fire" },
     ];
 
     let bestiaryHtml = "";

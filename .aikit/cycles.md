@@ -427,3 +427,31 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(audio): give traps their own cues`.
+
+## Cycle 16 — Choir Echoes appear in the Records bestiary (2026-11-08)
+
+- **Area**: Progression and saves (records/bestiary).
+- **Find**: A killed `choir_echo` increments `records.bestiary.choir_echo.slain`, but the
+  Records modal's `bestiaryDefs` had no echo row. With one echo kill, "Monsters Slain" was 1
+  while the codex's last rows were all Unknown Entity. Failing check: `rows: []` despite
+  `slain: 2`.
+- **Analyze**: Add the missing definition and lock the full killable roster; no save/rule
+  change. Killed: changing the split spawn (the echo already exists and is recorded; the
+  display row is the defect).
+- **Fix**: Choir Echo row (split lore, burst/fire weakness); `tests/test_bestiary.py`;
+  `records_show_choir_echo_kills` selftest check.
+- **Screenshots** (same seed 42 B2F state with `bestiary.choir_echo.slain = 1`, Records modal,
+  1920x1080):
+  - before: `.inspect/cycles/c16/before-records-full.png` / `before-records-zoom.png` —
+    "Monsters Slain 1" but three Unknown Entity rows
+  - after: `after-records-full.png` / `after-records-zoom.png` — "Choir Echo — Slayed: 1"
+  - command: `python .inspect/cycles/play_c16.py before|after` (before uses HEAD ui.js)
+- **Played run**: seed 42 B2F; the Choir's split posts were crowded by the vault/warden, so the
+  shipped `_spawnChoirEcho` helper placed an echo on a free tile; `attackMonster` killed it
+  (record `choir_echo.slain: 1`, totalKills 1), then the Records modal showed the row. No page
+  errors (`source: "spawn"` recorded in the report).
+- **Gates**: `python -m unittest discover -s tests` -> 165 OK;
+  `python tools/ai_harness.py selftest` -> 93 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(progression): show Choir Echo kills in the bestiary`.
