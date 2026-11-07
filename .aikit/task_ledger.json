@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-043",
+    "task_id": "CC-044",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794092051.7719374,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794093378.7923892,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794092113.4048007
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-037",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Projectile identity shipped: kind=bolt default, arrow shape for bone arrows (20px fletched shaft rotated to flight), 20px tapered trail for bolts; archer passes arrow. tests/test_projectile_style.py. Matched before/after at progress 0.51: orb -> fletched arrow, orb -> orb+trail; played archer 4 dmg / hex 7 dmg, no page errors. Unit 150 OK, harness 74/74, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-049, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794083659.9470217,
-      "timestamp_str": "2026-11-07 23:34:19",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-037, then cycle 9",
-        "evidence": "150 tests, harness 74/74, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-037",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-037' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794083695.200777,
-      "timestamp_str": "2026-11-07 23:34:55",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-038",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794092113.404803,
       "timestamp_str": "2026-11-08 01:55:13",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-044",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Audio: give trap reveal, disarm and each trap kind distinct cues instead of the shrine chime/generic hit, prove with a failing-first oscillator check, a cue source test and a real search-disarm-trigger run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794093354.9629,
+      "timestamp_str": "2026-11-08 02:15:54",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Reveal and disarm both played the shrine blessing chime [220,277,330,440] and all trap kinds played the generic hit 160, so the audio could not tell a scan from a blessing, a disarm from a reveal, or spike/dart/snare apart",
+        "benefits": "Trap events are audibly distinct: sonar reveal, metallic disarm, and spike thud/dart double-tick/snare snap; real shrines keep their blessing",
+        "risks": "contract: audio.js gains playSearch/playDisarm/playTrap and engine trap branches use them; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: audio.js and engine.js in the game-ui surface",
+        "mitigation": "Failing check recorded shrine chime for reveal/disarm and 160 for all kinds; after 600/350/140/700+520/220; real seed 42 B1F search-disarm-trigger capture; cue source test; inspector at three viewports; full gates"
+      },
+      "plan_digest": "cf02084f21401a0b04b29237e8c9bd14818c6983ece21dbdbf3b13af1b80226e"
+    },
+    {
+      "task_id": "CC-044",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Trap cues shipped: playSearch 600->900, playDisarm 350->90, playTrap spike 140/dart 700+520/snare 220; reveal/disarm/trigger wired; test_audio_cues extended + trap_cues_are_distinct (91 checks). Played seed 42 B1F: after reveal [600], disarm [350], trigger [90,700,520] HP 65->57; before [220,277,330,440]/[90,160]. Unit 163 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-056, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794093378.7923892,
+      "timestamp_str": "2026-11-08 02:16:18",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-044, then cycle 16 (progression/saves)",
+        "evidence": "163 tests, harness 91/91, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

@@ -444,3 +444,11 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: B2F rooms read as teal stone in the dark instead of a black void; the cavern mood, water and torchlight are preserved and B1/B3 are unchanged. 162 unit tests green, harness 89/89, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B2F rogue, four steps to (8,24), turn 5, before near-black vs after readable floor/wall grid.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (luminance drift test), PRINCIPLE-010 (same tile draw count and one fill/stroke per tile).
 
+
+### ADR-056: Trap search, disarm and trigger have distinct cues (improvement cycle 15)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `searchForTraps` played `playShrine()` for both a successful reveal and a disarm, and every trap trigger played the generic `playHit(false)`. Recorded oscillator starts at seed 42 B1F read `[220, 277, 330, 440]` for both reveal and disarm (the shrine blessing chime) and `[90, 160]` for spike, dart and snare alike, so the audio could not tell a scan from a blessing, a disarm from a reveal, or one trap kind from another.
+- **Decision**: Add `playSearch()` (triangle 600 -> 900 sonar ping), `playDisarm()` (square 350 -> 90 metallic clank), and `playTrap(kind)` (spike sawtooth 140 -> 40, dart two ticks 700/520, snare square 220 -> 70 plus a rattle) through a shared `_blip` helper with an optional delay. Wire reveal -> search, disarm -> disarm, trigger -> playTrap(kind); real shrines keep `playShrine`. Add the `trap_cues_are_distinct` selftest check and extend `tests/test_audio_cues.py`.
+- **Consequences**: The three trap events and the three trap kinds are audibly distinct and no longer borrow a blessing or a melee hit. No visual, rule, save or RNG change. 163 unit tests green, harness 91/91, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: real seed 42 B1F trap: after reveal [600], disarm [350], trigger [90, 700, 520] (dart, HP 65 -> 57); before [220,277,330,440], [220,277,330,440], [90,160].
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped audio path), PRINCIPLE-014 (failing-first cue check), PRINCIPLE-010 (two nodes per cue).

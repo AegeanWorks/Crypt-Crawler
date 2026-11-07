@@ -2014,6 +2014,96 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_audio_cues", not harness.errors, harness.errors))
     page.context.close()
 
+    # Trap audio identity: a reveal ping, a disarm clank and a distinct cue per
+    # trap kind (spike thud, dart double-tick, snare snap), not the shrine chime.
+    page = harness.open_page(seed)
+    trap_cues = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            const { sounds } = await import('/js/audio.js');
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const events = [];
+            const orig = AC.prototype.createOscillator;
+            AC.prototype.createOscillator = function () {
+                const osc = orig.call(this);
+                const param = osc.frequency;
+                const setValue = param.setValueAtTime.bind(param);
+                param.setValueAtTime = (value, when) => {
+                    events.push(Math.round(value));
+                    return setValue(value, when);
+                };
+                return osc;
+            };
+            sounds.playStep();
+            events.length = 0;
+            let spot = null;
+            for (let y = 1; y < d.height - 1 && !spot; y += 1) {
+                for (let x = 1; x < d.width - 1 && !spot; x += 1) {
+                    let clear = true;
+                    for (let yy = y - 1; yy <= y + 1; yy += 1) {
+                        for (let xx = x - 1; xx <= x + 1; xx += 1) {
+                            if (d.tiles[yy][xx] !== 1) clear = false;
+                        }
+                    }
+                    if (clear) spot = { x, y };
+                }
+            }
+            if (!spot) return { found: false };
+            const p = e.player;
+            p.x = spot.x;
+            p.y = spot.y;
+            p.hp = p.max_hp;
+            e.monsters = [];
+            e.omen = { id: 'calm', name: 'calm', desc: '', atkMult: 1, fov: 7,
+                       goldMult: 1, extraFoe: 0 };
+
+            const trapAt = (kind, dx, dy, discovered = false) => [{
+                x: spot.x + dx, y: spot.y + dy, kind,
+                triggered: false, discovered, disarmed: false,
+            }];
+            d.traps = trapAt('spike', 1, 0);
+            d.updateFOV(p.x, p.y, 7);
+            events.length = 0;
+            e.searchForTraps();
+            const reveal = events.slice();
+
+            p.x = spot.x; p.y = spot.y; p.hp = p.max_hp; p.status_effects = {};
+            d.traps = trapAt('dart', 1, 0, true);
+            d.updateFOV(p.x, p.y, 7);
+            events.length = 0;
+            e.searchForTraps();
+            const disarm = events.slice();
+
+            const trigger = (kind, dx, dy) => {
+                p.x = spot.x; p.y = spot.y; p.hp = p.max_hp; p.status_effects = {};
+                d.traps = trapAt(kind, dx, dy);
+                d.updateFOV(p.x, p.y, 7);
+                events.length = 0;
+                e.stepPlayer(dx, dy);
+                return events.slice();
+            };
+            const spike = trigger('spike', 1, 0);
+            const dart = trigger('dart', -1, 0);
+            const snare = trigger('snare', 0, 1);
+            AC.prototype.createOscillator = orig;
+            return { found: true, reveal, disarm, spike, dart, snare };
+        }"""
+    )
+    checks.append(_check(
+        "trap_cues_are_distinct",
+        trap_cues.get("found") is True
+        and 600 in trap_cues["reveal"]
+        and 350 in trap_cues["disarm"]
+        and 140 in trap_cues["spike"]
+        and 700 in trap_cues["dart"]
+        and 520 in trap_cues["dart"]
+        and 220 in trap_cues["snare"],
+        trap_cues,
+    ))
+    checks.append(_check("no_page_errors_after_trap_cues", not harness.errors, harness.errors))
+    page.context.close()
+
     # Twin hits must be readable: two adjacent attackers in one enemy phase have to
     # produce two stacked damage numbers that add up to the HP actually lost.
     page = harness.open_page(seed)

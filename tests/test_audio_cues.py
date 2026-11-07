@@ -24,6 +24,19 @@ class TestAudioCues(unittest.TestCase):
         self.assertEqual(self.engine.count('sounds.playTelegraph("drain")'), 1)
         self.assertEqual(self.engine.count("sounds.playBow()"), 1)
 
+    def test_trap_search_disarm_and_kinds_have_their_own_cues(self):
+        self.assertIn("playSearch()", self.audio)
+        self.assertIn("playDisarm()", self.audio)
+        self.assertIn("playTrap(kind = \"spike\")", self.audio)
+        self.assertIn("this._blip(\"triangle\", 600, 900", self.audio)
+        self.assertIn("this._blip(\"square\", 350, 90", self.audio)
+        self.assertIn("this._blip(\"sawtooth\", 140, 40", self.audio)
+        self.assertIn("this._blip(\"triangle\", 700, 660", self.audio)
+        self.assertIn("this._blip(\"square\", 220, 70", self.audio)
+        self.assertEqual(self.engine.count("sounds.playSearch()"), 1)
+        self.assertEqual(self.engine.count("sounds.playDisarm()"), 1)
+        self.assertEqual(self.engine.count("sounds.playTrap(kind)"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

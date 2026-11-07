@@ -400,3 +400,30 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(gfx): lift the cavern floor and wall contrast`.
+
+## Cycle 15 — Trap cues are distinct (2026-11-08)
+
+- **Area**: Audio cues (trap identity).
+- **Find**: A trap reveal and a disarm both played the shrine blessing chime (`[220, 277,
+  330, 440]`), and spike/dart/snare triggers all played the generic melee hit (`[90, 160]`).
+  The audio could not tell a scan from a blessing or one trap kind from another.
+- **Analyze**: Add three small synths and wire the existing branches; real shrines keep their
+  cue. Killed: changing the search/disarm visuals (already legible; this cycle is audio).
+- **Fix**: `playSearch` 600→900, `playDisarm` 350→90, `playTrap(kind)` spike 140→40 / dart
+  700+520 / snare 220→70 + rattle, via `_blip` with an optional delay; extend
+  `tests/test_audio_cues.py` and add `trap_cues_are_distinct`.
+- **Screenshots** (same seed 42 B1F trap scene; the visuals are unchanged, the event logs are
+  the proof):
+  - reveal: `.inspect/cycles/c15/before-reveal.png` vs `after-reveal.png` (dashed grille,
+    `TRAP!`, log "reveal 1 trap")
+  - disarm: `before-disarm.png` / `after-disarm.png` ("You disarm the revealed dart trap")
+  - trigger: `before-trigger.png` / `after-trigger.png` ("dart trap! Two volleys")
+  - command: `python .inspect/cycles/play_c15.py before|after` (before uses HEAD audio/engine)
+- **Played run**: real search → disarm → step on a trap at seed 42 B1F. Before: reveal/disarm
+  `[220,277,330,440]`, trigger `[90,160]`. After: reveal `[600]`, disarm `[350]`, trigger
+  `[90,700,520]` (dart), HP 65 -> 57; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 163 OK;
+  `python tools/ai_harness.py selftest` -> 91 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(audio): give traps their own cues`.

@@ -1639,7 +1639,7 @@ export class GameEngine {
         this.ui.logMessage(`⚠️ Triggered a spike trap! Took ${trapDmg} damage!`, "hit");
       }
       this.player.hp = Math.max(0, this.player.hp - trapDmg);
-      sounds.playHit(false);
+      sounds.playTrap(kind);
       this.renderer.addFloatingText(`-${trapDmg} ${trapLabel}`, nx, ny, "#ff2222");
       this._breakStreak("a trap");
 
@@ -2305,7 +2305,7 @@ export class GameEngine {
     );
     if (adjacent) {
       adjacent.disarmed = true;
-      sounds.playShrine();
+      sounds.playDisarm();
       this.renderer.addFloatingText("DISARMED", adjacent.x, adjacent.y, this.renderer.warningColor);
       this.renderer.addParticles(adjacent.x, adjacent.y, this.renderer.trapColor, 10);
       const kindName = (TRAP_TYPES[adjacent.kind || "spike"] || TRAP_TYPES.spike).name;
@@ -2325,7 +2325,7 @@ export class GameEngine {
       found.push(trap);
     }
     if (found.length > 0) {
-      sounds.playShrine();
+      sounds.playSearch();
       for (const trap of found) {
         this.renderer.addFloatingText("TRAP!", trap.x, trap.y, this.renderer.warningColor);
         this.renderer.addParticles(trap.x, trap.y, this.renderer.trapColor, 8);

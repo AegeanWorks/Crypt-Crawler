@@ -320,6 +320,51 @@ class SoundSystem {
     osc.stop(now + 0.62);
   }
 
+  _blip(type, startFreq, endFreq, gainValue, duration, delay = 0) {
+    if (this.sfxMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime + delay;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+
+    gain.gain.setValueAtTime(gainValue, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + duration + 0.01);
+  }
+
+  playSearch() {
+    // A sonar ping for a reveal, distinct from a shrine's blessing chime.
+    this._blip("triangle", 600, 900, 0.07, 0.16);
+  }
+
+  playDisarm() {
+    // A metallic clank for a recovered mechanism.
+    this._blip("square", 350, 90, 0.12, 0.18);
+  }
+
+  playTrap(kind = "spike") {
+    if (kind === "dart") {
+      this._blip("triangle", 700, 660, 0.07, 0.05);
+      this._blip("triangle", 520, 480, 0.06, 0.05, 0.08);
+    } else if (kind === "snare") {
+      this._blip("square", 220, 70, 0.12, 0.12);
+      this._blip("square", 90, 60, 0.06, 0.08, 0.1);
+    } else {
+      this._blip("sawtooth", 140, 40, 0.16, 0.3);
+    }
+  }
+
   playShieldWall() {
     if (this.sfxMuted) return;
     this.init();
