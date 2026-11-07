@@ -182,3 +182,28 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(audio): cue bow releases and boss telegraphs`.
+
+## Cycle 7 — Chronicle top-edge fade (2026-11-07)
+
+- **Area**: UI readability.
+- **Find**: The bottom-anchored Dungeon Chronicle shears its oldest visible line at the top
+  edge whenever it overflows (`before-chronicle-zoom.png`: "heal 30% more." cut through the
+  glyphs at seed 42, turn 9, scrollTop 137).
+- **Analyze**: The log is a scroll box with no top affordance. A sticky pseudo-element changed
+  the scroll geometry (688 vs 701px) and shifted the visible line, so the fix moved to a wrapper
+  overlay. Killed: mask-image on the box (it fades the border and the first line when unscrolled)
+  and increasing the height (does not address the cut).
+- **Fix**: `.chronicle-wrap` + `:has(.chronicle-log.is-scrolled)::after` gradient, toggled by a
+  scroll listener and `_updateChronicleFade()` after each append; `tests/test_chronicle_fade.py`.
+- **Screenshots** (same seed 42, B1F, turn 9, 19 log entries, scrollTop 137, 1920x1080):
+  - before: `.inspect/cycles/c7/before-chronicle-full.png` / `before-chronicle-zoom.png`
+  - after: `.inspect/cycles/c7/after-chronicle-full.png` / `after-chronicle-zoom.png`
+  - command: `python .inspect/cycles/play_c7.py before|after` (before uses HEAD CSS/JS/HTML)
+- **Played run**: the inspector opened a fresh run at three viewports; the scrolled chronicle in
+  `.inspect/cycles/c7/inspect/dungeon_desktop.png` shows the faded top edge; 75/75 audit checks,
+  0 console errors.
+- **Gates**: `python -m unittest discover -s tests` -> 148 OK;
+  `python tools/ai_harness.py selftest` -> 74 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(ui): fade the scrolled chronicle top edge`.

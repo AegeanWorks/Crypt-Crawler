@@ -1,60 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-035",
+    "task_id": "CC-036",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794081519.17003,
+    "updated_at": 1794082509.944209,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-029",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/4] Commit A: tuning table + metrics + parity tests, 128 tests green, 5/5 gates, checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793809753.2193096,
-      "timestamp_str": "2026-11-04 19:29:13",
-      "agent": "kilo:eng",
-      "impact_assessment": {
-        "why": "Port CyberPulse engagement principles without manipulation; fix seed, parity, tunability first",
-        "benefits": "Deterministic metrics, stated-vs-coded odds match on Python side, measurable loop",
-        "risks": "contract: additive files + behavior-preserving refactor; dependency: none; concurrency: none; state: no save change",
-        "mitigation": "Parity tests read shipped JS constants; full unit + mechanics + hygiene + secrets gates; no push"
-      }
-    },
-    {
-      "task_id": "CC-029",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/4] Commit B: live-engine parity + caps + seed chain, 128 tests green, 5/5 gates, checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793810270.6220615,
-      "timestamp_str": "2026-11-04 19:37:50",
-      "agent": "kilo:eng",
-      "impact_assessment": {
-        "why": "Port CyberPulse engagement principles without manipulation; fix seed, parity, tunability first",
-        "benefits": "Deterministic descents, stated-vs-shipped odds match, capped comeback, streak stakes",
-        "risks": "contract: additive save fields + TUNING mirror; dependency: none; concurrency: none; state: runSeed/surgeFloor default safe",
-        "mitigation": "Parity tests read shipped JS; harness selftest green in headless Edge; full gates; no push"
-      }
-    },
-    {
-      "task_id": "CC-029",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-029' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793810313.1521,
-      "timestamp_str": "2026-11-04 19:38:33",
-      "agent": "kilo:eng"
-    },
     {
       "task_id": "CC-030",
       "phase": "phase 2",
@@ -308,6 +264,50 @@
         "state": "uncommitted and green",
         "next": "commit, complete CC-035, then cycle 7 (graphics/effects or UI polish)",
         "evidence": "145 tests, harness 74/74, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-035",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-035' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794081545.5080118,
+      "timestamp_str": "2026-11-07 22:59:05",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-036",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] UI readability: fade the scrolled chronicle top edge instead of shearing the oldest visible line, prove with a matched seed-42 turn-9 capture pair and a wrapper/CSS/JS drift test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794082495.0916283,
+      "timestamp_str": "2026-11-07 23:14:55",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The bottom-anchored chronicle cuts its oldest visible line mid-glyph whenever it overflows; the hard edge reads as a rendering bug",
+        "benefits": "Scrollback reads as history, the newest line stays flush at the bottom, and the unscrolled log is untouched",
+        "risks": "contract: chronicleLog gains a wrapper and an is-scrolled class toggled on scroll/append; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: index.html, style.css and ui.js in the game-ui surface",
+        "mitigation": "Matched before/after at turn 9, 19 entries, scrollTop 137; tests/test_chronicle_fade.py locks wrapper, CSS gate and toggle; inspector at three viewports; full gates"
+      },
+      "plan_digest": "7e926557cceadfe5c76cd1eaa65e8521d65afc158e77b3ead5d49acd80876f9c"
+    },
+    {
+      "task_id": "CC-036",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Chronicle fade shipped: wrapper + :has(is-scrolled) top gradient, scroll listener and per-append toggle; tests/test_chronicle_fade.py. Matched capture at seed 42 turn 9/19 entries/scrollTop 137: before hard glyph shear, after soft fade; inspector 75/75, 0 console errors. Unit 148 OK, harness 74/74, aikit check 5/5. checklists: passed. ADR-048, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794082509.944209,
+      "timestamp_str": "2026-11-07 23:15:09",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-036, then cycle 8 (graphics/effects)",
+        "evidence": "148 tests, harness 74/74, inspector 75/75, gates 5/5"
       }
     }
   ]

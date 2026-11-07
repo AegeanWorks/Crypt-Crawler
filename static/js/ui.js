@@ -152,6 +152,13 @@ export class UIController {
       this.closeModal();
       if (this.onModalClose) this.onModalClose();
     });
+
+    this.chronicleLog?.addEventListener("scroll", () => this._updateChronicleFade());
+  }
+
+  _updateChronicleFade() {
+    if (!this.chronicleLog) return;
+    this.chronicleLog.classList.toggle("is-scrolled", this.chronicleLog.scrollTop > 2);
   }
 
   updateHero(player, turn, depth, kills = 0) {
@@ -1001,6 +1008,7 @@ export class UIController {
     entry.textContent = text;
     this.chronicleLog.appendChild(entry);
     this.chronicleLog.scrollTop = this.chronicleLog.scrollHeight;
+    this._updateChronicleFade();
   }
 
   updateJournal(unlockedCount = 0, total = 0) {

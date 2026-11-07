@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `34`
-- **Total Classes**: `36`
+- **Total Python Modules**: `35`
+- **Total Classes**: `37`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `217`
-- **Total Source Lines**: `9151`
+- **Total Class Methods**: `220`
+- **Total Source Lines**: `9182`
 
 ---
 
@@ -276,6 +276,19 @@
 
 **Functions:**
 - `def rule_for(css, selector)`
+
+---
+
+### [`tests/test_chronicle_fade.py`](tests/test_chronicle_fade.py)
+> *Chronicle fade contract: a scrolled log fades its top edge instead of shearing glyphs.*
+
+**Size**: `31` lines (`1150` bytes)
+
+**Classes:**
+- `class TestChronicleFade`
+  - Method `.test_markup_wraps_the_scroll_box_for_an_overlay()`
+  - Method `.test_css_fades_only_while_scrolled()`
+  - Method `.test_ui_toggles_the_scrolled_state()`
 
 ---
 

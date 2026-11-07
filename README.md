@@ -62,6 +62,9 @@ Below 768px the three panels stack into one vertically scrolling column; the act
 ### 🖥️ Canvas Fit & Click-to-Move
 The canvas keeps its native 760:540 ratio, so the frame hugs the drawn map instead of leaving black letterbox bands; on a 1920x1080 screen it fills up to 1100px wide (about 66px tiles). Clicking a visible tile moves one step toward it, and clicks outside the drawn bitmap are ignored, so the pointer never maps into fog or rock.
 
+### 📜 Chronicle Readability
+The Dungeon Chronicle auto-scrolls to the newest line. Scroll it back and the top edge fades instead of shearing the top line mid-glyph, so the oldest visible line reads as history rather than damage.
+
 ### 🎲 Seeds
 The class-selection screen accepts an optional positive run seed; leave it blank for a random run. The same seed, class and difficulty reproduce the same dungeon, and the Records modal shows the current seed with a **Copy Seed** button so a run can be replayed or shared.
 
@@ -196,6 +199,7 @@ crypt-crawler/
 │   ├── test_ai_harness.py    <- harness validation and UI inventory tests
 │   ├── test_audio_cues.py    <- bow-release and boss-telegraph audio cues
 │   ├── test_canvas_fit.py    <- canvas aspect-ratio and pointer-mapping contract
+│   ├── test_chronicle_fade.py <- scrolled chronicle fades its top edge
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_fairness.py      <- fairness validator tests
