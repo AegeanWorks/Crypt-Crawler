@@ -110,6 +110,8 @@ Wall sconces are real light sources: standing within two tiles restores the lant
 | Hollow Choir | B2F restless/silent | Hums 1 turn before a 2-tile verse (break LOS to avoid), splits at 50%, stunning silence at 25% |
 | Arch-Lich Malakor | B3F | Inhales 1 turn before Soul Drain (break LOS/range to avoid); summons at 50%, enrages at 25% |
 
+Enemies step axis-first toward a visible hero; when a chest, urn or corner blocks that step, they take the shortest free path around it, so a melee foe no longer stalls behind a prop.
+
 Chests can be **Gilded Mimics**: opening one pushes you back and springs a depth-scaled fight instead of paying gold. The mimic is chosen deterministically from the run seed and chest order, so a known seed reproduces the same trapped chest. Trap search reveals traps, not mimics.
 
 QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, and the 🎞️ header button toggles reduced motion (persisted, disables screen shake and pulsing accents). Story: three new codex entries — *Signs in the Blood*, *The Lantern-Keeper* and *The Debt of Malakor* — plus *Ember Tithe*, *Hollow Silence* and *Hollow Choir*, and a victory epilogue that closes the ledger.
@@ -207,6 +209,7 @@ crypt-crawler/
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger
 │   ├── test_death_cause.py   <- status causes end the turn and name the cause
 │   ├── test_dungeon.py       <- procedural generation tests
+│   ├── test_enemy_pathing.py <- blocked melee steps detour around props
 │   ├── test_fairness.py      <- fairness validator tests
 │   ├── test_foundry_packs.py <- foundry pack integration tests
 │   ├── test_inspect.py       <- inspection configuration tests

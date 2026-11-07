@@ -294,3 +294,30 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(combat): stop enemies and name the cause after a status death`.
+
+## Cycle 11 — Melee enemies detour around blockers (2026-11-08)
+
+- **Area**: Enemies/bosses (melee AI).
+- **Find**: `_stepToward` tries one x then one y step. With a real chest at (10,7) between
+  a skeleton at (9,7) and the player at (11,7), the skeleton stayed at (9,7) for six turns,
+  distance 2, no damage, only wait lines. Failing check: `monster_paths_around_a_blocking_prop`
+  read `moved: false, distance: 2, damage: 0`.
+- **Analyze**: Greedy movement has no detour. Add a BFS fallback over walkable, unoccupied
+  tiles; keep greedy as the preferred step. Killed: full A* or a navigation grid (the map is
+  45x30, BFS only on a blocked step is enough).
+- **Fix**: `_stepTowardPath` (BFS to the player tile, walls/props/monsters solid, player tile
+  only as the goal), used when `_stepToward` fails for the normal step and the hound/Swift
+  second step; `tests/test_enemy_pathing.py` + `monster_paths_around_a_blocking_prop`.
+- **Screenshots** (same seed 42 B1F, player 11,7, skeleton 9,7, chest 10,7, after six waits):
+  - start: `.inspect/cycles/c11/before-path-start.png` / `after-path-start.png`
+  - after: `before-path-after.png` (skeleton still at 9,7, HP 65) vs
+    `after-path-after.png` (skeleton at 11,8, HP 61, three attack lines in the chronicle)
+  - command: `python .inspect/cycles/play_c11.py before|after` (before uses HEAD engine.js)
+- **Played run**: real `waitTurn` x6. Before: turn 7, monster (9,7), distance 2, HP 65, log only
+  waits. After: turn 7, monster (11,8), distance 1, HP 61, log "Path Skeleton attacks you for
+  1/2/1 damage!"; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 157 OK;
+  `python tools/ai_harness.py selftest` -> 83 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(enemies): walk melee foes around blocking props`.

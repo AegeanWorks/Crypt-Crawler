@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `38`
-- **Total Classes**: `40`
+- **Total Python Modules**: `39`
+- **Total Classes**: `41`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `230`
-- **Total Source Lines**: `9419`
+- **Total Class Methods**: `233`
+- **Total Source Lines**: `9508`
 
 ---
 
@@ -397,6 +397,19 @@
 
 ---
 
+### [`tests/test_enemy_pathing.py`](tests/test_enemy_pathing.py)
+> *Enemy pathing contract: a blocked greedy step falls back to a free BFS step.*
+
+**Size**: `30` lines (`1124` bytes)
+
+**Classes:**
+- `class TestEnemyPathing`
+  - Method `.setUp()`
+  - Method `.test_blocked_step_falls_back_to_the_path()`
+  - Method `.test_path_respects_walls_and_occupied_tiles()`
+
+---
+
 ### [`tests/test_engagement.py`](tests/test_engagement.py)
 > *Engagement tuning tests: DATA bounds, determinism, sampler contract.*
 
@@ -602,7 +615,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2296` lines (`95804` bytes)
+**Size**: `2355` lines (`98260` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

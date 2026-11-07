@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-039",
+    "task_id": "CC-040",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794086285.2498448,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794087586.5734067,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794086334.6129985
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-033",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Room theme emblems shipped: 17% alpha chapel cross, ossuary skull, gallery arches, urn crypt urn, choke chevrons under props/actors; tests/test_room_themes.py locks palette+glyph per theme. Unit 141 OK, harness 70/70, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-045, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794079550.4957983,
-      "timestamp_str": "2026-11-07 22:25:50",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-033, then cycle 5",
-        "evidence": "141 tests, harness 70/70, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-033",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-033' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794079573.9140573,
-      "timestamp_str": "2026-11-07 22:26:13",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-034",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794086334.6130002,
       "timestamp_str": "2026-11-08 00:18:54",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-040",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Enemies: add a BFS detour when the greedy melee step is blocked by a chest/urn/corner, prove with a failing-first selftest check, a source test and a real chest-blocked played run before/after",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794087557.7566044,
+      "timestamp_str": "2026-11-08 00:39:17",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "A visible melee enemy with a real chest between it and the hero stalled forever: _stepToward only tries one x and one y step, so the skeleton at (9,7) with chest (10,7) and player (11,7) never moved in six turns, distance 2, damage 0",
+        "benefits": "Melee foes walk around props and corners and attack; greedy movement stays preferred in the open; ranged enemies keep hold-range behavior",
+        "risks": "contract: processEnemyTurns gains _stepTowardPath fallback for normal and hound/Swift second steps; dependency: none; concurrency: none; state: no save/rule change; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing check moved false/distance 2/damage 0; after moved to (11,8), distance 1, 3 attacks; source test; real six-turn wait before/after; inspector at three viewports; full gates"
+      },
+      "plan_digest": "f133f9590c8a361fe0c55b063bc1e9ba66f52e78f0e29282636d84ee8b505e79"
+    },
+    {
+      "task_id": "CC-040",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Enemy detour shipped: _stepTowardPath BFS fallback for normal and hound/Swift steps; tests/test_enemy_pathing.py + monster_paths_around_a_blocking_prop (83 checks total). Played: seed 42 B1F chest (10,7), skeleton (9,7), player (11,7): before stuck 6 turns HP 65; after reaches (11,8) and 3 attacks HP 61. Unit 157 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-052, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794087586.5734067,
+      "timestamp_str": "2026-11-08 00:39:46",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-040, then cycle 12 (levels)",
+        "evidence": "157 tests, harness 83/83, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

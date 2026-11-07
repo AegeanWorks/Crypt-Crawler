@@ -2865,9 +2865,12 @@ export class GameEngine {
         if (this.player.hp <= 0) break;
       } else if (isVisible && dist <= 7) {
         // Step toward player; hounds lunge and Swift champions sprint,
-        // closing two tiles per turn.
-        this._stepToward(monster);
-        if (monster.type === "hound" || monster.champion_affix === "Swift") this._stepToward(monster);
+        // closing two tiles per turn. If the greedy step is blocked by a
+        // prop or a corner, walk the shortest free path around it.
+        if (!this._stepToward(monster)) this._stepTowardPath(monster);
+        if (monster.type === "hound" || monster.champion_affix === "Swift") {
+          if (!this._stepToward(monster)) this._stepTowardPath(monster);
+        }
       }
     }
     if (newMonsters.length) this.monsters.push(...newMonsters);
@@ -2889,6 +2892,45 @@ export class GameEngine {
       return true;
     }
     return false;
+  }
+
+  /* Breadth-first detour: the first free step on the shortest path to the hero. */
+  _stepTowardPath(monster) {
+    const sx = monster.x;
+    const sy = monster.y;
+    const goal = `${this.player.x},${this.player.y}`;
+    const queue = [[sx, sy]];
+    const cameFrom = new Map([[`${sx},${sy}`, null]]);
+    const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    let head = 0;
+    while (head < queue.length) {
+      const [x, y] = queue[head];
+      head += 1;
+      if (`${x},${y}` === goal) break;
+      for (const [dx, dy] of dirs) {
+        const nx = x + dx;
+        const ny = y + dy;
+        const key = `${nx},${ny}`;
+        if (cameFrom.has(key)) continue;
+        if (!this.dungeon.isWalkable(nx, ny)) continue;
+        const isGoal = nx === this.player.x && ny === this.player.y;
+        if (!isGoal && this._isOccupied(nx, ny)) continue;
+        cameFrom.set(key, [x, y]);
+        queue.push([nx, ny]);
+      }
+    }
+    if (!cameFrom.has(goal)) return false;
+    let cur = [this.player.x, this.player.y];
+    while (true) {
+      const prev = cameFrom.get(`${cur[0]},${cur[1]}`);
+      if (!prev) return false;
+      if (prev[0] === sx && prev[1] === sy) break;
+      cur = prev;
+    }
+    if (cur[0] === sx && cur[1] === sy) return false;
+    monster.x = cur[0];
+    monster.y = cur[1];
+    return true;
   }
 
   _hasLineOfSight(x0, y0, x1, y1) {

@@ -1816,6 +1816,65 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_mob_turns", not harness.errors, harness.errors))
     page.context.close()
 
+    # A blocker between a melee foe and the hero must be walked around, not
+    # surrendered to: greedy axis movement alone leaves enemies stuck forever.
+    page = harness.open_page(seed)
+    pathing = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            let spot = null;
+            for (let y = 1; y < d.height - 1 && !spot; y += 1) {
+                for (let x = 1; x < d.width - 1 && !spot; x += 1) {
+                    let clear = true;
+                    for (let yy = y - 1; yy <= y + 1; yy += 1) {
+                        for (let xx = x - 1; xx <= x + 1; xx += 1) {
+                            if (!d.isWalkable(xx, yy)) clear = false;
+                        }
+                    }
+                    if (clear) spot = { x, y };
+                }
+            }
+            if (!spot) return { found: false };
+            const p = e.player;
+            p.x = spot.x + 1;
+            p.y = spot.y;
+            p.hp = p.max_hp;
+            d.chests = [{ x: spot.x, y: spot.y, opened: false }];
+            d.updateFOV(p.x, p.y, 7);
+            e.omen = { id: 'calm', name: 'calm', desc: '', atkMult: 1, fov: 7,
+                       goldMult: 1, extraFoe: 0 };
+            const mon = {
+                name: 'Path Skeleton', type: 'skeleton', x: spot.x - 1, y: spot.y,
+                hp: 20, max_hp: 20, attack: 6, defense: 0, xp_reward: 0, gold_reward: 0,
+                loot_drop: null, is_boss: false, is_champion: false, champion_affix: null,
+                status_effects: {},
+            };
+            e.monsters = [mon];
+            const start = { x: mon.x, y: mon.y };
+            const hp = p.hp;
+            for (let turn = 0; turn < 6; turn += 1) e.processEnemyTurns();
+            return {
+                found: true,
+                start,
+                end: { x: mon.x, y: mon.y },
+                moved: mon.x !== start.x || mon.y !== start.y,
+                distance: Math.abs(mon.x - p.x) + Math.abs(mon.y - p.y),
+                damage: hp - p.hp,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "monster_paths_around_a_blocking_prop",
+        pathing.get("found") is True
+        and pathing["moved"] is True
+        and pathing["distance"] <= 1
+        and pathing["damage"] > 0,
+        pathing,
+    ))
+    checks.append(_check("no_page_errors_after_pathing", not harness.errors, harness.errors))
+    page.context.close()
+
     # Ranged attacks and boss telegraphs need an entrance cue, not only an impact
     # sound. Record the oscillator starts the shipped audio module schedules.
     page = harness.open_page(seed)
