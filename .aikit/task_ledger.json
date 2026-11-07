@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-040",
+    "task_id": "CC-041",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794087586.5734067,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794088994.252368,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794087626.7186508
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-034",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Save version guard shipped: SAVE_VERSION=2 used by writer, loader refuses other versions with a warning and no mutation; tests/test_save_version.py + selftest 72/72. Real v99 reload: before resumed Turn 3/seed 42, after fresh Turn 1/seed 81401 with warning, no page errors. Unit 143 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-046, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794080644.8984122,
-      "timestamp_str": "2026-11-07 22:44:04",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-034, then cycle 6",
-        "evidence": "143 tests, harness 72/72, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-034",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-034' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794080664.3627503,
-      "timestamp_str": "2026-11-07 22:44:24",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-035",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794087626.718653,
       "timestamp_str": "2026-11-08 00:40:26",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-041",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Levels: persist room_themes in the saved dungeon so a resumed floor keeps its chapels/urn crypts instead of defaulting every room to ossuary, prove with a failing-first resume check and a real save/reload before/after",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794088963.40931,
+      "timestamp_str": "2026-11-08 01:02:43",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "saveGameState omitted room_themes and ClientDungeon defaults a missing list to ossuary, so after any autosave reload a floor's chapel, urn crypt and choke rooms all rendered as skulls (failing check: 4 distinct themes saved, 13x ossuary resumed)",
+        "benefits": "Room theme identity survives autosave/reload; old saves still default safely; no save version bump",
+        "risks": "contract: additive room_themes field in the version-2 dungeon save; dependency: none; concurrency: none; state: old saves default to ossuary as before; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing selftest resume_restores_room_themes (4 distinct -> all ossuary); writer contract test; real page.reload capture at seed 42 (chapel skull->cross, urn skull->urn); inspector at three viewports; full gates"
+      },
+      "plan_digest": "a202ab8689a38b501b6076587ea12800b2f51ec9cb6b5a779cb3f669801a9e01"
+    },
+    {
+      "task_id": "CC-041",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Room themes persisted: room_themes added to the saved dungeon; test_room_themes writer contract + resume_restores_room_themes (85 checks). Real reload at seed 42 (11,6): before all ossuary (chapel/urn skulls), after original gallery/chapel/choke/ossuary/urn_crypt list and cross/urn emblems. Unit 158 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-053, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794088994.252368,
+      "timestamp_str": "2026-11-08 01:03:14",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-041, then cycle 13 (UI readability)",
+        "evidence": "158 tests, harness 85/85, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

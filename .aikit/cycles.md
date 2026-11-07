@@ -321,3 +321,28 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(enemies): walk melee foes around blocking props`.
+
+## Cycle 12 — Room themes survive resume (2026-11-08)
+
+- **Area**: Levels (floor identity across save/resume).
+- **Find**: The save stored tiles, rooms and props but not `room_themes`; `ClientDungeon`
+  defaults a missing list to `"ossuary"`, so a reload repainted every room as an ossuary.
+  Failing check: seed 4242 saved 4 distinct themes and resumed with 13x "ossuary".
+- **Analyze**: Additive save field; no version bump (old saves keep the old default). The
+  behavior lives in the writer; the reader already accepts the field. Killed: a save-version
+  bump/migration (not needed, and would refuse otherwise valid saves).
+- **Fix**: `room_themes: this.dungeon.room_themes` in `saveGameState`; writer contract in
+  `tests/test_room_themes.py`; `resume_restores_room_themes` selftest check.
+- **Screenshots** (same seed 42 B1F save at (11,6), turn 1, real page reload, 1920x1080):
+  - chapel: `.inspect/cycles/c12/before-chapel.png` (skull) vs `after-chapel.png` (cross)
+  - urn crypt: `before-urn_crypt.png` (skull) vs `after-urn_crypt.png` (urn)
+  - ossuary: `before-ossuary.png` / `after-ossuary.png` (unchanged skull)
+  - command: `python .inspect/cycles/play_c12.py before|after` (before uses HEAD engine.js)
+- **Played run**: real `page.reload` resume. Before: themes all "ossuary", player (11,6),
+  turn 1. After: the original 11-theme list (gallery/chapel/choke/ossuary/urn_crypt) loads
+  unchanged, player (11,6), turn 1; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 158 OK;
+  `python tools/ai_harness.py selftest` -> 85 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(levels): persist room themes across save and resume`.

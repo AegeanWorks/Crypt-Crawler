@@ -3091,6 +3091,7 @@ export class GameEngine {
           player_spawn: this.dungeon.playerSpawn,
           stairs_pos: this.dungeon.stairsPos,
           rooms: this.dungeon.rooms,
+          room_themes: this.dungeon.room_themes,
           chests: this.dungeon.chests.map((c) => ({ x: c.x, y: c.y, opened: c.opened })),
           traps: this.dungeon.traps.map((t) => ({
             x: t.x,

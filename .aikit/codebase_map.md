@@ -9,8 +9,8 @@
 - **Total Python Modules**: `39`
 - **Total Classes**: `41`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `233`
-- **Total Source Lines**: `9508`
+- **Total Class Methods**: `234`
+- **Total Source Lines**: `9533`
 
 ---
 
@@ -546,13 +546,14 @@
 ### [`tests/test_room_themes.py`](tests/test_room_themes.py)
 > *Room theme emblem contract: every generated theme has a rendered glyph.*
 
-**Size**: `28` lines (`964` bytes)
+**Size**: `32` lines (`1166` bytes)
 
 **Classes:**
 - `class TestRoomThemes`
   - Method `.setUp()`
   - Method `.test_renderer_reads_generated_themes()`
   - Method `.test_every_generated_theme_has_a_glyph_and_colour()`
+  - Method `.test_save_persists_room_themes()`
 
 ---
 
@@ -615,7 +616,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2355` lines (`98260` bytes)
+**Size**: `2376` lines (`99169` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

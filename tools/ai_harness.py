@@ -1602,6 +1602,27 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_save_version", not harness.errors, harness.errors))
     page.context.close()
 
+    # Room themes are part of the floor identity: a resumed run must keep the
+    # chapel/urn crypt/choke rooms it had, not repaint every centre as an ossuary.
+    page = harness.open_page(seed)
+    theme_resume = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const before = (e.dungeon.room_themes || []).slice();
+            e.saveGameState();
+            await e.start(null, 1, 'paladin', true);
+            const after = (e.dungeon.room_themes || []).slice();
+            return { before, after, distinct: new Set(before).size };
+        }"""
+    )
+    checks.append(_check(
+        "resume_restores_room_themes",
+        theme_resume["distinct"] > 1 and theme_resume["after"] == theme_resume["before"],
+        theme_resume,
+    ))
+    checks.append(_check("no_page_errors_after_theme_resume", not harness.errors, harness.errors))
+    page.context.close()
+
     # Floor omens: deterministic per seed+depth, all reachable, and actually applied.
     page = harness.open_page(seed)
     omen = page.evaluate(

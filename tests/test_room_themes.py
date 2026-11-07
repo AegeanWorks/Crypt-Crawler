@@ -23,6 +23,10 @@ class TestRoomThemes(unittest.TestCase):
             self.assertIn(f'      {theme}: "#', self.js, f"missing palette colour for {theme}")
             self.assertIn(f'theme === "{theme}"', self.js, f"missing glyph branch for {theme}")
 
+    def test_save_persists_room_themes(self):
+        engine = (ROOT / "static" / "js" / "engine.js").read_text(encoding="utf-8")
+        self.assertIn("room_themes: this.dungeon.room_themes", engine)
+
 
 if __name__ == "__main__":
     unittest.main()
