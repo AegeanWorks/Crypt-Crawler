@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-041",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794088994.252368,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794089045.2657955
   },
   "checkpoints": [
-    {
-      "task_id": "CC-035",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Audio: add a bow-release cue before archer impacts and rising telegraph cues for the Choir hum/silence and Malakor inhale, prove with a failing-first oscillator-recording selftest, a source test and real before/after sessions",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794081506.2287035,
-      "timestamp_str": "2026-11-07 22:58:26",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Recording the shipped audio module showed the archer only scheduled the generic 160 Hz impact and the two avoidable boss windups scheduled nothing, so an arrow sounded like a melee hit and off-screen telegraphed attacks were silent",
-        "benefits": "The bow release is audible before damage; both boss windups are audible before they resolve; SFX mute still suppresses all cues",
-        "risks": "contract: audio.js gains playBow/playTelegraph, engine.js calls them at three telegraph sites and one archer site; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: audio.js and engine.js in the game-ui surface",
-        "mitigation": "Failing-first cue check recorded bow [160], hymn [] and drain [] on HEAD; after [880,160], [196], [110]; played sessions with screenshots and event JSON; inspector at three viewports; full gates"
-      },
-      "plan_digest": "f374556a68d68a48358ce64487815d56fbd71bb06dfacca879ab2c48e84914a4"
-    },
     {
       "task_id": "CC-035",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-041, then cycle 13 (UI readability)",
         "evidence": "158 tests, harness 85/85, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-041",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-041' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794089045.2657974,
+      "timestamp_str": "2026-11-08 01:04:05",
+      "agent": "opencode:cycles"
     }
   ]
 }
