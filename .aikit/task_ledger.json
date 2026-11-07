@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-044",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794093378.7923892,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794093422.4049232
   },
   "checkpoints": [
-    {
-      "task_id": "CC-038",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Combat feel: let the killing blow land (HUD zero, PERISHED float, shake) and delay the death ledger 750ms behind a run-token guard, prove with failing-first selftest checks, a source test and a real death before/after",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794084764.6771765,
-      "timestamp_str": "2026-11-07 23:52:44",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "handlePlayerDeath opened the modal in the same frame as the fatal hit: the killing float was hidden, the HUD still read the pre-hit HP, and players could not see what killed them, while victory already waits 1.5s",
-        "benefits": "Death reads as a beat: HP hits zero, the screen shakes, a PERISHED marker holds, then the ledger opens; gameOver/save clear/run record stay immediate",
-        "risks": "contract: death modal is delayed by 750ms and cancelled by runToken; dependency: none; concurrency: a stale timer cannot open over a new run; state: save cleared immediately as before; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing-first checks read modal true at t=0 and HUD 65/65; after HUD 0/65 + PERISHED + modal at 1s; source test; inspector waits 0.9s; full gates"
-      },
-      "plan_digest": "422fc303bb9418c32f8b83a14cdfc860d37ac4167cb3409480a4b679e869c7d7"
-    },
     {
       "task_id": "CC-038",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-044, then cycle 16 (progression/saves)",
         "evidence": "163 tests, harness 91/91, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-044",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-044' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794093422.404925,
+      "timestamp_str": "2026-11-08 02:17:02",
+      "agent": "opencode:cycles"
     }
   ]
 }
