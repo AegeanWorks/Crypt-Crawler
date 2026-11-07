@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-042",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794090762.926281,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794090808.9930553
   },
   "checkpoints": [
-    {
-      "task_id": "CC-036",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] UI readability: fade the scrolled chronicle top edge instead of shearing the oldest visible line, prove with a matched seed-42 turn-9 capture pair and a wrapper/CSS/JS drift test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794082495.0916283,
-      "timestamp_str": "2026-11-07 23:14:55",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The bottom-anchored chronicle cuts its oldest visible line mid-glyph whenever it overflows; the hard edge reads as a rendering bug",
-        "benefits": "Scrollback reads as history, the newest line stays flush at the bottom, and the unscrolled log is untouched",
-        "risks": "contract: chronicleLog gains a wrapper and an is-scrolled class toggled on scroll/append; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: index.html, style.css and ui.js in the game-ui surface",
-        "mitigation": "Matched before/after at turn 9, 19 entries, scrollTop 137; tests/test_chronicle_fade.py locks wrapper, CSS gate and toggle; inspector at three viewports; full gates"
-      },
-      "plan_digest": "7e926557cceadfe5c76cd1eaa65e8521d65afc158e77b3ead5d49acd80876f9c"
-    },
     {
       "task_id": "CC-036",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-042, then cycle 14 (graphics/effects)",
         "evidence": "160 tests, harness 89/89, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-042",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-042' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794090808.9930582,
+      "timestamp_str": "2026-11-08 01:33:28",
+      "agent": "opencode:cycles"
     }
   ]
 }
