@@ -110,10 +110,17 @@ export class DungeonRenderer {
   }
 
   addFloatingText(text, x, y, color = "#ff4444") {
+    const px = x * this.tileSize + this.tileSize / 2;
+    const baseY = y * this.tileSize + this.tileSize / 2 - 14;
+    // Numbers born in the same enemy phase share a tile; step each one up so a
+    // twin hit reads as two hits instead of one.
+    const stack = this.floatingTexts.filter(
+      (t) => Math.abs(t.x - px) < 2 && t.life > 30
+    ).length;
     this.floatingTexts.push({
       text,
-      x: x * this.tileSize + this.tileSize / 2,
-      y: y * this.tileSize + this.tileSize / 2 - 14,
+      x: px,
+      y: baseY - stack * 18,
       color,
       alpha: 1.0,
       vy: -0.75,

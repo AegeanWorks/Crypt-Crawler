@@ -1,49 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-030",
+    "task_id": "CC-031",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794076180.1151505,
+    "updated_at": 1794077115.2853217,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 17",
-      "phase_num": 3,
-      "description": "Reforge stage 17: window 51, 3 commit(s), 17 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793382671.9269664,
-      "timestamp_str": "2026-10-30 20:51:11",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 18",
-      "phase_num": 3,
-      "description": "Reforge stage 18: window 54, 3 commit(s), 5 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793382794.623761,
-      "timestamp_str": "2026-10-30 20:53:14",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 19",
-      "phase_num": 3,
-      "description": "Reforge stage 19: window 57, 3 commit(s), 9 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793382829.5666842,
-      "timestamp_str": "2026-10-30 20:53:49",
-      "agent": "opencode"
-    },
     {
       "task_id": "reforge:run-9",
       "phase": "reforge stage 20",
@@ -260,6 +227,50 @@
         "next": "commit then cycle 2",
         "open": "UI guard finish deferred (surface + tools/tests move together, ADR-039 precedent)",
         "evidence": "139 tests, harness 66/66, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-031",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Combat feel: stack simultaneous damage numbers at the same tile so twin hits are legible, prove with a selftest check and a real two-goblin turn",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794077104.8308587,
+      "timestamp_str": "2026-11-07 21:45:04",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Two enemies striking in one enemy phase spawn damage floats at the same x/y with identical velocity and life, so the canvas shows one number while the player loses two hits; the combat log names both but the map does not",
+        "benefits": "Twin hits read as two numbers whose sum equals the HP lost, while single hits, loot and heals keep their position",
+        "risks": "contract: addFloatingText offsets concurrent floats by 18px; dependency: none; concurrency: none; state: no save or RNG change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Selftest check failed first (two floats y=1021, distinct 1, damage 10); same-state before/after screenshots at turn 3 with a real two-goblin phase; inspector at three viewports; full gates"
+      },
+      "plan_digest": "36fd22b507ba1c6b573d0b89444e1edbe68903145ef722e1932bcaec03704921"
+    },
+    {
+      "task_id": "CC-030",
+      "phase": "superseded",
+      "phase_num": 4,
+      "description": "Superseded by 'CC-031' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794077104.8308587,
+      "timestamp_str": "2026-11-07 21:45:04",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-031",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Twin-hit stacking shipped: addFloatingText lifts concurrent same-tile floats 18px; selftest twin_hits_stack_and_sum_to_damage now reads two floats (y=1021,1003) summing to 9 damage; real two-goblin turn shows two -1s (y=690,672) at HP 62->60. Unit 139 OK, harness 68/68, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-043, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794077115.2853217,
+      "timestamp_str": "2026-11-07 21:45:15",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-031, then cycle 3",
+        "evidence": "139 tests, harness 68/68, inspector 75/75, gates 5/5"
       }
     }
   ]

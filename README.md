@@ -85,6 +85,9 @@ The passive is printed on each class card before you choose, and the in-game gui
 
 Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; or poison with a dagger/Shadow Strike, then detonate it with fire.
 
+### 💥 Combat Feedback
+When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost.
+
 ### 🎭 Floor Omens, Mobs and Story
 Every floor carries one omen chosen deterministically from the seed: **Blood Moon** (enemies strike 25% harder), **Deep Fog** (lantern 5 tiles, or 7 near a wall sconce), **Gilded Crypt** (+50% chest and urn gold), **Restless Dead** (one extra enemy), **Ember Tithe** (chests pay 25% less, shrines heal +15) or **Hollow Silence** (more traps, disarm XP x2). The header pill names it, the chronicle announces it, and the journal keeps it.
 
@@ -181,6 +184,7 @@ crypt-crawler/
 ├── tests/
 │   ├── __init__.py
 │   ├── test_ai_harness.py    <- harness validation and UI inventory tests
+│   ├── test_canvas_fit.py    <- canvas aspect-ratio and pointer-mapping contract
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_fairness.py      <- fairness validator tests

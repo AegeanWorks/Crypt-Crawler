@@ -39,3 +39,30 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75,
   0 console errors; `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(ui): fit the canvas to its bitmap and align click-to-move`.
+
+## Cycle 2 — Twin-hit damage numbers (2026-11-07)
+
+- **Area**: Combat feel (damage feedback).
+- **Find**: Two melee enemies striking in one enemy phase spawn identical `-1` floats at the
+  same x/y with the same velocity and life, so they draw exactly on top of each other. The
+  reproducer (`twin_hits_stack_and_sum_to_damage`) read two floats at y=1021 (`distinct: 1`)
+  after the player lost 10 HP.
+- **Analyze**: `static/js/renderer.js:addFloatingText` pushed raw coordinates with no stacking.
+  Fix there only; a per-enemy animation cadence was killed because it would make the turn loop
+  asynchronous and risk input during resolution, well outside this defect.
+- **Fix**: count recent floats (life > 30) within 2px on x and lift the new float 18px; add the
+  selftest check plus `no_page_errors_after_stacked_hits`.
+- **Screenshots** (same seed 42, paladin, normal, turn 3, player 13,15, HP 62, goblins at
+  13,14 and 14,15):
+  - before: `.inspect/cycles/c2/before-double-hit.png` / `before-double-hit-zoom.png`
+  - after: `.inspect/cycles/c2/after-double-hit.png` / `after-double-hit-zoom.png`
+  - command: `python .inspect/cycles/play_c2.py before|after`
+- **Played run**: real Playwright session (not the harness) at 1920x1080; the hero waited while
+  two goblins closed in, then waited again. Before the fix the player lost 2 HP and one `-1`
+  appeared; after the fix the same state lost 2 HP and two `-1` numbers appeared 18px apart
+  (`after-run.txt`: floats y=690 and y=672, `damage_dealt: 2`, turn 4). No page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 139 OK;
+  `python tools/ai_harness.py selftest` -> 68 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75,
+  0 console errors; `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(combat): stack simultaneous damage numbers`.

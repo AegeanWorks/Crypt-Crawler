@@ -1754,6 +1754,54 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_mob_turns", not harness.errors, harness.errors))
     page.context.close()
 
+    # Twin hits must be readable: two adjacent attackers in one enemy phase have to
+    # produce two stacked damage numbers that add up to the HP actually lost.
+    page = harness.open_page(seed)
+    stacked = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const p = e.player;
+            const ts = e.renderer.tileSize;
+            e.renderer.floatingTexts.length = 0;
+            e.dungeon.updateFOV(p.x, p.y, 7);
+            const mk = (x, y) => ({
+                name: 'Stack Dummy', type: 'skeleton', x, y, hp: 20, max_hp: 20,
+                attack: 9, defense: 0, xp_reward: 0, gold_reward: 0, loot_drop: null,
+                is_boss: false, is_champion: false, champion_affix: null, status_effects: {},
+            });
+            const spots = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .filter(([dx, dy]) => e.dungeon.isWalkable(p.x + dx, p.y + dy))
+                .slice(0, 2);
+            e.monsters = spots.map(([dx, dy]) => mk(p.x + dx, p.y + dy));
+            const hp = p.hp;
+            e.processEnemyTurns();
+            const floats = e.renderer.floatingTexts
+                .filter((f) => Math.abs(f.x - (p.x * ts + ts / 2)) < 2)
+                .map((f) => ({ text: f.text, y: Math.round(f.y) }));
+            const sum = floats.reduce((total, f) => {
+                const n = Number(String(f.text).replace(/[^0-9]/g, ''));
+                return total + (Number.isFinite(n) ? n : 0);
+            }, 0);
+            return {
+                attackers: spots.length,
+                damage: hp - p.hp,
+                floats,
+                distinct: new Set(floats.map((f) => f.y)).size,
+                sum,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "twin_hits_stack_and_sum_to_damage",
+        stacked["attackers"] == 2
+        and len(stacked["floats"]) == 2
+        and stacked["distinct"] == 2
+        and stacked["sum"] == stacked["damage"],
+        stacked,
+    ))
+    checks.append(_check("no_page_errors_after_stacked_hits", not harness.errors, harness.errors))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)
