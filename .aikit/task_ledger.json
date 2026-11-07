@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-045",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794094788.0987756,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794094825.6240509
   },
   "checkpoints": [
-    {
-      "task_id": "CC-039",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Combat feel: a dead hero cannot be attacked or robbed and a status death names its cause; stop the enemy phase on hp<=0, return poison/burn from the status tick, prove with failing-first selftest checks, a source test and a real poison-death before/after",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794086260.7513165,
-      "timestamp_str": "2026-11-08 00:17:40",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "finishPlayerTurn ticked poison first but ran the enemy phase anyway, so at 1 HP the goblin attacked for 98 and stole 9 gold after death; the ledger blamed mortal combat and two adjacent killers both acted",
-        "benefits": "Death cause is truthful, gold/state stop at the moment of death, only one killer acts; the ADR-050 death beat still applies",
-        "risks": "contract: _tickPlayerStatuses returns a cause, finishPlayerTurn early-returns, processEnemyTurns breaks on hp<=0; dependency: none; concurrency: none; state: no save-format change, post-death writes stop; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing checks read the goblin attack + theft and second: true; after gold 25, log only poison, cause poison; source test; inspector at three viewports; full gates"
-      },
-      "plan_digest": "5cc625671068b7f72eec3c2cd5ecc903706ed6640c28328b831b716c7d641da9"
-    },
     {
       "task_id": "CC-039",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-045, then cycle 17 (combat feel)",
         "evidence": "165 tests, harness 93/93, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-045",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-045' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794094825.624053,
+      "timestamp_str": "2026-11-08 02:40:25",
+      "agent": "opencode:cycles"
     }
   ]
 }
