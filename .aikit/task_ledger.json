@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-043",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794092051.7719374,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794092113.4048007
   },
   "checkpoints": [
-    {
-      "task_id": "CC-037",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Graphics: give projectiles an identity (fletched bone arrow vs glowing spell bolt with a trailing streak), prove with a matched frozen-flight archer/hex pair and a shape contract test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794083639.188605,
-      "timestamp_str": "2026-11-07 23:33:59",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Every projectile was the same 5px glowing orb with sparks, so a Skeletal Archer's arrow and a Dread Necromancer's hex looked identical in flight and the map could not distinguish physical from magical ranged attacks",
-        "benefits": "Arrows read as arrows, spells read as streaking bolts; the damage/timing contract is untouched",
-        "risks": "contract: addProjectile gains an optional kind defaulting to bolt; dependency: none; concurrency: none; state: no save/rule/RNG/speed change; UI: renderer.js and engine.js in the game-ui surface",
-        "mitigation": "Matched before/after at seed 42 B2F, projectile frozen at progress 0.51; tests/test_projectile_style.py locks both shapes and the archer call; inspector at three viewports; full gates"
-      },
-      "plan_digest": "3761e8d9a966a3311001afe0cbb147e03b7afb9df8154a8ce9b5abba86842a1c"
-    },
     {
       "task_id": "CC-037",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-043, then cycle 15 (audio cues)",
         "evidence": "162 tests, harness 89/89, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-043",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-043' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794092113.404803,
+      "timestamp_str": "2026-11-08 01:55:13",
+      "agent": "opencode:cycles"
     }
   ]
 }
