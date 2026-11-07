@@ -1,49 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-032",
+    "task_id": "CC-033",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794078492.4218283,
+    "updated_at": 1794079550.4957983,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 23",
-      "phase_num": 3,
-      "description": "Reforge stage 23: window 69, 3 commit(s), 17 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793383128.4780338,
-      "timestamp_str": "2026-10-30 20:58:48",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 23",
-      "phase_num": 3,
-      "description": "Reforge stage 23: stage 23 host review reviewed; run active; coverage 224/224",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793383216.4926255,
-      "timestamp_str": "2026-10-30 21:00:16",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-9",
-      "phase": "reforge stage 24",
-      "phase_num": 3,
-      "description": "Reforge stage 24: window 72, 3 commit(s), 28 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793383247.9610443,
-      "timestamp_str": "2026-10-30 21:00:47",
-      "agent": "opencode"
-    },
     {
       "task_id": "reforge:run-9",
       "phase": "reforge stage 24",
@@ -282,6 +249,50 @@
         "state": "uncommitted and green",
         "next": "commit, complete CC-032, then cycle 4",
         "evidence": "139 tests, harness 70/70, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-032",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-032' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794078513.6777782,
+      "timestamp_str": "2026-11-07 22:08:33",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-033",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Levels: draw an explored-room floor emblem per room theme (chapel/ossuary/gallery/urn crypt/choke) so the generator's theme DATA reads on the map, guard with a theme/glyph drift test and record three matched before/after pairs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794079543.8305135,
+      "timestamp_str": "2026-11-07 22:25:43",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The generator assigns five room themes and uses choke/gallery trap density, but renderer.js never read room_themes; chapel, ossuary and urn crypt rooms render as identical plain floors, so the theme is invisible outside the layout hash",
+        "benefits": "Rooms read at a glance, the theme DATA becomes visible, and the map gets identity without adding HUD text or obscuring props",
+        "risks": "contract: renderer reads dungeon.rooms/room_themes and adds two display-only helpers; dependency: none; concurrency: none; state: no save/RNG/rule change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Three matched seed-42 room captures before/after; tests/test_room_themes.py locks one palette colour and one glyph branch per ROOM_THEMES entry; inspector at three viewports; full gates"
+      },
+      "plan_digest": "a78858e3ac3c477c531b2730311d00b37844a1cd302ada482ab687b3567dc1b3"
+    },
+    {
+      "task_id": "CC-033",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Room theme emblems shipped: 17% alpha chapel cross, ossuary skull, gallery arches, urn crypt urn, choke chevrons under props/actors; tests/test_room_themes.py locks palette+glyph per theme. Unit 141 OK, harness 70/70, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-045, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794079550.4957983,
+      "timestamp_str": "2026-11-07 22:25:50",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-033, then cycle 5",
+        "evidence": "141 tests, harness 70/70, inspector 75/75, gates 5/5"
       }
     }
   ]

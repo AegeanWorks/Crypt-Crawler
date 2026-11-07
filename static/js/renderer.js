@@ -249,6 +249,9 @@ export class DungeonRenderer {
       }
     }
 
+    // 1.5 Draw Room Theme Emblems (a floor sigil per theme, under props)
+    this._drawRoomThemes(ctx, dungeon, ts);
+
     // 2. Draw Interactive Dungeon Props
     for (const chest of dungeon.chests) {
       if (dungeon.isExplored(chest.x, chest.y)) {
@@ -2191,6 +2194,99 @@ export class DungeonRenderer {
       ctx.fillText(ft.text, ft.x, ft.y);
     }
     ctx.restore();
+  }
+
+  _drawRoomThemes(ctx, dungeon, ts) {
+    const rooms = dungeon.rooms || [];
+    const themes = dungeon.room_themes || [];
+    if (!rooms.length || !themes.length) return;
+    const palette = {
+      chapel: "#ecc94b",
+      ossuary: "#a0aec0",
+      gallery: "#63b3ed",
+      urn_crypt: "#ed8936",
+      choke: "#e53e3e",
+    };
+    for (let i = 0; i < rooms.length; i += 1) {
+      const color = palette[themes[i]];
+      if (!color) continue;
+      const room = rooms[i];
+      const cx = room.x + Math.floor(room.w / 2);
+      const cy = room.y + Math.floor(room.h / 2);
+      if (!dungeon.isExplored(cx, cy)) continue;
+      const px = cx * ts + ts / 2;
+      const py = cy * ts + ts / 2;
+      const r = Math.min(room.w, room.h) * ts * 0.22;
+      ctx.save();
+      ctx.globalAlpha = 0.17;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      this._drawThemeGlyph(ctx, themes[i], px, py, r);
+      ctx.restore();
+    }
+  }
+
+  _drawThemeGlyph(ctx, theme, x, y, r) {
+    if (theme === "chapel") {
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.72, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y - r);
+      ctx.lineTo(x, y + r);
+      ctx.moveTo(x - r * 0.62, y - r * 0.18);
+      ctx.lineTo(x + r * 0.62, y - r * 0.18);
+      ctx.stroke();
+    } else if (theme === "ossuary") {
+      ctx.beginPath();
+      ctx.arc(x, y - r * 0.12, r * 0.55, 0, Math.PI * 2);
+      ctx.moveTo(x - r * 0.35, y + r * 0.28);
+      ctx.lineTo(x - r * 0.28, y + r * 0.62);
+      ctx.lineTo(x + r * 0.28, y + r * 0.62);
+      ctx.lineTo(x + r * 0.35, y + r * 0.28);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x - r * 0.22, y - r * 0.2, r * 0.1, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.22, y - r * 0.2, r * 0.1, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (theme === "gallery") {
+      for (let i = -1; i <= 1; i += 1) {
+        const gx = x + i * r * 0.62;
+        ctx.beginPath();
+        ctx.moveTo(gx - r * 0.22, y + r * 0.55);
+        ctx.lineTo(gx - r * 0.22, y - r * 0.1);
+        ctx.arc(gx, y - r * 0.1, r * 0.22, Math.PI, 0);
+        ctx.lineTo(gx + r * 0.22, y + r * 0.55);
+        ctx.stroke();
+      }
+    } else if (theme === "urn_crypt") {
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.38, y - r * 0.55);
+      ctx.lineTo(x + r * 0.38, y - r * 0.55);
+      ctx.lineTo(x + r * 0.28, y - r * 0.3);
+      ctx.bezierCurveTo(x + r * 0.65, y, x + r * 0.45, y + r * 0.6, x, y + r * 0.6);
+      ctx.bezierCurveTo(x - r * 0.45, y + r * 0.6, x - r * 0.65, y, x - r * 0.28, y - r * 0.3);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x - r * 0.55, y - r * 0.05, r * 0.18, Math.PI * 0.5, Math.PI * 1.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x + r * 0.55, y - r * 0.05, r * 0.18, -Math.PI * 0.5, Math.PI * 0.5);
+      ctx.stroke();
+    } else if (theme === "choke") {
+      ctx.beginPath();
+      for (let i = -1; i <= 1; i += 1) {
+        const gy = y + i * r * 0.42;
+        ctx.moveTo(x - r * 0.42, gy - r * 0.18);
+        ctx.lineTo(x + r * 0.05, gy);
+        ctx.lineTo(x - r * 0.42, gy + r * 0.18);
+      }
+      ctx.stroke();
+    }
   }
 
   _drawMinimap(ctx, dungeon, player, monsters) {

@@ -99,3 +99,29 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75,
   0 console errors; `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(enemies): make the Dread Necromancer hex from range`.
+
+## Cycle 4 — Room theme floor emblems (2026-11-07)
+
+- **Area**: Levels (room identity).
+- **Find**: The generator assigns five room themes and tunes trap density by theme, but
+  `renderer.js` never read `room_themes`. Before-captures of seed 42 rooms 1 (chapel), 6
+  (ossuary) and 9 (urn crypt) are identical plain stone floors.
+- **Analyze**: Pure display gap, no rule defect; draw a faint glyph under props/actors so the
+  existing DATA becomes legible. Killed: per-theme gameplay rules (out of scope, would touch the
+  generator contract) and text labels (breaks the diegetic map).
+- **Fix**: `_drawRoomThemes` + `_drawThemeGlyph` at 17% alpha: gold cross+halo, bone skull, blue
+  arches, orange urn, red chevrons. `tests/test_room_themes.py` locks one palette colour and one
+  glyph branch per `ROOM_THEMES` entry.
+- **Screenshots** (same seed 42, B1F, paladin, normal, 1920x1080, player at each room centre):
+  - chapel: `.inspect/cycles/c4/before-chapel.png` / `after-chapel.png`
+  - ossuary: `.inspect/cycles/c4/before-ossuary.png` / `after-ossuary.png`
+  - urn crypt: `.inspect/cycles/c4/before-urn_crypt.png` / `after-urn_crypt.png`
+  - command: `python .inspect/cycles/play_c4.py before|after`
+- **Played run**: visual-only change, no mechanics claim. The inspector opened a fresh run
+  (1440/1920 desktop, laptop, mobile) and the east choke room shows the red chevrons in
+  `.inspect/cycles/c4/inspect/dungeon_desktop.png`; 75/75 audit checks, 0 console errors.
+- **Gates**: `python -m unittest discover -s tests` -> 141 OK;
+  `python tools/ai_harness.py selftest` -> 70 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(levels): draw a floor emblem for every room theme`.

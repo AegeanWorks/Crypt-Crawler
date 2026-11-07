@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `31`
-- **Total Classes**: `33`
+- **Total Python Modules**: `32`
+- **Total Classes**: `34`
 - **Total Top-Level Functions**: `59`
-- **Total Class Methods**: `208`
-- **Total Source Lines**: `8948`
+- **Total Class Methods**: `211`
+- **Total Source Lines**: `8976`
 
 ---
 
@@ -461,6 +461,19 @@
   - Method `.test_near_miss_survival()`
   - Method `.test_generate_dungeon_bounties()`
   - Method `.test_vault_bounty_single_completion()`
+
+---
+
+### [`tests/test_room_themes.py`](tests/test_room_themes.py)
+> *Room theme emblem contract: every generated theme has a rendered glyph.*
+
+**Size**: `28` lines (`964` bytes)
+
+**Classes:**
+- `class TestRoomThemes`
+  - Method `.setUp()`
+  - Method `.test_renderer_reads_generated_themes()`
+  - Method `.test_every_generated_theme_has_a_glyph_and_colour()`
 
 ---
 

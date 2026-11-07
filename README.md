@@ -111,6 +111,9 @@ QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, an
 ### 🔍 Trap Search
 Press `R` or the deck's **Search** button to spend a turn revealing armed traps within three visible tiles. Traps come as **Spike** (8-13), **Dart volley** (4-6 x2) and **Snare** (0-2 + stun 1); a revealed trap gets a dashed amber grille and a hover card with odds, but it still triggers if stepped on: the search buys information, not safety. Press `R` again while beside a revealed trap to disarm it for `4+depth*2` XP (`x2` on Hollow Silence); the trap becomes a grey crossed grille, is safe to cross, and stays disarmed in saves. The revealed state survives saves; each new floor starts with fresh hidden traps. Deep Fog shortens the search because it uses the same line of sight as the lantern.
 
+### 🏛️ Room Themes
+Each generated room carries one of five themes — chapel, ossuary, gallery, urn crypt or choke — and leaves a faint floor emblem at its centre (cross, skull, arches, urn, chevrons), so a floor reads at a glance even before you hover a prop. Choke rooms hide more traps and gallery rooms fewer; the emblem itself is cosmetic and changes no rule.
+
 ### 🧳 Merchant
 Hermit Grimbold opens a two-tab shop on B2F and deeper. **Buy** spends gold on potions, gear and relics (15-140, rebalanced: Health 20, Hammer 115); **Sell** converts outclassed backpack loot into gold at a rarity-based price (common 10, rare 30, epic 60, legendary 100). The shop stays open after a sale, so a full 12-slot backpack can be cleared in one visit, and selling is refused once the shop is closed. The Crown of Eternity is a trophy, not stock: it never appears in the Sell tab. Chests pay 17+0-13 base with a 2.4x jackpot capped at 3.0x with omens; urns pay 6+0-10 with the same cap, so risk-for-power stays a real choice.
 
@@ -193,6 +196,7 @@ crypt-crawler/
 │   ├── test_inspect.py       <- inspection configuration tests
 │   ├── test_lore.py          <- codex data and /api/lore endpoint tests
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests
+│   ├── test_room_themes.py   <- every generated room theme has a rendered emblem
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
 │   ├── test_server.py        <- web server endpoints tests
