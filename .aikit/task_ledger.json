@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-069",
+    "task_id": "CC-070",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794138869.641039,
+    "updated_at": 1794140361.6199086,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794139054.6296673
+    "completed_at": 1794140589.541609
   },
   "checkpoints": [
-    {
-      "task_id": "CC-063",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Minimap key readable on narrow canvases: one MINIMAP_LEGEND_ROWS source feeds the canvas key and a new DOM #minimapLegend; a ResizeObserver toggles the 10px two-column DOM key below a 600px canvas and the canvas key returns above it. Measured live: mobile canvas 372px, canvas text 3.43px -> DOM 10px/9 items (106.5x84), compact true; desktop canvas 783px, DOM hidden, canvas key 7.21px. Same-state mobile before/after crops; tests/test_minimap_legend_dom.py (3 checks). Unit 197 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-075, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794133242.0727599,
-      "timestamp_str": "2026-11-08 13:20:42",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit cycle 34, then cycle 35 (graphics/effects)",
-        "evidence": "197 tests, harness 117/117, inspector 75/75, aikit check 5/5"
-      }
-    },
-    {
-      "task_id": "CC-063",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-063' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794133357.4259634,
-      "timestamp_str": "2026-11-08 13:22:37",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-064",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Graphics/effects: isolate every renderer Math.random call into a visual-only LCG so projectile sparks, flicker and particles never advance the seeded gameplay stream; prove with a failing-first RNG-consumption harness check, immediate-vs-delayed snare runs, and projectile-in-flight captures",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794133907.673294,
-      "timestamp_str": "2026-11-08 13:31:47",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "renderer.js calls Math.random 42 times, including per-frame projectile sparks. The render loop advances the seeded gameplay RNG, so the same seed/state can roll different trap damage depending on frame timing; before the fix the same snare took 2 vs 1 damage.",
-        "benefits": "Same seed/actions produce the same gameplay outcome regardless of frame timing; visual effects keep their variation; the harness's reproducibility contract holds",
-        "risks": "contract: renderer-local LCG plus 42 call-site replacements; dependency: none; concurrency: none; state: no save/gameplay value change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Failing-first harness check counting Math.random calls during a projectile; immediate-vs-delayed snare play; projectile screenshots; source drift test; full gates"
-      },
-      "plan_digest": "51e057a52eb40045a7264a73f7f31e7c202dd707d2b98d8225b9064bb8f56988"
-    },
     {
       "task_id": "CC-064",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794139054.629669,
       "timestamp_str": "2026-11-08 14:57:34",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-070",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Enemies/bosses: give each boss its own death text, loot and victory identity so the B2F Choir no longer ends the run with Malakor's crown and foundry B3F bosses use their configured name/loot; prove with failing-first identity checks, real key-1 kills, and before/after modal captures",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794140347.1145713,
+      "timestamp_str": "2026-11-08 15:19:07",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "_handleMonsterDefeat treats every is_boss as Malakor: it unlocks Malakor lore, grants the Crown and schedules victory. The B2F Choir ends the run; the seed 42 Ashen Warden shows Malakor and drops the Crown instead of hammer_thunder.",
+        "benefits": "Only the depth-3 guardian ends a run; each boss shows its own name and loot; the Choir remains a B2F vault boss; the victory modal matches the actual fight",
+        "risks": "contract: boss branch, BOSS_LOOT_ITEMS, finalBoss record and victory text; dependency: none; concurrency: none; state: no save/RNG/turn-rule change; UI: victory modal",
+        "mitigation": "Failing-first harness checks for both bosses, source tests, real key-1 kills, before/after modal captures, full gates"
+      },
+      "plan_digest": "47027c892dba899361c4113b9a26f9ed2c7eb02c68c784cf9bf841e9fd33813f"
+    },
+    {
+      "task_id": "CC-070",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Boss identity shipped: BOSS_LOOT_ITEMS, per-boss death text/loot, finalBoss only for depth>=3, victory modal reads it, stairs barrier names the living boss. Failing-first checks failed on HEAD (pack: Malakor/crown; choir: victory true) and pass now (pack: Ashen Warden/hammer/no Malakor lore; choir: no victory/no modal/tome). tests/test_boss_identity.py (3 checks). Real seed 42 key-1 kills: before pack/choir both Malakor triumph, after pack Ashen Warden/Warhammer and choir continues with tome; no page errors; before/after full captures. Unit 208 OK, harness 133/133, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-082, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794140361.6199086,
+      "timestamp_str": "2026-11-08 15:19:21",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 41, then cycle 42 (UI readability)",
+        "evidence": "208 tests, harness 133/133, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-070",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-070' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794140589.5416114,
+      "timestamp_str": "2026-11-08 15:23:09",
       "agent": "opencode:cycles"
     }
   ]
