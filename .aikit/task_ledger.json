@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-051",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794100609.7254362,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794100649.684353
   },
   "checkpoints": [
-    {
-      "task_id": "CC-045",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Progression: add the Choir Echo to the Records bestiary so its recorded kills are visible, prove with a failing-first Records check, a roster test and a same-state Records before/after after a real echo kill",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794094759.351487,
-      "timestamp_str": "2026-11-08 02:39:19",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "choir_echo is a killable split/spawned enemy and recordMonsterDefeat stores its kills, but bestiaryDefs had no row; a run with one echo kill showed Monsters Slain 1 while the codex ended in Unknown Entity rows",
-        "benefits": "Every recorded kill type has a visible codex row; Choir split children no longer vanish from progression; the Records totals and codex agree",
-        "risks": "contract: one bestiary definition added; dependency: none; concurrency: none; state: no save/rule change; UI: ui.js in the game-ui surface",
-        "mitigation": "Failing check rows [] despite slain 2; after one row Slayed: 2; roster test; real echo kill then Records before/after; inspector at three viewports; full gates"
-      },
-      "plan_digest": "67c422cd7e661f04f993772f0713f6c59e92d02170ffd856be10047dc9a87226"
-    },
     {
       "task_id": "CC-045",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-051, then cycle 23 (progression/saves)",
         "evidence": "177 tests, harness 101/101, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-051",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-051' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794100649.6843553,
+      "timestamp_str": "2026-11-08 04:17:29",
+      "agent": "opencode:cycles"
     }
   ]
 }
