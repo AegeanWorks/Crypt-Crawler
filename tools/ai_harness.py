@@ -2394,6 +2394,66 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_stacked_hits", not harness.errors, harness.errors))
     page.context.close()
 
+    # The hover card previews a specific adjacent enemy; pressing Strike must hit
+    # that hovered target instead of whichever enemy sits first in the array.
+    page = harness.open_page(seed)
+    hover_target = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            let spot = null;
+            for (let y = 1; y < d.height - 1 && !spot; y += 1) {
+                for (let x = 1; x < d.width - 1 && !spot; x += 1) {
+                    let clear = true;
+                    for (let yy = y - 1; yy <= y + 1; yy += 1) {
+                        for (let xx = x - 1; xx <= x + 1; xx += 1) {
+                            if (d.tiles[yy][xx] !== 1) clear = false;
+                        }
+                    }
+                    if (clear) spot = { x, y };
+                }
+            }
+            if (!spot) return { found: false };
+            const p = e.player;
+            p.x = spot.x;
+            p.y = spot.y;
+            p.hp = p.max_hp;
+            d.updateFOV(p.x, p.y, 7);
+            const mk = (name, x, y) => ({
+                name, type: 'skeleton', x, y, hp: 100, max_hp: 100, attack: 0,
+                defense: 0, xp_reward: 0, gold_reward: 0, loot_drop: null,
+                is_boss: false, is_champion: false, champion_affix: null, status_effects: {},
+            });
+            const a = mk('Target A', spot.x + 1, spot.y);
+            const b = mk('Target B', spot.x, spot.y + 1);
+            e.monsters = [a, b];
+            e.renderer.setHoverTile(b.x, b.y);
+            const hpA = a.hp;
+            const hpB = b.hp;
+            e.tacticalStrike();
+            return {
+                found: true,
+                hover: e.renderer.hoverTile,
+                hpA,
+                hpB,
+                afterA: a.hp,
+                afterB: b.hp,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .slice(-3).map((el) => el.textContent),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "strike_hits_the_hovered_adjacent_enemy",
+        hover_target.get("found") is True
+        and hover_target["afterA"] == hover_target["hpA"]
+        and hover_target["afterB"] < hover_target["hpB"]
+        and any("Target B" in line for line in hover_target["log"]),
+        hover_target,
+    ))
+    checks.append(_check("no_page_errors_after_hover_target", not harness.errors, harness.errors))
+    page.context.close()
+
     # The killing blow deserves a beat: death feedback first, the modal after.
     page = harness.open_page(seed)
     death = page.evaluate(

@@ -517,6 +517,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: A resumed run keeps its momentum and the badge matches the engine; a new run clears the badge. 178 unit tests green, harness 103/103, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, three real kills (streak 3), save, reload: before no streak pill, after "🔥 Streak: 3"; a new run hides it.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first resume check), PRINCIPLE-013 (additive save fields, old saves safe).
 
+### ADR-065: Strike hits the hovered adjacent enemy (improvement cycle 24)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `tacticalStrike` picked the first monster in the array with Manhattan distance 1. The hover card previews the monster under the cursor, so with two adjacent enemies the card could show Target B's strike range while pressing 1 hit Target A. The same-state run read `Target A 89, Target B 100, log "You strike Target A"` while B was hovered and its card showed 100/100.
+- **Decision**: `tacticalStrike` prefers `renderer.hoverTile` when that tile holds a living adjacent monster; otherwise it falls back to the first adjacent foe. No damage or turn rule change. Add `tests/test_strike_target.py` and the `strike_hits_the_hovered_adjacent_enemy` selftest check (hover B: A unchanged, B damaged, log names B).
+- **Consequences**: A real mouse hover plus the 1 hotkey now damages the previewed enemy; touch/keyboard-only players keep the fallback. 179 unit tests green, harness 105/105, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 clear block, Target A at +x and B at +y, hover B, press 1: before A 89/B 100, after A 100/B 90.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first targeting check), PRINCIPLE-011 (mouse and keyboard agree).
+
+
 
 
 

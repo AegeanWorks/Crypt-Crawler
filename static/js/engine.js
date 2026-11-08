@@ -2126,11 +2126,13 @@ export class GameEngine {
   }
 
   tacticalStrike() {
-    const adj = this.monsters.find((m) => {
-      if (m.hp <= 0) return false;
-      const d = Math.abs(m.x - this.player.x) + Math.abs(m.y - this.player.y);
-      return d === 1;
-    });
+    const hover = this.renderer && this.renderer.hoverTile;
+    const isAdjacent = (m) => m.hp > 0
+      && Math.abs(m.x - this.player.x) + Math.abs(m.y - this.player.y) === 1;
+    let adj = hover
+      ? this.monsters.find((m) => isAdjacent(m) && m.x === hover.x && m.y === hover.y)
+      : null;
+    if (!adj) adj = this.monsters.find(isAdjacent);
     if (adj) {
       this.attackMonster(adj);
       this.finishPlayerTurn();

@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-052",
+    "task_id": "CC-053",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794101419.9231973,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794106999.6288514,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794101450.7306461
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-046",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Execute feedback fixed: _drawMonster gets heroClass and draws the skull only for rogue; tooltip execute gate + 1.25x range; tests/test_execute_marker.py (167 unit). Paladin 60/200: before EXECUTE+skull, after plain ~5-6; rogue: before ~5-8 EXECUTE, after ~7-10 EXECUTE with skull. Real hover/attacks, no page errors. Harness 93/93, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-058, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794095908.9544773,
-      "timestamp_str": "2026-11-08 02:58:28",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-046, then cycle 18 (enemies/bosses)",
-        "evidence": "167 tests, harness 93/93, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-046",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-046' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794095939.7654216,
-      "timestamp_str": "2026-11-08 02:58:59",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-047",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794101450.7306483,
       "timestamp_str": "2026-11-08 04:30:50",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-053",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Combat feel: make Strike hit the hovered adjacent enemy before falling back to the first adjacent foe, prove with a failing-first targeting check, a source test and a real mouse-hover-plus-1 run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794106971.8146126,
+      "timestamp_str": "2026-11-08 06:02:51",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "tacticalStrike picked the first adjacent monster in array order; with two adjacent enemies the hover card previewed Target B but pressing 1 hit Target A (before A 89/B 100, log Target A), so the preview and blow disagreed",
+        "benefits": "The hovered enemy is the target when adjacent; touch/keyboard-only play keeps the first-adjacent fallback; the card preview matches the blow",
+        "risks": "contract: tacticalStrike reads renderer.hoverTile; dependency: none; concurrency: none; state: no save/RNG change; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing check read A damaged/B full; after B damaged/A full; real mouse+keyboard pair; source test; inspector at three viewports; full gates"
+      },
+      "plan_digest": "a79fe363c4356f2239474ccfbb46c098ec6091941f0330ad945e2decd828c9f3"
+    },
+    {
+      "task_id": "CC-053",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Hover targeting shipped: tacticalStrike prefers a living adjacent hoverTile, falls back to first adjacent; tests/test_strike_target.py + strike_hits_the_hovered_adjacent_enemy (105 checks). Seed 42 two adjacent targets, B hovered + key 1: before A 89/B 100 log Target A, after A 100/B 90 log Target B; real mouse+keyboard, no page errors. Unit 179 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-065, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794106999.6288514,
+      "timestamp_str": "2026-11-08 06:03:19",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-053, then cycle 25 (enemies/bosses)",
+        "evidence": "179 tests, harness 105/105, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

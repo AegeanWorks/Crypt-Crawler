@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `47`
-- **Total Classes**: `49`
+- **Total Python Modules**: `48`
+- **Total Classes**: `50`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `262`
-- **Total Source Lines**: `10173`
+- **Total Class Methods**: `264`
+- **Total Source Lines**: `10257`
 
 ---
 
@@ -707,6 +707,18 @@
 
 ---
 
+### [`tests/test_strike_target.py`](tests/test_strike_target.py)
+> *Strike targeting contract: an adjacent hovered enemy is the chosen target.*
+
+**Size**: `24` lines (`812` bytes)
+
+**Classes:**
+- `class TestStrikeTarget`
+  - Method `.setUp()`
+  - Method `.test_strike_prefers_the_hovered_adjacent_enemy()`
+
+---
+
 ### [`tests/test_swarm_fixes.py`](tests/test_swarm_fixes.py)
 > *Swarm-triage regression locks: verified true findings only (failing-first).*
 
@@ -727,7 +739,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2744` lines (`114300` bytes)
+**Size**: `2804` lines (`116781` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

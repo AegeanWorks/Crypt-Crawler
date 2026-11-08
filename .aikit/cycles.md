@@ -642,3 +642,29 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(save): keep the kill streak across resume`.
+
+## Cycle 24 — Strike hits the hovered adjacent enemy (2026-11-08)
+
+- **Area**: Combat feel (target selection).
+- **Find**: `tacticalStrike` picked the first adjacent monster in array order. With two
+  adjacent enemies, hovering Target B showed B's card and strike preview, but pressing 1 hit
+  Target A: before `A 89 / B 100`, log "You strike Target A". Failing check
+  `strike_hits_the_hovered_adjacent_enemy`.
+- **Analyze**: Prefer the hovered tile when it holds a living adjacent enemy; fall back to the
+  first adjacent foe for touch/keyboard-only play. No damage/turn rule change. Killed: a full
+  target-selection mode (one hover preference is enough).
+- **Fix**: hover-aware `tacticalStrike`; `tests/test_strike_target.py` and the selftest check.
+- **Screenshots** (same seed 42 clear block, Target A at +x, Target B at +y, player at centre,
+  B hovered, real mouse + `1` key, 1920x1080):
+  - before: `.inspect/cycles/c24/before-hover-before.png` / `before-hover-after.png` (B card
+    100/100, A's bar damaged; log Target A)
+  - after: `after-hover-before.png` / `after-hover-after.png` (B card 90/100; A full; log
+    Target B)
+  - command: `python .inspect/cycles/play_c24.py before|after` (before uses HEAD engine.js)
+- **Played run**: real `page.mouse.move` onto B, real `page.keyboard.press("1")`; before A 89 /
+  B 100, after A 100 / B 90; both enemies retaliate for 1; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 179 OK;
+  `python tools/ai_harness.py selftest` -> 105 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(combat): strike the hovered adjacent enemy`.

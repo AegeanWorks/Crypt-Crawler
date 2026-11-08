@@ -101,7 +101,7 @@ Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; 
 When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible. A defeated monster leaves a short shockwave ring and a particle burst at its tile — steel for regular foes, amber for champions, gold for bosses — so every kill has a death beat. The skull marker and **EXECUTE** hover suffix appear only for the rogue — the class with the Executioner passive — and the hover strike range includes the +25% execute bonus; other classes see the plain range.
 
 ### 🏷️ Hover Cards
-Champion names already start with their affix (Swift, Fortified, Molten, Vampiric), so the hover card does not repeat it; boss cards keep a right-aligned BOSS badge. Long titles are measured and ellipsized before they can spill past the card edge. Poison or burn that finishes the hero ends the turn immediately and names the status as the cause; no later enemy acts after the hero falls.
+Champion names already start with their affix (Swift, Fortified, Molten, Vampiric), so the hover card does not repeat it; boss cards keep a right-aligned BOSS badge. Long titles are measured and ellipsized before they can spill past the card edge. When the hovered enemy is adjacent, pressing **Strike** (1) attacks that enemy, so the card's preview matches the blow; without a hover it falls back to the first adjacent foe. Poison or burn that finishes the hero ends the turn immediately and names the status as the cause; no later enemy acts after the hero falls.
 
 ### 🏹 Projectiles
 Bone arrows render as fletched arrows rotated along their flight; spells keep a glowing head with a short tapered trail, so a physical ranged hit reads differently from a hex or a fireball.
@@ -237,6 +237,7 @@ crypt-crawler/
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests
 │   ├── test_room_themes.py   <- every generated room theme has a rendered emblem
 │   ├── test_save_version.py  <- one save version constant, unsupported saves refused
+│   ├── test_strike_target.py <- Strike prefers the hovered adjacent enemy
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
 │   ├── test_projectile_style.py <- arrows read physical, spell bolts keep a trail
