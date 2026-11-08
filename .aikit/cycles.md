@@ -540,3 +540,28 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(levels): label every minimap blip`.
+
+## Cycle 20 — Hover titles fit the card (2026-11-08)
+
+- **Area**: UI readability (monster hover card).
+- **Find**: Champion names already start with their affix, but the card repeated it
+  right-aligned, producing "SkeletonSWIFT" in the 148px card; long names were never measured and
+  could spill past the card. Failing test: no `_fitText`/wider card/badge gate.
+- **Analyze**: Drop the redundant champion badge (names carry the affix), keep the boss BOSS
+  badge, widen the card and ellipsize the title to the remaining width. No rule/save change.
+  Killed: dropping the BOSS badge too (boss names do not carry it).
+- **Fix**: `const affix = monster.is_boss ? "Boss" : ""`; `cardW = 168`; title measured and
+  passed through `_fitText`; `tests/test_hover_title.py`.
+- **Screenshots** (same seed 42, paladin, 1920x1080):
+  - champion: `.inspect/cycles/c20/before-champion.png` ("SkeletonSWIFT" collision) vs
+    `after-champion.png` ("★ Swift Crypt Skeleton" clean, no badge)
+  - boss: `before-boss.png` / `after-boss.png` ("Hollow Choir" + right-aligned BOSS, no overlap)
+  - full pages: `before-<case>-full.png`, `after-<case>-full.png`
+  - command: `python .inspect/cycles/play_c20.py before|after` (before uses HEAD renderer.js)
+- **Played run**: real hover over the Swift Crypt Skeleton at 60/200 and the Hollow Choir; no
+  page errors; the card reads fully in both cases.
+- **Gates**: `python -m unittest discover -s tests` -> 174 OK;
+  `python tools/ai_harness.py selftest` -> 99 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(ui): fit hover titles and drop the duplicate affix`.

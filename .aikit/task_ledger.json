@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-048",
+    "task_id": "CC-049",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794098357.0080645,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794099037.1789353,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794098392.2766974
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-042",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Deck affordance fixed: rogue/mage btnActionHeal cost 10; test_deck_costs.py + 2 selftest checks (89 total); stale test_swarm_fixes slot-4 assertion corrected with intent preserved. At seed 42 turn 1 with 8 MP: rogue Fireball and mage Nova bright -> dimmed/aria-disabled; Heal/Frost/Barrier stay bright; forced clicks still log the engine refusal. Unit 160 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-054, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794090762.926281,
-      "timestamp_str": "2026-11-08 01:32:42",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-042, then cycle 14 (graphics/effects)",
-        "evidence": "160 tests, harness 89/89, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-042",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-042' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794090808.9930582,
-      "timestamp_str": "2026-11-08 01:33:28",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-043",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794098392.2766986,
       "timestamp_str": "2026-11-08 03:39:52",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-049",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] UI readability: stop repeating champion affixes in the hover card, widen the card to 168px and ellipsize the title to the remaining width, prove with a failing-first title test plus same-state champion/boss hover captures",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794099016.3962057,
+      "timestamp_str": "2026-11-08 03:50:16",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Champion names already start with their affix, but the card drew the same affix right-aligned in a 148px card, colliding into 'SkeletonSWIFT'; long titles were never measured and could spill past the card edge",
+        "benefits": "Champion titles read cleanly, boss cards keep a separate BOSS badge, and overlong names ellipsize inside the card",
+        "risks": "contract: affix badge boss-only, card wider, title fitted; dependency: none; concurrency: none; state: no save/rule change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Failing title test before the fix; seed 42 Swift champion before/after hover; Hollow Choir BOSS card; inspector at three viewports; full gates"
+      },
+      "plan_digest": "dff3354f98f7672651bbc36662ba1c99c71817fc57a1919dc66b5fa5091db2b3"
+    },
+    {
+      "task_id": "CC-049",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Hover title fix shipped: boss-only affix badge, cardW 168, _fitText ellipsis, test_hover_title. Seed 42 Swift champion 60/200: before SkeletonSWIFT, after clean title; Hollow Choir keeps BOSS without overlap. Unit 174 OK, harness 99/99, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-061, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794099037.1789353,
+      "timestamp_str": "2026-11-08 03:50:37",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-049, then cycle 21 (graphics/effects)",
+        "evidence": "174 tests, harness 99/99, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

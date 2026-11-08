@@ -2470,6 +2470,15 @@ export class DungeonRenderer {
     ctx.restore();
   }
 
+  _fitText(ctx, text, maxWidth) {
+    if (ctx.measureText(text).width <= maxWidth) return text;
+    let shortened = text;
+    while (shortened.length > 1 && ctx.measureText(`${shortened}…`).width > maxWidth) {
+      shortened = shortened.slice(0, -1);
+    }
+    return `${shortened}…`;
+  }
+
   _drawHoverTooltip(ctx, tx, ty, ts, monsters, dungeon, player = null, ox = 0, oy = 0, vw = 0, vh = 0) {
     const monster = monsters.find((m) => m.x === tx && m.y === ty && m.hp > 0);
     // Screen-space anchor: the render loop translates the camera before props
@@ -2508,8 +2517,8 @@ export class DungeonRenderer {
         preview = `Strike ~${lo}-${hi} • Crit ${critPct}%`;
         if (execute) preview += " • EXECUTE 💀";
       }
-      const affix = monster.champion_affix || (monster.is_boss ? "Boss" : "");
-      const cardW = 148;
+      const affix = monster.is_boss ? "Boss" : "";
+      const cardW = 168;
       const cardH = (effects.length ? 62 : 50) + (preview ? 13 : 0);
       const [cardX, cardY] = clampCard(px + ts / 2 - cardW / 2, py - cardH - 10, cardW, cardH);
 
@@ -2523,7 +2532,13 @@ export class DungeonRenderer {
       ctx.fillStyle = monster.is_champion ? "#f6ad55" : (monster.is_boss ? "#b794f4" : "#e2e8f0");
       ctx.font = "bold 11px sans-serif";
       const title = monster.is_champion ? `★ ${monster.name}` : monster.name;
-      ctx.fillText(title, cardX + 6, cardY + 14);
+      let titleMax = cardW - 12;
+      if (affix) {
+        ctx.font = "bold 9px sans-serif";
+        titleMax -= ctx.measureText(affix.toUpperCase()).width + 10;
+        ctx.font = "bold 11px sans-serif";
+      }
+      ctx.fillText(this._fitText(ctx, title, titleMax), cardX + 6, cardY + 14);
       if (affix) {
         ctx.textAlign = "right";
         ctx.fillStyle = "#f6ad55";

@@ -485,5 +485,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Every minimap colour is self-explanatory; the map/trap/vault colours are distinct. 172 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, three real steps to (8,25), turn 4: before map only, after the nine-label legend. Also stabilized the inspector's `damage_flash_active` check by reading the class in the same synchronous evaluate as `flashDamage()`; it passed two consecutive full runs.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (legend drift test), PRINCIPLE-011 (navigation legible without a manual).
 
+### ADR-061: Hover titles fit the card and stop repeating champion affixes (improvement cycle 20)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Champion names already begin with their affix ("Swift Crypt Skeleton", "Fortified Sneaky Goblin"), but the hover card drew the same affix again as a right-aligned badge in a 148px card. The title and badge collided into "SkeletonSWIFT"; longer names could also spill past the card edge because the title was never measured. The foundry/other bosses still need the "BOSS" badge because it is not in their names.
+- **Decision**: Draw the affix badge only for bosses (`monster.is_boss ? "Boss" : ""`), widen the monster card to 168px, measure the remaining title width after reserving the badge, and ellipsize with `_fitText(ctx, text, maxWidth)` so the title always stays inside the card. Add `tests/test_hover_title.py` for the badge gate, card width and fit helper. No combat/save rule change.
+- **Consequences**: Champion titles read cleanly ("★ Swift Crypt Skeleton"), boss cards keep a separate BOSS badge, and overlong names truncate instead of spilling. 174 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F Swift Crypt Skeleton 60/200: before "SkeletonSWIFT" collision, after clean title; seed 42 B2F Hollow Choir keeps "BOSS" without overlap.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (title-fit drift test), PRINCIPLE-012 (one measure/ellipsis helper).
+
+
 
 
