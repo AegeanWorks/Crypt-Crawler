@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-049",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794099037.1789353,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794099069.5157242
   },
   "checkpoints": [
-    {
-      "task_id": "CC-043",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Graphics: lift the B2F cavern visible floor/wall/grid palette so the room shape is readable in the dark biome, prove with a same-path before/after pair, a luminance contract test and a real four-step play",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794092015.28806,
-      "timestamp_str": "2026-11-08 01:53:35",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The B2F cavern visible floor (#0e1c20/#0a1619) and walls (#122629) were so dark that a real walk showed a near-black void with faint grid lines; floor luminance ~0.010 vs crypt ~0.013, and the room shape was unreadable even without the CRT overlay",
-        "benefits": "B2F rooms read as teal stone at a glance while unexplored tiles stay black and the cavern mood/water/torchlight are preserved",
-        "risks": "contract: only the visible cavern palette changes; dependency: none; concurrency: none; state: no save/rule change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Same-path before/after at seed 42 B2F rogue turn 5 HP 48; tests/test_cavern_contrast.py luminance floors; inspector at three viewports; full gates"
-      },
-      "plan_digest": "1b64c40af00f9af45cd3121644afb72c55923bd584bed720ab832f1cefa8dfcd"
-    },
     {
       "task_id": "CC-043",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-049, then cycle 21 (graphics/effects)",
         "evidence": "174 tests, harness 99/99, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-049",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-049' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794099069.5157263,
+      "timestamp_str": "2026-11-08 03:51:09",
+      "agent": "opencode:cycles"
     }
   ]
 }
