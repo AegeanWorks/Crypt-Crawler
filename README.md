@@ -8,6 +8,8 @@
 
 Tactical turn-based web dungeon crawler with procedural levels, Normal/Hard difficulty, class passives, status combos, per-floor omens, a turn-cost trap search and disarm, mimic chests, a two-way merchant, seed replay, five-slot equipment, side-by-side loot comparison, filterable inventory, a persistent lore codex, branching soul encounters, risk-for-power black pact altars, sigil-sealed vaults, hover-annotated props, ranged and lunging enemies, phased boss fights, and headless browser inspection.
 
+> **Archived**: Project completed and archived at user request. (archived 2026-11-08). This project is read-only; its GitHub repository is archived.
+
 ## ⚡ 30-Second Cold-Start Quick Reference
 
 - **Runtime Prerequisites**: Python 3.10+ (Standard Library only for runtime; Playwright with Edge for visual UI inspection)
