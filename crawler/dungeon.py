@@ -354,18 +354,40 @@ class DungeonGenerator:
             dungeon.stairs_pos = farthest_room.center
             dungeon.tiles[dungeon.stairs_pos[1]][dungeon.stairs_pos[0]] = TileType.STAIRS_DOWN
 
-            # Wandering Hermit Merchant on Depth 2 (or depths >= 2)
+            # Wandering Hermit Merchant on depths >= 2. The first spare room
+            # can be the stairs room; keep looking for another room instead of
+            # dropping the merchant entirely (seeds 1/3/15 at depth 2-3).
             if self.depth >= 2 and len(dungeon.rooms) >= 2:
-                shop_room = dungeon.rooms[1]
-                if shop_room != farthest_room:
+                for shop_room in dungeon.rooms[1:]:
+                    if shop_room == farthest_room:
+                        continue
                     mx = shop_room.center[0]
                     my = shop_room.center[1]
-                    if dungeon.tiles[my][mx] == TileType.FLOOR and (mx, my) not in (
+                    if dungeon.tiles[my][mx] != TileType.FLOOR or (mx, my) in (
                         dungeon.player_spawn,
                         dungeon.stairs_pos,
                     ):
-                        dungeon.tiles[my][mx] = TileType.MERCHANT
-                        dungeon.merchants.append((mx, my))
+                        continue
+                    dungeon.tiles[my][mx] = TileType.MERCHANT
+                    dungeon.merchants.append((mx, my))
+                    break
+
+                if not dungeon.merchants:
+                    # Two-room maps can leave no spare room center; fall back
+                    # to any free floor tile, never spawn or stairs.
+                    reserved = {dungeon.player_spawn, dungeon.stairs_pos}
+                    for shop_room in dungeon.rooms:
+                        for my in range(shop_room.y1 + 1, shop_room.y2 - 1):
+                            for mx in range(shop_room.x1 + 1, shop_room.x2 - 1):
+                                if (dungeon.tiles[my][mx] == TileType.FLOOR
+                                        and (mx, my) not in reserved):
+                                    dungeon.tiles[my][mx] = TileType.MERCHANT
+                                    dungeon.merchants.append((mx, my))
+                                    break
+                            if dungeon.merchants:
+                                break
+                        if dungeon.merchants:
+                            break
 
             # Scatter chests, traps, shrines, and urns
             for i, room in enumerate(dungeon.rooms[1:], 1):

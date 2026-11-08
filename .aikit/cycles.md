@@ -925,3 +925,36 @@ class, difficulty and viewport.
 - **Gates**: unit 193 OK; harness 117 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(bosses): let the Choir split before it can hum again`.
+
+## Cycle 33 — Every depth-two floor keeps its merchant (2026-11-08)
+
+- **Area**: Levels (merchant placement).
+- **Find**: The fairness validator over seeds 1-30 at depths 1-3 rejected 6 of 90 floors:
+  seeds 1, 3 and 15 at depths 2 and 3 had no Hermit Merchant. The generator only tried
+  `dungeon.rooms[1]`; when that room was the farthest room (the stairs room), the whole
+  merchant block was skipped. Seed 1 B2F has 14 rooms, stairs at room 1's center (34,24),
+  room 2's center (18,23) free, and `merchants: []`; a Lost Soul sat on (18,23).
+- **Analyze**: A shop is a floor promise on depth >= 2, not a room-1 promise. Walk the
+  other rooms in order and place the merchant at the first free room center; if a
+  degenerate two-room map has no spare center, fall back to any free floor tile that is
+  not spawn or stairs. Killed: moving the stairs (changes the floor's flow), keeping the
+  room-1-only rule (the bug), and overwriting a prop (would delete a soul or chest).
+- **Fix**: In `crawler/dungeon.py`, loop `dungeon.rooms[1:]`, skip `farthest_room`, and
+  place the merchant on a FLOOR center not occupied by spawn/stairs; add a free-floor
+  fallback for two-room maps. Add `tests/test_merchant_spawn.py` (seeds 1/3/15 at depths
+  2 and 3: one merchant, correct tile, walkable, reachable, no prop overlap).
+- **Screenshots** (seed 1 B2F, player staged at (17,23), target (18,23), real ArrowRight,
+  1920x1080, dsf 2; before uses HEAD `crawler/dungeon.py`):
+  - before: `.inspect/cycles/c33/before-1-room-zoom.png` shows no merchant and a Lost Soul
+    at (18,23); `before-2-modal-full.png` shows "A Soul Without a Grave" after the step.
+  - after: `after-1-room-zoom.png` shows the merchant's gold SHOP banner at (18,23);
+    `after-2-modal-full.png` shows "Grimbold the Wandering Hermit" and four wares.
+  - command: `python .inspect/cycles/play_c33.py before|after`
+- **Played run**: Real ArrowRight from (17,23). Before: `merchants: []`, target tile 10
+  (SOUL), modal "A Soul Without a Grave". After: `merchants: [(18,23)]`, target tile 9
+  (MERCHANT), soul relocated to (32,3), modal "Grimbold the Wandering Hermit", 25 gold and
+  four buy rows; `errors: []` in both runs. `validate_fairness.py --seeds 1..30 --depths
+  1,2,3`: 90/90 fair after the fix (84/90 before).
+- **Gates**: unit 194 OK; harness 117 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(levels): keep a merchant on every depth-two floor`.

@@ -589,6 +589,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: The Choir splits or silences on the first enemy turn after its threshold, then resumes humming once the phase is spent; a split turn never overlaps a new echo. No save, RNG format, damage or turn-order change outside the Choir's phase turn. 193 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real Space run, before hum/0 echoes/phase false, after split/2 echoes/phase true with the Choir still on (3,6); same-state full and zoom crops in `.inspect/cycles/c32/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first phase check), PRINCIPLE-011 (a boss phase that always arrives).
 
+### ADR-074: The depth-two merchant is never dropped (improvement cycle 33)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The generator placed the Hermit Merchant only in `dungeon.rooms[1]`, and skipped the whole block when that room was the farthest/stairs room. The fairness validator over seeds 1-30 at depths 1-3 rejected 6 floors: seeds 1, 3 and 15 at depths 2 and 3 had no merchant. Seed 1 B2F has 14 rooms, stairs in room 1 at (34,24), and `merchants: []`; the room-2 center (18,23), the natural shop spot, held the Lost Soul.
+- **Decision**: Walk `dungeon.rooms[1:]`, skip the farthest/stairs room, and place the merchant at the first free FLOOR room center that is not spawn or stairs. If a degenerate two-room map has no spare center, fall back to any free floor tile that is not spawn or stairs. Add `tests/test_merchant_spawn.py` for seeds 1/3/15 at depths 2 and 3 (tile type, walkability, reachability, no prop overlap) and list it in the README tree.
+- **Consequences**: Every depth >= 2 floor with a free floor tile offers its merchant; the soul and other props relocate but the one-soul/one-pact contracts hold. No save format or movement rule change. 194 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5, and `validate_fairness.py --seeds 1..30 --depths 1,2,3` is 90/90 (84/90 before). Evidence: seed 1 B2F real ArrowRight, before no merchant + soul modal, after merchant tile + "Grimbold the Wandering Hermit"; same-state room and modal captures in `.inspect/cycles/c33/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first placement test), PRINCIPLE-011 (a reachable shop on every depth-two floor).
+
 
 
 

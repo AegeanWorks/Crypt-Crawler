@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `53`
-- **Total Classes**: `55`
+- **Total Python Modules**: `54`
+- **Total Classes**: `56`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `286`
-- **Total Source Lines**: `10796`
+- **Total Class Methods**: `287`
+- **Total Source Lines**: `10853`
 
 ---
 
@@ -47,7 +47,7 @@
 ### [`crawler/dungeon.py`](crawler/dungeon.py)
 > *Procedural dungeon generation and grid management for Crypt-Crawler.*
 
-**Size**: `560` lines (`21545` bytes)
+**Size**: `582` lines (`22777` bytes)
 
 **Classes:**
 - `class TileType`
@@ -636,6 +636,17 @@
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
   - Method `.test_api_lore_returns_entries_and_starting_set()`
+
+---
+
+### [`tests/test_merchant_spawn.py`](tests/test_merchant_spawn.py)
+> *Every depth >= 2 floor must offer the Hermit Merchant.*
+
+**Size**: `35` lines (`1506` bytes)
+
+**Classes:**
+- `class TestMerchantSpawn`
+  - Method `.test_regression_seeds_have_a_merchant_on_depth_two_and_three()`
 
 ---
 

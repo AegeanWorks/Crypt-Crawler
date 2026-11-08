@@ -245,6 +245,7 @@ crypt-crawler/
 │   ├── test_hover_title.py   <- champion/boss hover title fit contract
 │   ├── test_inspect.py       <- inspection configuration tests
 │   ├── test_lore.py          <- codex data and /api/lore endpoint tests
+│   ├── test_merchant_spawn.py <- every depth>=2 floor has its Hermit Merchant
 │   ├── test_minimap_legend.py <- every minimap colour is named in the legend
 │   ├── test_bounty_modal.py  <- all three floor contracts fit the bounty modal
 │   ├── test_reduced_motion_flash.py <- reduced motion freezes ambience, not hit flashes
