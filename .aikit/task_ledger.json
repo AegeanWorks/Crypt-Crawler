@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-060",
+    "task_id": "CC-061",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794129234.798046,
+    "updated_at": 1794131168.3235703,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794130260.5070376
+    "completed_at": 1794131418.5636022
   },
   "checkpoints": [
-    {
-      "task_id": "CC-054",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Champion affix hints shipped: affixHints map + fitted amber line on champion cards (12px taller), README affix table, test_hover_title extended. Seed 42 Swift Crypt Skeleton 60/200 hover: before no rule, after 'Swift: moves 2 tiles/turn'; Hollow Choir card unchanged. Unit 181 OK, harness 105/105, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-066, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794108262.6819062,
-      "timestamp_str": "2026-11-08 06:24:22",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-054, then cycle 26 (levels)",
-        "evidence": "181 tests, harness 105/105, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-054",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-054' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794108313.817224,
-      "timestamp_str": "2026-11-08 06:25:13",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-055",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Levels: clear spent sigil and vault markers from the minimap so the map stops advertising collected or opened objectives; prove with a failing-first minimap pixel check, a same-state before/after pair and a played sigil+vault run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794108918.9498134,
-      "timestamp_str": "2026-11-08 06:35:18",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Collected sigils and opened vaults keep their blue/gold minimap blips because the tile type never changes; the hover cards already hide spent objectives, so the map disagrees with the world and sends the player back to a dead objective",
-        "benefits": "The minimap shows only live objectives, matching the hover cards and resumed saves; no combat, level layout or save-format change",
-        "risks": "contract: minimap marker colors only; dependency: none; concurrency: none; state: no save/RNG change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Pixel-level harness check read before/after; seed 42 same-state minimap screenshot pair at 1920x1080; real sigil collection and vault opening in a played run; three-viewport inspector; full unit/harness/inspector/aikit gates"
-      },
-      "plan_digest": "68bc7d9ff62bf0d50bd5b9e68dbaa2df206af56b1b800a6530477b7422f20e40"
-    },
     {
       "task_id": "CC-055",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794130260.5070403,
       "timestamp_str": "2026-11-08 12:31:00",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-061",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Enemies/bosses: make the Hollow Choir's 50% split and 25% silence win the turn their threshold is crossed instead of being preempted by a new 30% hum roll, and make the split turn consume the Choir's action so it cannot step onto a fresh echo; prove with a failing-first forced-hum harness check, same-state before/after board crops and a real Space run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794131153.5018172,
+      "timestamp_str": "2026-11-08 12:45:53",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "A Choir at <=50% can roll a new hum before the split block and continue, delaying or avoiding its signature phase indefinitely; the harness check already flaked on this. The first split run also overlapped the Choir and an echo because newMonsters are not in this.monsters during the spawning turn.",
+        "benefits": "The Choir splits or silences on the first enemy turn after its threshold, then resumes humming once the phase is spent; split turns never overlap a new echo; the harness check becomes deterministic",
+        "risks": "contract: one phase-due guard and one continue in processEnemyTurns; dependency: none; concurrency: none; state: no save, RNG format, damage or turn-order change outside the Choir phase turn; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing-first forced-hum harness check with unique-tile assertion; source guard test; real Space run on seed 42 B1F; before/after full and zoom crops at 1920x1080; three-viewport inspector; full gates"
+      },
+      "plan_digest": "8df6355e2b5665d319eba0b6e5de5ce783236cfad0ebd1f2f2da268c3617df45"
+    },
+    {
+      "task_id": "CC-061",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Choir phase priority shipped: choirPhaseDue suppresses a new hum while the 50% split or 25% silence is due; a successful split now consumes the Choir's turn so it cannot overlap a fresh echo. Failing-first: forced-hum harness check failed on HEAD (echoes 0, phase false) and passes now (echoes 2, phase true, uniqueTiles true); tests/test_choir_phase_priority.py (2 checks). Real seed 42 B1F Space run: before hums one note/no echoes, after splits into 2 echoing voices at (4,6) and (2,6), Choir stays (3,6), no page errors. Before/after full and zoom crops at 1920x1080. Unit 193 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-073, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794131168.3235703,
+      "timestamp_str": "2026-11-08 12:46:08",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 32, then cycle 33 (levels)",
+        "evidence": "193 tests, harness 117/117, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-061",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-061' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794131418.5636039,
+      "timestamp_str": "2026-11-08 12:50:18",
       "agent": "opencode:cycles"
     }
   ]
