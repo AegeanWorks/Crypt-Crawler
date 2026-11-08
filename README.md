@@ -116,7 +116,7 @@ Wall sconces are real light sources: standing within two tiles restores the lant
 | Hollow Choir | B2F restless/silent | Hums 1 turn before a 2-tile verse (break LOS to avoid), splits at 50%, stunning silence at 25% |
 | Arch-Lich Malakor | B3F | Inhales 1 turn before Soul Drain (break LOS/range to avoid); summons at 50%, enrages at 25% |
 
-Enemies step axis-first toward a visible hero; when a chest, urn or corner blocks that step, they take the shortest free path around it, so a melee foe no longer stalls behind a prop.
+Enemies step axis-first toward a visible hero; when a chest, urn or corner blocks that step, they take the shortest free path around it, so a melee foe no longer stalls behind a prop. Boss phase text is per boss: Malakor alone tears open the vault floor and enrages, the Hollow Choir's 50% split searches a wider ring when its adjacent tiles are crowded, and foundry bosses break their own seal — no boss borrows another's announcement.
 
 Chests can be **Gilded Mimics**: opening one pushes you back and springs a depth-scaled fight instead of paying gold. The mimic is chosen deterministically from the run seed and chest order, so a known seed reproduces the same trapped chest. Trap search reveals traps, not mimics.
 
@@ -210,6 +210,7 @@ crypt-crawler/
 │   ├── test_ai_harness.py    <- harness validation and UI inventory tests
 │   ├── test_audio_cues.py    <- bow-release and boss-telegraph audio cues
 │   ├── test_bestiary.py      <- every killable type has a Records row
+│   ├── test_boss_phases.py   <- Malakor, Choir and pack bosses own their phases
 │   ├── test_canvas_fit.py    <- canvas aspect-ratio and pointer-mapping contract
 │   ├── test_cavern_contrast.py <- B2F cavern floor/wall readability floor
 │   ├── test_chronicle_fade.py <- scrolled chronicle fades its top edge

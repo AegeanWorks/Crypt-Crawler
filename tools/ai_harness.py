@@ -1964,6 +1964,139 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_pathing", not harness.errors, harness.errors))
     page.context.close()
 
+    # The Hollow Choir's 50% split must not silently become "0 echoing voices"
+    # when its four neighbours are crowded; search a wider ring for open tiles.
+    page = harness.open_page(seed)
+    choir_split = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            let spot = null;
+            for (let y = 2; y < d.height - 2 && !spot; y += 1) {
+                for (let x = 2; x < d.width - 2 && !spot; x += 1) {
+                    let clear = true;
+                    for (let yy = y - 2; yy <= y + 2; yy += 1) {
+                        for (let xx = x - 2; xx <= x + 2; xx += 1) {
+                            if (!d.isWalkable(xx, yy)) clear = false;
+                        }
+                    }
+                    if (clear) spot = { x, y };
+                }
+            }
+            if (!spot) return { found: false };
+            const p = e.player;
+            p.x = spot.x + 2;
+            p.y = spot.y + 2;
+            p.hp = p.max_hp;
+            d.updateFOV(p.x, p.y, 7);
+            const mk = (name, dx, dy) => ({
+                name, type: 'skeleton', x: spot.x + dx, y: spot.y + dy,
+                hp: 99, max_hp: 99, attack: 0, defense: 0, xp_reward: 0, gold_reward: 0,
+                loot_drop: null, is_boss: false, is_champion: false, champion_affix: null,
+                status_effects: {},
+            });
+            const choir = e._spawnChoir(spot.x, spot.y);
+            choir.max_hp = 70;
+            choir.hp = 35;
+            e.monsters = [
+                choir,
+                mk('Block A', 1, 0), mk('Block B', -1, 0),
+                mk('Block C', 0, 1), mk('Block D', 0, -1),
+            ];
+            e.processEnemyTurns();
+            const echoes = e.monsters.filter((m) => m.type === 'choir_echo');
+            const splitLog = Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                .map((el) => el.textContent)
+                .filter((text) => text.includes('splits into'));
+            return {
+                found: true,
+                echoes: echoes.length,
+                echoTiles: echoes.map((m) => [m.x, m.y]),
+                phase: Boolean(choir.phase_two),
+                splitLog,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "choir_split_finds_room_beyond_crowded_neighbours",
+        choir_split.get("found") is True
+        and choir_split["echoes"] == 2
+        and choir_split["phase"] is True
+        and any("splits into 2" in line for line in choir_split["splitLog"]),
+        choir_split,
+    ))
+    checks.append(_check("no_page_errors_after_choir_split", not harness.errors, harness.errors))
+    page.context.close()
+
+    # Foundry bosses own their phase names: the Ashen Warden must not borrow
+    # Malakor's "tears open the vault floor" summon text.
+    page = harness.open_page(42, depth=3)
+    pack_phase = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const boss = e.monsters.find((m) => m.type === 'boss_ashen_warden_s42');
+            if (!boss) return { found: false };
+            e.monsters = [boss];
+            boss.hp = Math.floor(boss.max_hp * 0.5);
+            const before = boss.attack;
+            e.processEnemyTurns();
+            return {
+                found: true,
+                attackBefore: before,
+                attackAfter: boss.attack,
+                phase: Boolean(boss.phase_two),
+                monsters: e.monsters.length,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .map((el) => el.textContent),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "pack_boss_keeps_its_own_phase",
+        pack_phase.get("found") is True
+        and pack_phase["phase"] is True
+        and pack_phase["attackAfter"] > pack_phase["attackBefore"]
+        and pack_phase["monsters"] == 1
+        and not any("Malakor" in line for line in pack_phase["log"])
+        and any("Ashen Warden" in line and "seal breaks" in line for line in pack_phase["log"]),
+        pack_phase,
+    ))
+    checks.append(_check("no_page_errors_after_pack_phase", not harness.errors, harness.errors))
+    page.context.close()
+
+    # Malakor keeps his own summon/enrage identity after the type split.
+    page = harness.open_page(seed, depth=3)
+    lich_phase = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const boss = e.monsters.find((m) => m.type === 'boss_lich');
+            if (!boss) return { found: false };
+            e.monsters = [boss];
+            boss.hp = Math.floor(boss.max_hp * 0.5);
+            e.processEnemyTurns();
+            const phaseTwo = {
+                phase: Boolean(boss.phase_two),
+                monsters: e.monsters.length,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .map((el) => el.textContent),
+            };
+            boss.hp = Math.floor(boss.max_hp * 0.25);
+            e.processEnemyTurns();
+            return { found: true, phaseTwo, phaseThree: Boolean(boss.phase_three) };
+        }"""
+    )
+    checks.append(_check(
+        "malakor_keeps_his_own_phases",
+        lich_phase.get("found") is True
+        and lich_phase["phaseTwo"]["phase"] is True
+        and lich_phase["phaseTwo"]["monsters"] > 1
+        and any("Malakor" in line for line in lich_phase["phaseTwo"]["log"])
+        and lich_phase["phaseThree"] is True,
+        lich_phase,
+    ))
+    checks.append(_check("no_page_errors_after_lich_phase", not harness.errors, harness.errors))
+    page.context.close()
+
     # Ranged attacks and boss telegraphs need an entrance cue, not only an impact
     # sound. Record the oscillator starts the shipped audio module schedules.
     page = harness.open_page(seed)

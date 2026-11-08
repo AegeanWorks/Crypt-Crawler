@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `43`
-- **Total Classes**: `45`
+- **Total Python Modules**: `44`
+- **Total Classes**: `46`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `247`
-- **Total Source Lines**: `9841`
+- **Total Class Methods**: `251`
+- **Total Source Lines**: `10005`
 
 ---
 
@@ -273,6 +273,20 @@
   - Method `.setUp()`
   - Method `.test_every_killable_type_has_a_records_row()`
   - Method `.test_choir_echo_is_a_real_spawned_type()`
+
+---
+
+### [`tests/test_boss_phases.py`](tests/test_boss_phases.py)
+> *Boss phase contract: each boss owns its phase text and summons.*
+
+**Size**: `31` lines (`1174` bytes)
+
+**Classes:**
+- `class TestBossPhases`
+  - Method `.setUp()`
+  - Method `.test_malakor_phases_are_type_gated()`
+  - Method `.test_other_bosses_have_their_own_phase_text()`
+  - Method `.test_choir_split_searches_wider_rings_and_retries()`
 
 ---
 
@@ -672,7 +686,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2534` lines (`105567` bytes)
+**Size**: `2667` lines (`111212` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

@@ -484,3 +484,33 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(combat): show the execute window only to the rogue`.
+
+## Cycle 18 — Boss phases belong to their own boss (2026-11-08)
+
+- **Area**: Enemies/bosses (phase ownership).
+- **Find**: Both boss phase blocks were keyed on `monster.is_boss`, so every boss ran
+  Malakor's phase first. The Hollow Choir's `phase_two` was consumed by "Malakor tears open the
+  vault floor" + 2 risen skeletons, so its split never ran (seed 42 B2F: 0 echoes, 3 skeletons,
+  wrong log). The foundry Ashen Warden borrowed the same text and summoned 2 skeletons (5
+  total). A crowded Choir also logged "splits into 0".
+- **Analyze**: Gate Malakor by type; give other bosses their own named escalation; let the
+  Choir own its split and search rings 1-3, retrying instead of spending the phase when
+  crowded. Killed: keeping the generic summon for all bosses (wrong fiction and double phase).
+- **Fix**: `boss_lich` gates on both Malakor blocks; `otherBoss` seal-break/fury for pack
+  bosses; Choir split rings 2-3 + "no room to split" retry; `tests/test_boss_phases.py` and
+  three selftest checks (choir split, pack boss, Malakor).
+- **Screenshots** (same seed 42, 50% boss HP, real `waitTurn`, 1920x1080):
+  - Choir: `.inspect/cycles/c18/before-choir-zoom.png` (0 echoes, 2 risen skeletons,
+    "Malakor..." log) vs `after-choir-zoom.png` (2 purple echoes, "splits into 2" log)
+  - Warden: `before-warden-full.png` (5 skeletons, Malakor log) vs `after-warden-full.png`
+    (3 skeletons, "Ashen Warden's seal breaks", attack 15 -> 18)
+  - command: `python .inspect/cycles/play_c18.py before|after` (before uses HEAD engine.js)
+- **Played run**: real `waitTurn` at 50% HP. Choir after: 2 echoes, split log; before: 0 echoes,
+  3 skeletons, Malakor log. Warden after: attack 15 -> 18, own seal log, no summons; before:
+  2 summoned skeletons and Malakor log. Malakor selftest still summons 2 and reaches phase
+  three; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 170 OK;
+  `python tools/ai_harness.py selftest` -> 99 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(enemies): give each boss its own phase`.

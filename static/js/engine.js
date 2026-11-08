@@ -2626,8 +2626,9 @@ export class GameEngine {
       const dist = Math.hypot(monster.x - this.player.x, monster.y - this.player.y);
       const isVisible = this.dungeon.isVisible(monster.x, monster.y);
 
-      // Boss phases: the fight changes shape as Malakor weakens.
-      if (monster.is_boss && !monster.phase_two && monster.hp <= monster.max_hp * 0.5) {
+      // Malakor's phases: the lich alone tears open the vault floor and enrages.
+      // Other bosses (the Hollow Choir, foundry packs) own their phase blocks.
+      if (monster.type === "boss_lich" && !monster.phase_two && monster.hp <= monster.max_hp * 0.5) {
         monster.phase_two = true;
         monster.attack = Math.ceil(monster.attack * 1.2);
         const spots = [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, 1]];
@@ -2649,7 +2650,7 @@ export class GameEngine {
         this.ui.logMessage(`💀 Malakor tears open the vault floor and raises ${summoned} risen skeletons! His blows grow heavier.`, "crit");
       }
 
-      if (monster.is_boss && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
+      if (monster.type === "boss_lich" && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
         monster.phase_three = true;
         monster.attack = Math.ceil(monster.attack * 1.3);
         sounds.playNova();
@@ -2657,6 +2658,28 @@ export class GameEngine {
         this.renderer.addShockwave(monster.x, monster.y, "#e53e3e", 150);
         this.renderer.addFloatingText("MALAKOR ENRAGES!", monster.x, monster.y, "#fc8181");
         this.ui.logMessage("🔥 The Crown of Eternity flares crimson. Malakor fights like a cornered god!", "crit");
+      }
+
+      // Foundry/other bosses escalate on their own name, never Malakor's.
+      const otherBoss = monster.is_boss
+        && monster.type !== "boss_lich" && monster.type !== "boss_choir";
+      if (otherBoss && !monster.phase_two && monster.hp <= monster.max_hp * 0.5) {
+        monster.phase_two = true;
+        monster.attack = Math.ceil(monster.attack * 1.2);
+        sounds.playNova();
+        this.renderer.shake(8, 240);
+        this.renderer.addShockwave(monster.x, monster.y, "#9f7aea", 110);
+        this.renderer.addFloatingText("THE SEAL BREAKS!", monster.x, monster.y, "#d6bcfa");
+        this.ui.logMessage(`💢 ${monster.name}'s seal breaks — its blows grow heavier!`, "crit");
+      }
+      if (otherBoss && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
+        monster.phase_three = true;
+        monster.attack = Math.ceil(monster.attack * 1.3);
+        sounds.playNova();
+        this.renderer.shake(10, 300);
+        this.renderer.addShockwave(monster.x, monster.y, "#e53e3e", 150);
+        this.renderer.addFloatingText("FURY!", monster.x, monster.y, "#fc8181");
+        this.ui.logMessage(`🔥 ${monster.name} fights with the fury of a cornered god!`, "crit");
       }
 
       // Boss special ability: Soul Drain is telegraphed one turn ahead.
@@ -2743,10 +2766,16 @@ export class GameEngine {
       // Hollow Choir phases: <50% splits into two echoes (telegraphed, capped),
       // <25% falls silent (telegraphs a stunning verse next turn, avoidable).
       if (monster.type === "boss_choir" && !monster.phase_two && monster.hp <= monster.max_hp * 0.5) {
-        monster.phase_two = true;
-        const spots = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        const candidates = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        for (let ring = 2; ring <= 3; ring += 1) {
+          for (let dx = -ring; dx <= ring; dx += 1) {
+            for (let dy = -ring; dy <= ring; dy += 1) {
+              if (Math.max(Math.abs(dx), Math.abs(dy)) === ring) candidates.push([dx, dy]);
+            }
+          }
+        }
         let split = 0;
-        for (const [sx, sy] of spots) {
+        for (const [sx, sy] of candidates) {
           if (split >= 2) break;
           const tx = monster.x + sx;
           const ty = monster.y + sy;
@@ -2756,10 +2785,18 @@ export class GameEngine {
             split += 1;
           }
         }
-        this.renderer.addShockwave(monster.x, monster.y, "#d6bcfa", 90);
-        this.renderer.addFloatingText("THE CHOIR SPLITS!", monster.x, monster.y, "#d6bcfa");
-        this.ui.logMessage(`🎵 The Hollow Choir splits into ${split} echoing voices!`, "crit");
-        this.unlockLore(this.loreEvents?.choir);
+        if (split > 0) {
+          monster.phase_two = true;
+          this.renderer.addShockwave(monster.x, monster.y, "#d6bcfa", 90);
+          this.renderer.addFloatingText("THE CHOIR SPLITS!", monster.x, monster.y, "#d6bcfa");
+          this.ui.logMessage(`🎵 The Hollow Choir splits into ${split} echoing voices!`, "crit");
+          this.unlockLore(this.loreEvents?.choir);
+        } else {
+          // Every nearby tile is crowded: keep the phase unspent and retry
+          // rather than announcing a split into zero voices.
+          this.renderer.addFloatingText("NO ROOM TO SPLIT!", monster.x, monster.y, "#a0aec0");
+          this.ui.logMessage("🎵 The Choir's verse cracks against the stone — no room to split!", "system");
+        }
       }
       if (monster.type === "boss_choir" && !monster.phase_three && monster.hp <= monster.max_hp * 0.25) {
         monster.phase_three = true;
