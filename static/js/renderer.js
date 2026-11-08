@@ -1728,8 +1728,10 @@ export class DungeonRenderer {
     }
 
     // Hit flash: engine stamps _hitFlash on damage; a brief white veil sells the impact.
-    if (monster._hitFlash && (timestamp - monster._hitFlash) < 140) {
-      ctx.globalAlpha = 1 - (timestamp - monster._hitFlash) / 140;
+    // Read the live clock: reduced motion freezes ambient time, not feedback.
+    const flashNow = performance.now();
+    if (monster._hitFlash && (flashNow - monster._hitFlash) < 140) {
+      ctx.globalAlpha = 1 - (flashNow - monster._hitFlash) / 140;
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
       ctx.arc(px + ts / 2, py + ts / 2, ts / 3, 0, Math.PI * 2);
@@ -2005,8 +2007,10 @@ export class DungeonRenderer {
     }
 
     // Hit flash: engine stamps _hitFlash when the player takes damage.
-    if (player._hitFlash && (timestamp - player._hitFlash) < 160) {
-      ctx.globalAlpha = 0.85 * (1 - (timestamp - player._hitFlash) / 160);
+    // Read the live clock: reduced motion freezes ambient time, not feedback.
+    const flashNow = performance.now();
+    if (player._hitFlash && (flashNow - player._hitFlash) < 160) {
+      ctx.globalAlpha = 0.85 * (1 - (flashNow - player._hitFlash) / 160);
       ctx.fillStyle = "#ff6b6b";
       ctx.beginPath();
       ctx.arc(px + ts / 2, py + ts / 2, ts / 2 - 2, 0, Math.PI * 2);

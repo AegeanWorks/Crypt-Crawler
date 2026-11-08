@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `49`
-- **Total Classes**: `51`
+- **Total Python Modules**: `50`
+- **Total Classes**: `52`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `269`
-- **Total Source Lines**: `10435`
+- **Total Class Methods**: `273`
+- **Total Source Lines**: `10528`
 
 ---
 
@@ -651,6 +651,20 @@
 
 ---
 
+### [`tests/test_reduced_motion_flash.py`](tests/test_reduced_motion_flash.py)
+> *Reduced motion freezes ambience, not the transient hit flash.*
+
+**Size**: `31` lines (`1050` bytes)
+
+**Classes:**
+- `class TestReducedMotionFlash`
+  - Method `.setUp()`
+  - Method `._body(start_marker, end_marker)`
+  - Method `.test_player_flash_uses_live_clock()`
+  - Method `.test_monster_flash_uses_live_clock()`
+
+---
+
 ### [`tests/test_rewards.py`](tests/test_rewards.py)
 > *Unit tests for the variable-ratio reward engine and dopamine loot schedules.*
 
@@ -754,7 +768,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2942` lines (`122814` bytes)
+**Size**: `3004` lines (`125434` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

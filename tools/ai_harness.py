@@ -2734,6 +2734,68 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # Reduced motion freezes ambient bobbing and pulsing, but a hit flash is
+    # transient feedback and must still age out on the live clock. Freezing the
+    # render timestamp while comparing it to performance.now() keeps it lit.
+    page = harness.open_page(seed)
+    flash = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const r = e.renderer;
+            const d = e.dungeon;
+            e._applyReducedMotion(true);
+            e.monsters = e.monsters.filter((m) => m.type === "goblin").slice(0, 1);
+            const m = e.monsters[0];
+            if (!m) return { found: false, reason: "no goblin" };
+            const step = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .find(([dx, dy]) => d.isWalkable(m.x + dx, m.y + dy));
+            if (!step) return { found: false, reason: "no walkable neighbour" };
+            e.player.x = m.x + step[0];
+            e.player.y = m.y + step[1];
+            d.updateFOV(e.player.x, e.player.y, 7);
+            r.shakeDuration = 0;
+            const ts = r.tileSize;
+            const camX = Math.floor(e.canvas.width / 2 - e.player.x * ts - ts / 2);
+            const camY = Math.floor(e.canvas.height / 2 - e.player.y * ts - ts / 2);
+            const px = camX + e.player.x * ts;
+            const py = camY + e.player.y * ts;
+            const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+            const coral = (rr, gg, bb) => rr > 200 && gg < 170 && bb < 170
+                && rr - gg > 60 && rr - bb > 60;
+            const count = () => {
+                const data = e.canvas.getContext("2d")
+                    .getImageData(px, py, ts, ts).data;
+                let n = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    if (coral(data[i], data[i + 1], data[i + 2])) n += 1;
+                }
+                return n;
+            };
+            e.player._hitFlash = 0;
+            await wait(120);
+            const base = count();
+            e.player._hitFlash = performance.now() - 200;
+            await wait(200);
+            return {
+                found: true,
+                reduced: e.reducedMotion,
+                base,
+                expired: count(),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "reduced_motion_hit_flash_expires",
+        flash.get("found") is True
+        and flash["reduced"] is True
+        and flash["expired"] <= flash["base"] + 20,
+        flash,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_reduced_flash", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)

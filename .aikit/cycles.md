@@ -757,3 +757,31 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(ui): show all floor bounties in the contract modal`.
+
+## Cycle 28 — Reduced-motion hit flashes expire (2026-11-08)
+
+- **Area**: Graphics and effects (reduced-motion feedback).
+- **Find**: With reduced motion on, `render` freezes the animation clock to 0, but
+  `_drawMonster`/`_drawPlayer` compared `_hitFlash` against that clock while the engine
+  stamps it with `performance.now()`. The age stayed negative, so the veil never cleared:
+  after a real goblin hit, 906ms later the player tile still held 1368 coral pixels
+  (baseline 14) and the goblin 696 cream pixels (baseline 2); the crop showed solid coral
+  and cream circles. Failing guards: `reduced_motion_hit_flash_expires` and the two
+  `test_reduced_motion_flash` checks.
+- **Analyze**: Ambient motion should freeze, but the flash is transient feedback. Read the
+  live clock inside both flash paths instead of the frozen render timestamp. Killed:
+  disabling reduced motion for combat (accessibility regression); shortening the flash
+  durations (does not fix the stuck state).
+- **Fix**: `renderer.js` uses a live `performance.now()` for the monster (140ms) and player
+  (160ms) flash checks; `tests/test_reduced_motion_flash.py` and the selftest guard.
+- **Screenshots** (seed 42 B1F, player at (20,6), Sneaky Goblin at (19,6), reduced motion,
+  real `tacticalStrike`, waited 900ms, 1920x1080, dsf 2, 3x3-tile crop):
+  - before: `.inspect/cycles/c28/before-reduced-hit.png` (solid coral player, solid cream goblin)
+  - after: `after-reduced-hit.png` (normal paladin and goblin)
+  - command: `python .inspect/cycles/play_c28.py before|after` (before uses HEAD renderer.js)
+- **Played run**: clicked the header motion toggle to reduced, staged one adjacent Sneaky
+  Goblin, real `tacticalStrike` (strike + retaliate, player 65 -> 64 HP), waited 919ms:
+  before flash still lit, after expired; `stamped: true`, no page errors.
+- **Gates**: unit 185 OK; harness 111 checks, 0 failed; inspector 75/75 at three viewports,
+  0 console errors; aikit check 5/5.
+- **Commit**: `fix(effects): expire reduced-motion hit flashes on the live clock`.

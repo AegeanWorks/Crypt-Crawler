@@ -549,6 +549,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Every floor contract and its reward is readable in one view on typical screens; a small screen retains the scroll fallback. 183 unit tests green, harness 109/109, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, real Bounties click, before 66/99px -> after 99/99px visible.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first fold check), PRINCIPLE-005/011 (readable without a hidden gesture).
 
+### ADR-069: Reduced-motion hit flashes expire on the live clock (improvement cycle 28)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `render` freezes `timestamp` to 0 when reduced motion is on, but the player and monster hit-flash checks compared `_hitFlash` (stamped with `performance.now()`) against that frozen timestamp. The condition stayed true and the alpha became invalid, so a struck player stayed a solid coral circle and a struck monster stayed a solid cream circle indefinitely. A real goblin hit still read 1368 coral pixels on the player tile after 906ms (baseline 14).
+- **Decision**: Read `performance.now()` inside `_drawMonster` and `_drawPlayer` for the 140ms/160ms flash checks. Keep the frozen timestamp for ambient bobbing, pulsing, flicker and shields. Guard with `test_player_flash_uses_live_clock`, `test_monster_flash_uses_live_clock` and the `reduced_motion_hit_flash_expires` pixel selftest (base 14 -> expired 14 after; 1240 before). No normal-mode, save or rule change.
+- **Consequences**: Reduced motion freezes ambience as intended while combat feedback still expires on schedule. 185 unit tests green, harness 111/111, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, reduced motion, real strike + retaliation, before/after 3x3-tile crops.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first pixel check), PRINCIPLE-011 (accessibility settings do not leave stale overlays).
+
 
 
 
