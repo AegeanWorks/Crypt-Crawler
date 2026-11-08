@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-065",
+    "task_id": "CC-066",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794134728.5266786,
+    "updated_at": 1794136441.6231885,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794135212.615659
+    "completed_at": 1794136537.1582868
   },
   "checkpoints": [
-    {
-      "task_id": "CC-059",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Equipment/drop/unequip now save immediately: added this.saveGameState() to the equipment branch of useInventoryItem, dropInventoryItem and unequipSlot. Failing-first: test_equipment_save.py (3 checks) + equipment_change_survives_reload (before equipped sword_iron/saved null/resumed null; after saved/resumed sword_iron, bag 2 items). Real UI click on the starting sword + Equip, real page reload/resume at seed 42 B1F; before slot Empty after reload, after 'Forged Iron Sword'; no page errors. Unit 189 OK, harness 115/115, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-071, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794115221.7743492,
-      "timestamp_str": "2026-11-08 08:20:21",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-059, then cycle 31 (combat feel)",
-        "evidence": "189 tests, harness 115/115, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-059",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-059' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794115287.1695673,
-      "timestamp_str": "2026-11-08 08:21:27",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-060",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Combat feel: make the player's stun actually skip the next turn action and consume the status instead of leaving a permanent 'Stunned (1)' badge while the hero moves and attacks; prove with a failing-first snare check, same-state before/after stun crops and a real snare-step run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794115606.710342,
-      "timestamp_str": "2026-11-08 08:26:46",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The snare trap and Hollow Choir set player.status_effects.stun, and the UI says 'Stunned: skips its next action', but no action guard or tick consumes it. A probe: step on a snare -> stun 1, tray 'Stunned (1)'; step away -> player moves from (11,6) to (12,6), stun still 1, turn 3.",
-        "benefits": "The snare and Choir silence now cost the hero one action, and the badge clears; all other statuses and actions are unchanged",
-        "risks": "contract: one helper plus guards on turn actions; dependency: none; concurrency: none; state: no save/RNG/format change; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing-first snare check and source guard test; real snare-step played run; same-state before/after stun crops at 1920x1080; three-viewport inspector; full gates"
-      },
-      "plan_digest": "8e0d95c5a7e26b8f6bd4de4e36b74f05ed7caeb1bb905e2288b602b8826de983"
-    },
     {
       "task_id": "CC-060",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794135212.6156611,
       "timestamp_str": "2026-11-08 13:53:32",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-066",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Progression/saves: persist the dungeon fog-of-war explored grid so a reload keeps the minimap and navigation history instead of collapsing to the current lantern circle; prove with a failing-first resume check, a real 44-step walk plus reload, and same-state minimap crops",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794136430.0137916,
+      "timestamp_str": "2026-11-08 14:13:50",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "saveGameState omits dungeon.explored and ClientDungeon reinitializes it; a seed 42 B1F walk showed 435 explored tiles, but a real reload resumed at the same turn/tile with 77.",
+        "benefits": "Resumed runs keep the map knowledge they earned; the minimap, hover cards and navigation stay continuous; old saves still load",
+        "risks": "contract: additive explored field plus ClientDungeon restore; dependency: none; concurrency: none; state: save payload grows by a 45x30 boolean grid, no version bump; UI: minimap is unchanged but now retains data",
+        "mitigation": "Failing-first harness resume check; real 44-step walk and page reload; before/after minimap crops; source guard test; full gates"
+      },
+      "plan_digest": "e6c553a7297fd1d3fadd88dc711982a2ce9b5b41a409dd2745296f94841daae9"
+    },
+    {
+      "task_id": "CC-066",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Fog of war persists: saveGameState now stores dungeon.explored and ClientDungeon restores it with an absent/ragged-safe Boolean map; tests/test_save_version.py adds test_explored_map_is_saved_and_restored and the harness adds explored_map_survives_resume. Failing-first check failed on HEAD (after false) and passes now. Real seed 42 B1F 44-step walk to (29,6), turn 45: before explored 435 -> 77 after reload; after 435 -> 435 at the same turn/tile; minimap crops show the full walked map before and after. Unit 201 OK, harness 123/123, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-078, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794136441.6231885,
+      "timestamp_str": "2026-11-08 14:14:01",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 37, then cycle 38 (combat feel)",
+        "evidence": "201 tests, harness 123/123, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-066",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-066' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794136537.1582882,
+      "timestamp_str": "2026-11-08 14:15:37",
       "agent": "opencode:cycles"
     }
   ]
