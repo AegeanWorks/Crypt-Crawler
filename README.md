@@ -253,6 +253,7 @@ crypt-crawler/
 │   ├── test_strike_target.py <- Strike prefers the hovered adjacent enemy
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
+│   ├── test_player_stun.py   <- a stun costs the next turn action
 │   ├── test_projectile_style.py <- arrows read physical, spell bolts keep a trail
 │   ├── test_server.py        <- web server endpoints tests
 │   └── test_swarm_fixes.py   <- swarm-triage verified regression locks
