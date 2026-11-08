@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-050",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794099815.9145954,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794099856.8365204
   },
   "checkpoints": [
-    {
-      "task_id": "CC-044",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Audio: give trap reveal, disarm and each trap kind distinct cues instead of the shrine chime/generic hit, prove with a failing-first oscillator check, a cue source test and a real search-disarm-trigger run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794093354.9629,
-      "timestamp_str": "2026-11-08 02:15:54",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Reveal and disarm both played the shrine blessing chime [220,277,330,440] and all trap kinds played the generic hit 160, so the audio could not tell a scan from a blessing, a disarm from a reveal, or spike/dart/snare apart",
-        "benefits": "Trap events are audibly distinct: sonar reveal, metallic disarm, and spike thud/dart double-tick/snare snap; real shrines keep their blessing",
-        "risks": "contract: audio.js gains playSearch/playDisarm/playTrap and engine trap branches use them; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: audio.js and engine.js in the game-ui surface",
-        "mitigation": "Failing check recorded shrine chime for reveal/disarm and 160 for all kinds; after 600/350/140/700+520/220; real seed 42 B1F search-disarm-trigger capture; cue source test; inspector at three viewports; full gates"
-      },
-      "plan_digest": "cf02084f21401a0b04b29237e8c9bd14818c6983ece21dbdbf3b13af1b80226e"
-    },
     {
       "task_id": "CC-044",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-050, then cycle 22 (audio cues)",
         "evidence": "176 tests, harness 99/99, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-050",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-050' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794099856.8365228,
+      "timestamp_str": "2026-11-08 04:04:16",
+      "agent": "opencode:cycles"
     }
   ]
 }
