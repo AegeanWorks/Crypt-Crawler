@@ -75,7 +75,7 @@ The minimap names every blip: Stairs (gold), Chest (orange), Shop (purple), Sigi
 The class-selection screen accepts an optional positive run seed; leave it blank for a random run. The same seed, class and difficulty reproduce the same dungeon, and the Records modal shows the current seed with a **Copy Seed** button so a run can be replayed or shared.
 
 ### 📖 Records & Bestiary
-The Records modal persists runs, victories, deepest floor, kills, streaks and gold, plus a codex of every enemy you have slain. Each killable type has its own row — including the Choir Echoes that split from the Hollow Choir — with a live kill count.
+The Records modal persists runs, victories, deepest floor, kills, streaks and gold, plus a codex of every enemy you have slain. Each killable type has its own row - including the Choir Echoes that split from the Hollow Choir and installed foundry pack bosses, recorded by their pack name - with a live kill count.
 
 ### ⚔️ Difficulty
 New Game offers **Normal** and **Hard**. Hard multiplies enemy max HP by 1.4, enemy attack by 1.25, and enemy XP and gold by 1.15; a **HARD** badge in the header marks the run. The choice survives saves and restarts, and seed plus class plus difficulty is the full reproducibility contract. The harness exposes the same choice through `--difficulty` or the script's `difficulty` field.

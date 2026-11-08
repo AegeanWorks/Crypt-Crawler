@@ -944,13 +944,14 @@ export class GameEngine {
     return this.unlockLore(pick.id, quiet);
   }
 
-  recordMonsterDefeat(monsterType) {
+  recordMonsterDefeat(monsterType, monsterName = null) {
     const rec = this.loadRecords();
     rec.totalKills = (rec.totalKills || 0) + 1;
     rec.highestStreak = Math.max(rec.highestStreak || 0, this.killStreak + 1);
     rec.bestiary = rec.bestiary || {};
     rec.bestiary[monsterType] = rec.bestiary[monsterType] || { slain: 0 };
     rec.bestiary[monsterType].slain += 1;
+    if (monsterName) rec.bestiary[monsterType].name = monsterName;
     this.saveRecords(rec);
   }
 
@@ -1770,7 +1771,7 @@ export class GameEngine {
     this.renderer.addDeathBurst(monster.x, monster.y, monster.is_boss ? "#d69e2e" : (monster.is_champion ? "#f6ad55" : "#a0aec0"));
 
     // Bestiary recording
-    this.recordMonsterDefeat(monster.type);
+    this.recordMonsterDefeat(monster.type, monster.name);
 
     // Paladin passive: Zeal restores a little health and mana on a kill.
     if (this.heroClass === "paladin" && !monster.is_boss) {

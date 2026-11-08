@@ -645,6 +645,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Summoned bodies are solid immediately, all living monsters keep unique tiles, and the lich's drain/attack/enrage flow is unchanged. No save format, RNG or gameplay-value change. 204 unit tests green, harness 127/127, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 4242 B3F real Space, before boss/skeleton both on (9,2), after boss (10,3) and skeletons (9,2)/(9,4); same-state zoom crops in `.inspect/cycles/c39/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first boss check), PRINCIPLE-011 (boss bodies never share a tile).
 
+### ADR-081: Foundry pack bosses are recorded by name (improvement cycle 40)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `recordMonsterDefeat` stored only `{ slain }` under the monster type, and the Records bestiary was a static list of 13 core types. Foundry packs replace Malakor with unique ids such as `boss_ashen_warden_s42`; a real seed 42 B3F kill of the Ashen Warden recorded the kill but left the bestiary at 13 rows ending in "Unknown Entity / Locked". The harness check `foundry_boss_kill_appears_in_bestiary` failed on HEAD.
+- **Decision**: Store the killed monster's display name in the bestiary entry (`recordMonsterDefeat(monsterType, monsterName)`), pass `monster.name` from `_handleMonsterDefeat`, and append any unknown killed ids after the static bestiary defs in `showHallOfRecordsModal`, using the recorded name or a humanized id fallback. Add the harness check and the `test_foundry_bosses_get_a_dynamic_row` source check; document foundry rows in the README.
+- **Consequences**: Every recorded kill, including installed-pack bosses, has a named row with its live count; no static list edit is needed for a new pack, and old saves without a stored name still show a readable fallback. No save version bump; the field is additive. 205 unit tests green, harness 129/129, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B3F real key-1 kill, 13 -> 14 rows, last row "Ashen Warden / Slayed: 1"; same-state row crops in `.inspect/cycles/c40/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first records check), PRINCIPLE-011 (every kill is legible in the codex).
+
 
 
 

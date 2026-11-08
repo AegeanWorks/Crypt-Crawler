@@ -24,7 +24,12 @@ class TestBestiary(unittest.TestCase):
 
     def test_choir_echo_is_a_real_spawned_type(self):
         self.assertIn('type: "choir_echo"', self.engine)
-        self.assertIn("recordMonsterDefeat(monster.type)", self.engine)
+        self.assertIn("recordMonsterDefeat(monster.type, monster.name)", self.engine)
+
+    def test_foundry_bosses_get_a_dynamic_row(self):
+        self.assertIn("for (const [id, entry] of Object.entries(r.bestiary", self.ui)
+        self.assertIn("entry.name || fallbackName", self.ui)
+        self.assertIn("if (monsterName) rec.bestiary[monsterType].name = monsterName;", self.engine)
 
 
 if __name__ == "__main__":

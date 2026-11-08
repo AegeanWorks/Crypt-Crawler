@@ -1559,6 +1559,56 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_echo_record", not harness.errors, harness.errors))
     page.context.close()
 
+    # Foundry pack bosses are killable but absent from the static bestiary list;
+    # their kill must still get a named row in Records. Pack s42 replaces Malakor.
+    page = harness.open_page(42, depth=3)
+    foundry_bestiary = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const boss = e.monsters.find((m) => m.type === 'boss_ashen_warden_s42');
+            if (!boss) return { found: false };
+            const step = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .find(([dx, dy]) => e.dungeon.isWalkable(boss.x + dx, boss.y + dy));
+            if (!step) return { found: false, reason: 'no stand' };
+            e.monsters = [boss];
+            const p = e.player;
+            p.x = boss.x + step[0];
+            p.y = boss.y + step[1];
+            p.hp = p.max_hp;
+            e.dungeon.updateFOV(p.x, p.y, 7);
+            boss.hp = 1;
+            e.attackMonster(boss);
+            const rec = e.loadRecords();
+            e.ui.showHallOfRecordsModal(rec, e.dungeon && e.dungeon.seed);
+            const list = document.querySelector('.bestiary-list');
+            return {
+                found: true,
+                type: boss.type,
+                name: boss.name,
+                entry: rec.bestiary[boss.type] || null,
+                list: list ? list.textContent : '',
+                victory: e.victory,
+                gameOver: e.gameOver,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "foundry_boss_kill_appears_in_bestiary",
+        foundry_bestiary.get("found") is True
+        and foundry_bestiary["entry"] is not None
+        and foundry_bestiary["entry"].get("slain") == 1
+        and foundry_bestiary["name"] in foundry_bestiary["list"]
+        and "Slayed: 1" in foundry_bestiary["list"],
+        {
+            "kill": foundry_bestiary,
+            "has_row": foundry_bestiary.get("name", "") in foundry_bestiary.get("list", ""),
+        },
+    ))
+    checks.append(_check(
+        "no_page_errors_after_foundry_bestiary", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # A deterministic mimic chest springs a fight instead of paying loot.
     page = harness.open_page(2, depth=1)
     mimic_setup = page.evaluate(

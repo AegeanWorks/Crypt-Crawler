@@ -9,8 +9,8 @@
 - **Total Python Modules**: `58`
 - **Total Classes**: `60`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `301`
-- **Total Source Lines**: `11192`
+- **Total Class Methods**: `302`
+- **Total Source Lines**: `11247`
 
 ---
 
@@ -269,13 +269,14 @@
 ### [`tests/test_bestiary.py`](tests/test_bestiary.py)
 > *Bestiary coverage: every killable enemy type has a Records row.*
 
-**Size**: `31` lines (`1030` bytes)
+**Size**: `36` lines (`1346` bytes)
 
 **Classes:**
 - `class TestBestiary`
   - Method `.setUp()`
   - Method `.test_every_killable_type_has_a_records_row()`
   - Method `.test_choir_echo_is_a_real_spawned_type()`
+  - Method `.test_foundry_bosses_get_a_dynamic_row()`
 
 ---
 
@@ -876,7 +877,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3385` lines (`141156` bytes)
+**Size**: `3435` lines (`143240` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

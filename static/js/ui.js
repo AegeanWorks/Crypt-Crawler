@@ -719,6 +719,21 @@ export class UIController {
       { id: "choir_echo", name: "Choir Echo", icon: "🎶", desc: "A splinter of the Hollow Choir. Splits from the mother hymn at half health and repeats her verse.", weakness: "Burst / Fire" },
     ];
 
+    // Foundry pack bosses have their own type ids and are absent from the static
+    // list; any kill recorded under an unknown id still gets a named row.
+    const knownBestiary = new Set(bestiaryDefs.map((def) => def.id));
+    for (const [id, entry] of Object.entries(r.bestiary || {})) {
+      if (knownBestiary.has(id) || !entry || !entry.slain) continue;
+      const fallbackName = id.replace(/_/g, " ").replace(/\b\w/g, (ch) => ch.toUpperCase());
+      bestiaryDefs.push({
+        id,
+        name: entry.name || fallbackName,
+        icon: "👑",
+        desc: "A foundry-born horror recorded in the crypt's ledger.",
+        weakness: "Unknown",
+      });
+    }
+
     let bestiaryHtml = "";
     for (const def of bestiaryDefs) {
       const kills = r.bestiary?.[def.id]?.slain || 0;

@@ -1171,3 +1171,38 @@ class, difficulty and viewport.
 - **Gates**: unit 204 OK; harness 127 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(bosses): keep summoned skeletons off the summoner's tile`.
+
+## Cycle 40 — Foundry bosses get a bestiary row (2026-11-08)
+
+- **Area**: Progression and records (foundry pack bestiary).
+- **Find**: `recordMonsterDefeat` stored only `{ slain }` under the monster type, and the
+  Records bestiary is a static list of 13 core types. Foundry packs replace Malakor with
+  unique ids such as `boss_ashen_warden_s42`; killing one recorded the kill but produced
+  no row. A real seed 42 B3F key-1 kill of the Ashen Warden left the bestiary at 13 rows,
+  ending in "Unknown Entity / Locked"; the stored entry was `{ slain: 1 }` with no name.
+  The harness check `foundry_boss_kill_appears_in_bestiary` failed on HEAD.
+- **Analyze**: Packs are installable data, so the bestiary cannot stay a closed static
+  list. Record the monster's display name with the kill, then append any unknown killed
+  id to the rendered rows using that name (with a humanized id fallback for old saves).
+  Killed: hardcoding the three shipped pack ids (a new pack would break again), and
+  showing the raw id (correct but ugly for a codex row).
+- **Fix**: `recordMonsterDefeat(monsterType, monsterName)` now stores `name`;
+  `_handleMonsterDefeat` passes `monster.name`. `showHallOfRecordsModal` appends unknown
+  killed ids after the static defs with a generic foundry description and the recorded
+  name. Extend `tests/test_bestiary.py`, add the harness check, and document the foundry
+  rows in the README.
+- **Screenshots** (seed 42 B3F, pack boss staged adjacent at 1 HP, real key 1, Records
+  opened through the shipped modal path, 1920x1080, dsf 2; before uses HEAD
+  `engine.js`/`ui.js`):
+  - before: `.inspect/cycles/c40/before-last-row.png` is the final "Unknown Entity /
+    Locked" row; `before-bestiary.png` shows the 13-row list top.
+  - after: `after-last-row.png` is "Ashen Warden ... Slayed: 1";
+    `after-bestiary.png` shows the list with the new row appended.
+  - command: `python .inspect/cycles/play_c40.py before|after`
+- **Played run**: Real key 1 killed Ashen Warden at seed 42 B3F; Records opened. Before:
+  entry `{ slain: 1 }`, 13 rows, `has_row: false`. After: entry
+  `{ slain: 1, name: "Ashen Warden" }`, 14 rows, `has_row: true`, "Slayed: 1"; no page
+  errors in either run. The victory ledger appears and is closed before Records in both.
+- **Gates**: unit 205 OK; harness 129 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(records): give foundry pack bosses a bestiary row`.
