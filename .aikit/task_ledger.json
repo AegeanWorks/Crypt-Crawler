@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-061",
+    "task_id": "CC-062",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794131168.3235703,
+    "updated_at": 1794132416.5059128,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794131418.5636022
+    "completed_at": 1794132643.683348
   },
   "checkpoints": [
-    {
-      "task_id": "CC-055",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Minimap clears spent objectives: _drawMinimap builds a spent set from sigil.collected/vault.opened and draws floor gray, hover cards and live markers unchanged; tests/test_minimap_legend.py drift test + minimap_clears_spent_objectives pixel check (live [99,179,237]/[214,158,46] -> spent [45,55,72]). Seed 42 B1F same-state pair: before spent markers identical to live, after both cleared; real stepPlayer onto 3 sigils (held 1->2->3) and vault (held 3->0, opened); no page errors. Unit 182 OK, harness 107/107, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-067, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794109848.967555,
-      "timestamp_str": "2026-11-08 06:50:48",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-055, then cycle 27 (UI readability)",
-        "evidence": "182 tests, harness 107/107, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-055",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-055' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794109894.8552542,
-      "timestamp_str": "2026-11-08 06:51:34",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-056",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] UI readability: fit all three floor bounties in the Bounties modal by replacing the fixed 280px list cap with a viewport-relative cap; prove with a failing-first fold measurement, a same-state before/after modal pair and a real Bounties-button run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794110148.7326372,
-      "timestamp_str": "2026-11-08 06:55:48",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The Bounties modal caps its list at 280px while three 99px cards need 321px; at 1920x1080 and 1366x768 the last contract is only 66/99px visible and its reward line is below the fold, even though the modal uses only 462 of 1080px",
-        "benefits": "All three contracts and their rewards are readable without scrolling on desktop and laptop; shorter screens still scroll; no bounty, save or combat rule change",
-        "risks": "contract: inline bounty list style only; dependency: none; concurrency: none; state: no save/RNG change; UI: ui.js in the game-ui surface",
-        "mitigation": "Failing-first last-card visibility selftest and source drift test; same-state 1920x1080 before/after modal crops; real Bounties-button click; three-viewport inspector and full gates"
-      },
-      "plan_digest": "c29f8956ef22bf51eb5bf848cd0e884b893957b9cff20a095a8ee1083198f908"
-    },
     {
       "task_id": "CC-056",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794131418.5636039,
       "timestamp_str": "2026-11-08 12:50:18",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-062",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Levels: keep the Hermit Merchant on every depth>=2 floor instead of dropping it when room 1 is the farthest/stairs room; prove with the fairness validator, a failing-first merchant placement test, same-state room and modal crops, and a real ArrowRight merchant step",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794132407.2741458,
+      "timestamp_str": "2026-11-08 13:06:47",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The generator only tries dungeon.rooms[1]; when that is the farthest room, no merchant is placed. validate_fairness.py rejects seeds 1, 3 and 15 at depths 2 and 3, 6 of 90 tested floors.",
+        "benefits": "Every depth>=2 floor offers its merchant; the validator goes from 84/90 to 90/90; the soul relocates but stays one per floor",
+        "risks": "contract: merchant placement loop plus free-floor fallback in crawler/dungeon.py; dependency: none; concurrency: none; state: no save format or RNG stream change, but prop positions can shift; UI: none",
+        "mitigation": "Failing-first tests/test_merchant_spawn.py; fairness sweep; seed 1 B2F real ArrowRight onto the shop tile; same-state room and modal crops at 1920x1080; full gates"
+      },
+      "plan_digest": "cd61ed14e659394aea43ace28051f995bb3eadc7f1ea272b3e53d79cd99c3a39"
+    },
+    {
+      "task_id": "CC-062",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Merchant placement fixed: walk rooms[1:] skipping the farthest/stairs room, place at the first free FLOOR center, fall back to any free floor tile on two-room maps. Failing-first tests/test_merchant_spawn.py failed 6/6 regression subtests on HEAD and passes now; fairness 90/90 for seeds 1-30 x depths 1-3 (84/90 before). Real seed 1 B2F ArrowRight: before no merchant, soul at (18,23), soul modal; after merchant at (18,23), soul at (32,3), Grimbold shop with 4 wares; no page errors. Before/after room zoom and modal crops at 1920x1080. Unit 194 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-074, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794132416.5059128,
+      "timestamp_str": "2026-11-08 13:06:56",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 33, then cycle 34 (UI readability)",
+        "evidence": "194 tests, fairness 90/90, harness 117/117, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-062",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-062' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794132643.6833498,
+      "timestamp_str": "2026-11-08 13:10:43",
       "agent": "opencode:cycles"
     }
   ]
