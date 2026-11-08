@@ -3056,6 +3056,7 @@ export class GameEngine {
     this.gameOver = true;
     this.unlockLore(this.loreEvents?.death, true);
     sounds.stopMusic();
+    sounds.playDeath();
     this.clearSavedRun();
     this.recordRunEnd(false);
     this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
@@ -3087,6 +3088,7 @@ export class GameEngine {
     const crownKept = this.player.inventory.some((item) => item.id === "crown_eternity")
       || (this.player.equipped?.ring?.id === "crown_eternity");
     sounds.stopMusic();
+    sounds.playVictory();
     this.clearSavedRun();
     this.recordRunEnd(true);
     this.ui.showModal(

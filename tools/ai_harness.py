@@ -2256,6 +2256,54 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_audio_cues", not harness.errors, harness.errors))
     page.context.close()
 
+    # The two run-ending beats need their own cue, not only stopped music.
+    page = harness.open_page(seed)
+    run_endings = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const { sounds } = await import('/js/audio.js');
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const events = [];
+            const orig = AC.prototype.createOscillator;
+            AC.prototype.createOscillator = function () {
+                const osc = orig.call(this);
+                const param = osc.frequency;
+                const setValue = param.setValueAtTime.bind(param);
+                param.setValueAtTime = (value, when) => {
+                    events.push({ freq: Math.round(value), type: osc.type });
+                    return setValue(value, when);
+                };
+                return osc;
+            };
+            sounds.playStep();
+            events.length = 0;
+            e.handlePlayerDeath("the probe");
+            const death = events.slice();
+            events.length = 0;
+            e.gameOver = false;
+            e.victory = false;
+            e.player.hp = e.player.max_hp;
+            e.handleVictory();
+            const victory = events.slice();
+            AC.prototype.createOscillator = orig;
+            return { death, victory };
+        }"""
+    )
+    death_freqs = [entry["freq"] for entry in run_endings.get("death", [])]
+    victory_freqs = [entry["freq"] for entry in run_endings.get("victory", [])]
+    checks.append(_check(
+        "run_endings_have_their_own_cues",
+        98 in death_freqs
+        and 73 in death_freqs
+        and 440 in victory_freqs
+        and 880 in victory_freqs,
+        {"death": death_freqs, "victory": victory_freqs},
+    ))
+    checks.append(_check(
+        "no_page_errors_after_run_endings", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # Trap audio identity: a reveal ping, a disarm clank and a distinct cue per
     # trap kind (spike thud, dart double-tick, snare snap), not the shrine chime.
     page = harness.open_page(seed)

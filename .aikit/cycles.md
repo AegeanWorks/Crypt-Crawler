@@ -785,3 +785,35 @@ class, difficulty and viewport.
 - **Gates**: unit 185 OK; harness 111 checks, 0 failed; inspector 75/75 at three viewports,
   0 console errors; aikit check 5/5.
 - **Commit**: `fix(effects): expire reduced-motion hit flashes on the live clock`.
+
+## Cycle 29 — The run endings speak (2026-11-08)
+
+- **Area**: Audio cues (death and victory).
+- **Find**: `handlePlayerDeath` and `handleVictory` called `sounds.stopMusic()` and then
+  showed their ledgers with no cue of their own. A recorded probe of the shipped audio path
+  returned `[]` for both; a real fatal goblin hit played only the two `160 Hz` hit sounds,
+  and a real boss kill played only the level-up arpeggio (`160, 262, 330, 392, 523`).
+  Failing guards: `run_endings_have_their_own_cues`, `test_run_endings_have_their_own_cues`.
+- **Analyze**: Both run ends are terminal one-shot beats and deserve their own identity:
+  a low funeral knell for death, an A-major fanfare for victory. Keep the existing music
+  fade and all other cues. Killed: reusing `playDescend` for death (a floor transition
+  should not sound like a run end) and `playJackpot` for victory (already the vault/chest
+  reward cue).
+- **Fix**: `playDeath()` (sine 98/196 and 73.42/146.83 Hz, two slow tolls) and
+  `playVictory()` (triangle A4/C#5/E5/A5 plus a held A-major chord) in `audio.js`; call
+  them after `stopMusic()` in `handlePlayerDeath`/`handleVictory`; extend
+  `tests/test_audio_cues.py` and add the recorder selftest check.
+- **Evidence** (audio is the claim; the modals show the unchanged state):
+  - death before: `[160, 160]`; after: `[160, 160, 98, 196, 73, 147]`
+  - victory before (after the 1.5s ledger delay): `[]`; after:
+    `[440, 554, 659, 880, 440, 554, 659]`
+  - `.inspect/cycles/c29/before-death-modal.png` / `after-death-modal.png` and
+    `before-victory-modal.png` / `after-victory-modal.png` (same seed/setup, 1920x1080,
+    dsf 2; the modal layout is unchanged, only RNG gold differs in the death text)
+  - command: `python .inspect/cycles/play_c29.py before|after`
+- **Played run**: real fatal goblin retaliation at seed 42 B1F (player 1 -> 0 HP, death
+  ledger) and a real boss kill at seed 42 B3F (Malakor 1 -> 0 HP, victory ledger); no page
+  errors; modal titles correct.
+- **Gates**: unit 186 OK; harness 113 checks, 0 failed; inspector 75/75 at three viewports,
+  0 console errors; aikit check 5/5.
+- **Commit**: `feat(audio): give death and victory their own cues`.

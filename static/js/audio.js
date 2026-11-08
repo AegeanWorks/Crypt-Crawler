@@ -816,6 +816,48 @@ class SoundSystem {
       osc.stop(start + 0.38);
     });
   }
+
+  playDeath() {
+    if (this.sfxMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    // Funeral knell: two low bronze tolls sinking into the dark.
+    this._blip("sine", 98, 98, 0.16, 1.15);
+    this._blip("sine", 196, 196, 0.05, 0.8, 0.02);
+    this._blip("sine", 73.42, 73.42, 0.14, 1.35, 0.45);
+    this._blip("sine", 146.83, 146.83, 0.045, 0.9, 0.47);
+  }
+
+  playVictory() {
+    if (this.sfxMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // A-major fanfare: A4 -> C#5 -> E5 -> A5, then a held A-major chord.
+    [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+      this._blip("triangle", freq, freq, 0.12, 0.5, idx * 0.1);
+    });
+    [440, 554.37, 659.25].forEach((freq) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const start = now + 0.5;
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, start);
+
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.linearRampToValueAtTime(0.09, start + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 1.2);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(start);
+      osc.stop(start + 1.25);
+    });
+  }
 }
 
 export const sounds = new SoundSystem();

@@ -557,6 +557,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Reduced motion freezes ambience as intended while combat feedback still expires on schedule. 185 unit tests green, harness 111/111, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, reduced motion, real strike + retaliation, before/after 3x3-tile crops.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first pixel check), PRINCIPLE-011 (accessibility settings do not leave stale overlays).
 
+### ADR-070: Death and victory get their own cues (improvement cycle 29)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `handlePlayerDeath` and `handleVictory` stopped the music and then showed their ledgers in silence. A recorded probe of the shipped path returned `[]` for both; a real fatal hit played only two `160 Hz` hit sounds, and a real boss kill played only the level-up arpeggio. The two terminal beats of a run had no identity.
+- **Decision**: Add `playDeath()` - two slow funeral tolls at 98/196 Hz and 73.42/146.83 Hz - and `playVictory()` - an A-major triangle fanfare (440, 554.37, 659.25, 880) plus a held A-major chord - and call them after `stopMusic()` in `handlePlayerDeath`/`handleVictory`. Keep `playDescend` and `playJackpot` for their existing moments. Guard with `test_run_endings_have_their_own_cues` and the `run_endings_have_their_own_cues` oscillator selftest.
+- **Consequences**: A run now ends audibly: a knell on death, a fanfare on victory, both distinct from floor descent and vault rewards. No save, RNG or combat change. 186 unit tests green, harness 113/113, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: real death and boss-kill recordings, `[160,160]` -> `[160,160,98,196,73,147]` and `[]` -> `[440,554,659,880,...]`; modal crops for state.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped audio path), PRINCIPLE-014 (failing-first cue tests), PRINCIPLE-011 (the biggest moments are not silent).
+
 
 
 

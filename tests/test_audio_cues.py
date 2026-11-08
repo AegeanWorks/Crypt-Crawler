@@ -43,6 +43,16 @@ class TestAudioCues(unittest.TestCase):
         self.assertIn("this._blip(\"sine\", 110, 40", self.audio)
         self.assertEqual(self.engine.count("sounds.playDescend()"), 1)
 
+    def test_run_endings_have_their_own_cues(self):
+        self.assertIn("playDeath()", self.audio)
+        self.assertIn("playVictory()", self.audio)
+        self.assertIn("this._blip(\"sine\", 98, 98", self.audio)
+        self.assertIn("this._blip(\"sine\", 73.42, 73.42", self.audio)
+        for freq in ("440", "554.37", "880"):
+            self.assertIn(freq, self.audio)
+        self.assertEqual(self.engine.count("sounds.playDeath()"), 1)
+        self.assertEqual(self.engine.count("sounds.playVictory()"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
