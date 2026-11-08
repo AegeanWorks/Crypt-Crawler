@@ -9,8 +9,8 @@
 - **Total Python Modules**: `48`
 - **Total Classes**: `50`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `264`
-- **Total Source Lines**: `10257`
+- **Total Class Methods**: `266`
+- **Total Source Lines**: `10265`
 
 ---
 
@@ -552,13 +552,15 @@
 ### [`tests/test_hover_title.py`](tests/test_hover_title.py)
 > *Hover title contract: no repeated champion affix, no overflow past the card.*
 
-**Size**: `24` lines (`741` bytes)
+**Size**: `32` lines (`1088` bytes)
 
 **Classes:**
 - `class TestHoverTitle`
   - Method `.setUp()`
   - Method `.test_champion_name_does_not_repeat_the_affix_badge()`
   - Method `.test_title_is_fitted_inside_a_wider_card()`
+  - Method `.test_champion_affix_hints_cover_the_shipped_affixes()`
+  - Method `.test_hover_card_draws_the_affix_hint()`
 
 ---
 

@@ -19,6 +19,14 @@ class TestHoverTitle(unittest.TestCase):
         self.assertIn("const cardW = 168", self.js)
         self.assertIn("titleMax", self.js)
 
+    def test_champion_affix_hints_cover_the_shipped_affixes(self):
+        for affix in ("Swift", "Fortified", "Molten", "Vampiric"):
+            self.assertIn(f'        {affix}: "', self.js)
+
+    def test_hover_card_draws_the_affix_hint(self):
+        self.assertIn("const affixHint =", self.js)
+        self.assertIn("affixHint ? 12", self.js)
+
 
 if __name__ == "__main__":
     unittest.main()

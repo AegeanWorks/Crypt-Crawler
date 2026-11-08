@@ -2524,8 +2524,17 @@ export class DungeonRenderer {
         if (execute) preview += " • EXECUTE 💀";
       }
       const affix = monster.is_boss ? "Boss" : "";
+      const affixHints = {
+        Swift: "Swift: moves 2 tiles/turn",
+        Fortified: "Fortified: +3 DEF",
+        Molten: "Molten: burns attackers",
+        Vampiric: "Vampiric: leeches 3 HP",
+      };
+      const affixHint = monster.is_champion && monster.champion_affix
+        ? affixHints[monster.champion_affix] || null
+        : null;
       const cardW = 168;
-      const cardH = (effects.length ? 62 : 50) + (preview ? 13 : 0);
+      const cardH = (effects.length ? 62 : 50) + (preview ? 13 : 0) + (affixHint ? 12 : 0);
       const [cardX, cardY] = clampCard(px + ts / 2 - cardW / 2, py - cardH - 10, cardW, cardH);
 
       ctx.fillStyle = "rgba(10, 14, 22, 0.94)";
@@ -2585,6 +2594,11 @@ export class DungeonRenderer {
         ctx.fillStyle = "#68d391";
         ctx.font = "9px sans-serif";
         ctx.fillText(effects.join("   "), cardX + 6, cardY + (preview ? 66 : 56));
+      }
+      if (affixHint) {
+        ctx.fillStyle = "#f6ad55";
+        ctx.font = "8px sans-serif";
+        ctx.fillText(this._fitText(ctx, affixHint, cardW - 12), cardX + 6, cardY + cardH - 5);
       }
 
       ctx.restore();

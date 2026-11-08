@@ -668,3 +668,27 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(combat): strike the hovered adjacent enemy`.
+
+## Cycle 25 — Champion affixes explain themselves (2026-11-08)
+
+- **Area**: Enemies/bosses (champion readability).
+- **Find**: Swift/Fortified/Molten/Vampiric enforce real combat rules (two steps, +3 DEF,
+  burn attacker, leech 3 HP) but were explained only as a word in the champion's name; the
+  hover card and README said nothing. Failing test: no affix-hint map or card line.
+- **Analyze**: Add a fitted hint line to champion cards and a README table; bosses/regulars
+  unchanged. Killed: a separate codex modal for four affixes (hover is where the player asks).
+- **Fix**: `affixHints` + 12px taller champion card; README "Champion Affixes" table;
+  `test_hover_title` extended.
+- **Screenshots** (same seed 42 B1F, Swift Crypt Skeleton 60/200, player adjacent, hovered,
+  1920x1080):
+  - before: `.inspect/cycles/c25/before-champion.png` (card ends at the strike preview)
+  - after: `after-champion.png` (adds "Swift: moves 2 tiles/turn" at the bottom)
+  - boss: `before-boss.png` / `after-boss.png` (Hollow Choir card unchanged)
+  - command: `python .inspect/cycles/play_c25.py before|after` (before uses HEAD renderer.js)
+- **Played run**: real hover over the Swift Crypt Skeleton and the Hollow Choir; no page
+  errors; the champion card now names its rule, the boss card does not grow.
+- **Gates**: `python -m unittest discover -s tests` -> 181 OK;
+  `python tools/ai_harness.py selftest` -> 105 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(enemies): explain champion affixes on hover`.

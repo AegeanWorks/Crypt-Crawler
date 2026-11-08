@@ -525,6 +525,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: A real mouse hover plus the 1 hotkey now damages the previewed enemy; touch/keyboard-only players keep the fallback. 179 unit tests green, harness 105/105, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 clear block, Target A at +x and B at +y, hover B, press 1: before A 89/B 100, after A 100/B 90.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first targeting check), PRINCIPLE-011 (mouse and keyboard agree).
 
+### ADR-066: Champion affixes explain themselves (improvement cycle 25)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Champion affixes change combat rules — Swift moves two tiles/turn, Fortified has +3 DEF, Molten burns its attacker for 2, Vampiric leeches 3 HP — but nothing in the game or README explained them. The hover card only showed the affix as part of the title ("Swift Crypt Skeleton"), so a player could not learn the rule without being hit by it.
+- **Decision**: Add an `affixHints` map in `_drawHoverTooltip` and draw a fitted amber line at the bottom of champion cards: "Swift: moves 2 tiles/turn", "Fortified: +3 DEF", "Molten: burns attackers", "Vampiric: leeches 3 HP". Increase the card height by 12px only when the hint exists. Add a "Champion Affixes" README table and extend `tests/test_hover_title.py` with the four hints and the card-height gate. "Elder" is documented as the Vault Warden's title, not an affix.
+- **Consequences**: Champion mechanics are discoverable on hover and in the README; boss/regular cards are unchanged. 181 unit tests green, harness 105/105, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F Swift Crypt Skeleton 60/200: before card ends at the strike preview, after adds "Swift: moves 2 tiles/turn".
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (affix-hint drift test), PRINCIPLE-011 (mechanics legible without a wiki).
+
+
 
 
 

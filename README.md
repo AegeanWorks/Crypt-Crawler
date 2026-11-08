@@ -124,6 +124,16 @@ Wall sconces are real light sources: standing within two tiles restores the lant
 
 Enemies step axis-first toward a visible hero; when a chest, urn or corner blocks that step, they take the shortest free path around it, so a melee foe no longer stalls behind a prop. Boss phase text is per boss: Malakor alone tears open the vault floor and enrages, the Hollow Choir's 50% split searches a wider ring when its adjacent tiles are crowded, and foundry bosses break their own seal — no boss borrows another's announcement.
 
+### ⭐ Champion Affixes
+| Affix | Rule |
+|---|---|
+| Swift | Moves two tiles per turn |
+| Fortified | +3 DEF |
+| Molten | Burns its attacker for 2 damage when struck |
+| Vampiric | Leeches 3 HP when it hits |
+
+The hover card names the rule next to the champion's title. "Elder" is the Elder Vault Warden's title, not a champion affix.
+
 Chests can be **Gilded Mimics**: opening one pushes you back and springs a depth-scaled fight instead of paying gold. The mimic is chosen deterministically from the run seed and chest order, so a known seed reproduces the same trapped chest. Trap search reveals traps, not mimics.
 
 QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, and the 🎞️ header button toggles reduced motion (persisted, disables screen shake and pulsing accents). Story: three new codex entries — *Signs in the Blood*, *The Lantern-Keeper* and *The Debt of Malakor* — plus *Ember Tithe*, *Hollow Silence* and *Hollow Choir*, and a victory epilogue that closes the ledger.
