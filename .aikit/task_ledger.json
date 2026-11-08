@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-055",
+    "task_id": "CC-056",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794109848.967555,
+    "updated_at": 1794110660.294842,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794109894.8552525
+    "completed_at": 1794110711.1573186
   },
   "checkpoints": [
-    {
-      "task_id": "CC-049",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Hover title fix shipped: boss-only affix badge, cardW 168, _fitText ellipsis, test_hover_title. Seed 42 Swift champion 60/200: before SkeletonSWIFT, after clean title; Hollow Choir keeps BOSS without overlap. Unit 174 OK, harness 99/99, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-061, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794099037.1789353,
-      "timestamp_str": "2026-11-08 03:50:37",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-049, then cycle 21 (graphics/effects)",
-        "evidence": "174 tests, harness 99/99, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-049",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-049' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794099069.5157263,
-      "timestamp_str": "2026-11-08 03:51:09",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-050",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Graphics: add a death burst (shockwave + particles, tier-colored) at every defeated monster tile, prove with a failing-first effect test, a same-monster 80ms kill before/after and a real attack run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794099797.0129273,
-      "timestamp_str": "2026-11-08 04:03:17",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "A regular kill removed the sprite with only the attack's hit slash/particles and a float; the same-state kill showed 8 particles and no shockwave, so ordinary kills had no death beat while champions/bosses did",
-        "benefits": "Every kill leaves a visible ring/burst at the tile; regular/champion/boss colors differ; the hit slash and damage float still read",
-        "risks": "contract: _handleMonsterDefeat calls addDeathBurst; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: renderer.js and engine.js in the game-ui surface",
-        "mitigation": "Failing effect test before the fix; same goblin (19,6) 14 HP one-attack 80ms before/after (8/0 -> 30/1 particles/rings); real attack kill log; inspector at three viewports; full gates"
-      },
-      "plan_digest": "11d715d23e12c2808251e0bd657f226c2a7f173776c4be0b18dad0ca6a1f6c4c"
-    },
     {
       "task_id": "CC-050",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794109894.8552542,
       "timestamp_str": "2026-11-08 06:51:34",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-056",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] UI readability: fit all three floor bounties in the Bounties modal by replacing the fixed 280px list cap with a viewport-relative cap; prove with a failing-first fold measurement, a same-state before/after modal pair and a real Bounties-button run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794110148.7326372,
+      "timestamp_str": "2026-11-08 06:55:48",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The Bounties modal caps its list at 280px while three 99px cards need 321px; at 1920x1080 and 1366x768 the last contract is only 66/99px visible and its reward line is below the fold, even though the modal uses only 462 of 1080px",
+        "benefits": "All three contracts and their rewards are readable without scrolling on desktop and laptop; shorter screens still scroll; no bounty, save or combat rule change",
+        "risks": "contract: inline bounty list style only; dependency: none; concurrency: none; state: no save/RNG change; UI: ui.js in the game-ui surface",
+        "mitigation": "Failing-first last-card visibility selftest and source drift test; same-state 1920x1080 before/after modal crops; real Bounties-button click; three-viewport inspector and full gates"
+      },
+      "plan_digest": "c29f8956ef22bf51eb5bf848cd0e884b893957b9cff20a095a8ee1083198f908"
+    },
+    {
+      "task_id": "CC-056",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All three floor bounties fit the contract modal: replaced the fixed 280px list cap with min(52vh, 420px) in showBountiesModal. Failing-first tests: bounties_modal_shows_all_contracts (client 280/scroll 321/last 66/99) and test_bounty_list_cap_is_viewport_relative; after: 321/321, last 99/99, modal 502px inside 1080. Real Bounties click at seed 42 B1F; before/after same-state crops; no page errors. Unit 183 OK, harness 109/109, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-068, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794110660.294842,
+      "timestamp_str": "2026-11-08 07:04:20",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-056, then cycle 28 (graphics and effects)",
+        "evidence": "183 tests, harness 109/109, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-056",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-056' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794110711.1573212,
+      "timestamp_str": "2026-11-08 07:05:11",
       "agent": "opencode:cycles"
     }
   ]
