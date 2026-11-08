@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-062",
+    "task_id": "CC-063",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794132416.5059128,
+    "updated_at": 1794133242.0727599,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794132643.683348
+    "completed_at": 1794133357.4259613
   },
   "checkpoints": [
-    {
-      "task_id": "CC-056",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] All three floor bounties fit the contract modal: replaced the fixed 280px list cap with min(52vh, 420px) in showBountiesModal. Failing-first tests: bounties_modal_shows_all_contracts (client 280/scroll 321/last 66/99) and test_bounty_list_cap_is_viewport_relative; after: 321/321, last 99/99, modal 502px inside 1080. Real Bounties click at seed 42 B1F; before/after same-state crops; no page errors. Unit 183 OK, harness 109/109, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-068, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794110660.294842,
-      "timestamp_str": "2026-11-08 07:04:20",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-056, then cycle 28 (graphics and effects)",
-        "evidence": "183 tests, harness 109/109, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-056",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-056' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794110711.1573212,
-      "timestamp_str": "2026-11-08 07:05:11",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-057",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Graphics/effects: make reduced-motion hit flashes expire on the live clock instead of the frozen ambient timestamp; prove with a failing-first pixel check, a same-state before/after reduced-motion crop and a real hit run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794111117.5693781,
-      "timestamp_str": "2026-11-08 07:11:57",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Reduced motion freezes the render timestamp to 0, but the player and monster hit flashes compare against performance.now() stamps; the age is negative forever, so the player stays red and the monster veil never clears after the first hit",
-        "benefits": "Hit flashes expire on their real 160/140ms schedule in reduced-motion mode; ambient bobbing, pulsing and flicker stay frozen; normal mode is unchanged",
-        "risks": "contract: two flash expiry checks only; dependency: none; concurrency: none; state: no save/RNG change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Failing-first reduced-motion pixel selftest with an expired flash; source drift test; same-state 1920x1080 before/after player-tile crops; real hit under reduced motion; three-viewport inspector and full gates"
-      },
-      "plan_digest": "36c1276669914165e8a158b60901fc08e225ea80b853b253f8fa7dabb5ecbeff"
-    },
     {
       "task_id": "CC-057",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794132643.6833498,
       "timestamp_str": "2026-11-08 13:10:43",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-063",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] UI readability: give narrow canvases a CSS-pixel minimap key instead of the 7px canvas legend that renders at 3.43px on a 390px mobile viewport; prove with same-state mobile before/after crops, live measurements at mobile and desktop, and a source drift test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794133233.982008,
+      "timestamp_str": "2026-11-08 13:20:33",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The minimap legend is drawn into the 760x540 canvas at 7px; at a 372px canvas it is 3.43px on-screen and unreadable, while the README promises every blip is named.",
+        "benefits": "The nine minimap labels stay legible on mobile and narrow center panels; desktop keeps the compact canvas key; the labels/colors have one source",
+        "risks": "contract: renderer DOM key plus ResizeObserver toggle and CSS; dependency: none; concurrency: none; state: no game/save change; UI: renderer.js and style.css in the game-ui surface",
+        "mitigation": "Live mobile and desktop measurement, same-state before/after crops, source drift test, three-viewport inspector, full gates"
+      },
+      "plan_digest": "d8309020f5797720016d0ea4b52eb6d04cf63300f806810a5664b100e0b88448"
+    },
+    {
+      "task_id": "CC-063",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Minimap key readable on narrow canvases: one MINIMAP_LEGEND_ROWS source feeds the canvas key and a new DOM #minimapLegend; a ResizeObserver toggles the 10px two-column DOM key below a 600px canvas and the canvas key returns above it. Measured live: mobile canvas 372px, canvas text 3.43px -> DOM 10px/9 items (106.5x84), compact true; desktop canvas 783px, DOM hidden, canvas key 7.21px. Same-state mobile before/after crops; tests/test_minimap_legend_dom.py (3 checks). Unit 197 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-075, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794133242.0727599,
+      "timestamp_str": "2026-11-08 13:20:42",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 34, then cycle 35 (graphics/effects)",
+        "evidence": "197 tests, harness 117/117, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-063",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-063' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794133357.4259634,
+      "timestamp_str": "2026-11-08 13:22:37",
       "agent": "opencode:cycles"
     }
   ]
