@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-056",
+    "task_id": "CC-057",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794110660.294842,
+    "updated_at": 1794112504.2315779,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794110711.1573186
+    "completed_at": 1794112580.4204316
   },
   "checkpoints": [
-    {
-      "task_id": "CC-050",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Death burst shipped: addDeathBurst (48px ring + 16 tier + 8 steel particles) called from _handleMonsterDefeat; test_death_effect. Seed 42 goblin (19,6) 14 HP single attack: before 8 particles/0 rings, after 30 particles/1 ring, kills 1, log Defeated. Unit 176 OK, harness 99/99, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-062, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794099815.9145954,
-      "timestamp_str": "2026-11-08 04:03:35",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-050, then cycle 22 (audio cues)",
-        "evidence": "176 tests, harness 99/99, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-050",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-050' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794099856.8365228,
-      "timestamp_str": "2026-11-08 04:04:16",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-051",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Audio: add a two-layer stone whoosh to every floor descent, prove with a failing-first oscillator check, a source test and a real stairs step before/after run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794100592.508103,
-      "timestamp_str": "2026-11-08 04:16:32",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Stepping onto the stairs changed the whole floor with only a chronicle line; the recorded events were [90] (step) and no transition cue, so the largest state change in the game was silent",
-        "benefits": "The descent is audible before the new floor renders; the step cue layers underneath; no rule/save change",
-        "risks": "contract: descendFloor calls playDescend; dependency: none; concurrency: none; state: no save/rule change; UI: audio.js and engine.js in the game-ui surface",
-        "mitigation": "Failing descent_cue check (events []); after [220,110]; real seed 42 stairs step depth 1->2 before [90]/after [90,220,110]; source test; inspector at three viewports; full gates"
-      },
-      "plan_digest": "4decc0e1473ea602bada93af5902da81cba1630facd33d4fa9b424923afcd47c"
-    },
     {
       "task_id": "CC-051",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794110711.1573212,
       "timestamp_str": "2026-11-08 07:05:11",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-057",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Graphics/effects: make reduced-motion hit flashes expire on the live clock instead of the frozen ambient timestamp; prove with a failing-first pixel check, a same-state before/after reduced-motion crop and a real hit run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794111117.5693781,
+      "timestamp_str": "2026-11-08 07:11:57",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Reduced motion freezes the render timestamp to 0, but the player and monster hit flashes compare against performance.now() stamps; the age is negative forever, so the player stays red and the monster veil never clears after the first hit",
+        "benefits": "Hit flashes expire on their real 160/140ms schedule in reduced-motion mode; ambient bobbing, pulsing and flicker stay frozen; normal mode is unchanged",
+        "risks": "contract: two flash expiry checks only; dependency: none; concurrency: none; state: no save/RNG change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Failing-first reduced-motion pixel selftest with an expired flash; source drift test; same-state 1920x1080 before/after player-tile crops; real hit under reduced motion; three-viewport inspector and full gates"
+      },
+      "plan_digest": "36c1276669914165e8a158b60901fc08e225ea80b853b253f8fa7dabb5ecbeff"
+    },
+    {
+      "task_id": "CC-057",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Reduced-motion hit flashes expire on the live clock: _drawMonster/_drawPlayer now read performance.now() for the 140/160ms flash checks instead of the frozen render timestamp. Failing-first tests: reduced_motion_hit_flash_expires (base 14 -> expired 1240) + test_player/monster_flash_uses_live_clock; after base 14 -> expired 14. Seed 42 B1F reduced motion, real tacticalStrike + retaliation, waited 919ms: before solid coral player/cream goblin, after normal sprites. Unit 185 OK, harness 111/111, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-069, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794112504.2315779,
+      "timestamp_str": "2026-11-08 07:35:04",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-057, then cycle 29 (audio cues)",
+        "evidence": "185 tests, harness 111/111, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-057",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-057' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794112580.4204335,
+      "timestamp_str": "2026-11-08 07:36:20",
       "agent": "opencode:cycles"
     }
   ]
