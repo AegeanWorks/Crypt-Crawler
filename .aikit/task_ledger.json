@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-067",
+    "task_id": "CC-068",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794137203.9032416,
+    "updated_at": 1794137710.2601666,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794137300.75616
+    "completed_at": 1794137816.9096289
   },
   "checkpoints": [
-    {
-      "task_id": "CC-061",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Choir phase priority shipped: choirPhaseDue suppresses a new hum while the 50% split or 25% silence is due; a successful split now consumes the Choir's turn so it cannot overlap a fresh echo. Failing-first: forced-hum harness check failed on HEAD (echoes 0, phase false) and passes now (echoes 2, phase true, uniqueTiles true); tests/test_choir_phase_priority.py (2 checks). Real seed 42 B1F Space run: before hums one note/no echoes, after splits into 2 echoing voices at (4,6) and (2,6), Choir stays (3,6), no page errors. Before/after full and zoom crops at 1920x1080. Unit 193 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-073, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794131168.3235703,
-      "timestamp_str": "2026-11-08 12:46:08",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit cycle 32, then cycle 33 (levels)",
-        "evidence": "193 tests, harness 117/117, inspector 75/75, aikit check 5/5"
-      }
-    },
-    {
-      "task_id": "CC-061",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-061' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794131418.5636039,
-      "timestamp_str": "2026-11-08 12:50:18",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-062",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Levels: keep the Hermit Merchant on every depth>=2 floor instead of dropping it when room 1 is the farthest/stairs room; prove with the fairness validator, a failing-first merchant placement test, same-state room and modal crops, and a real ArrowRight merchant step",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794132407.2741458,
-      "timestamp_str": "2026-11-08 13:06:47",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The generator only tries dungeon.rooms[1]; when that is the farthest room, no merchant is placed. validate_fairness.py rejects seeds 1, 3 and 15 at depths 2 and 3, 6 of 90 tested floors.",
-        "benefits": "Every depth>=2 floor offers its merchant; the validator goes from 84/90 to 90/90; the soul relocates but stays one per floor",
-        "risks": "contract: merchant placement loop plus free-floor fallback in crawler/dungeon.py; dependency: none; concurrency: none; state: no save format or RNG stream change, but prop positions can shift; UI: none",
-        "mitigation": "Failing-first tests/test_merchant_spawn.py; fairness sweep; seed 1 B2F real ArrowRight onto the shop tile; same-state room and modal crops at 1920x1080; full gates"
-      },
-      "plan_digest": "cd61ed14e659394aea43ace28051f995bb3eadc7f1ea272b3e53d79cd99c3a39"
-    },
     {
       "task_id": "CC-062",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794137300.7561612,
       "timestamp_str": "2026-11-08 14:28:20",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-068",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Enemies/bosses: make Malakor's freshly summoned skeletons occupy their tiles for the rest of the enemy turn so the lich cannot stand on one; prove with a failing-first unique-tile check, a real Space turn at seed 4242 B3F, and same-state boss/skeleton crops",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794137699.1048353,
+      "timestamp_str": "2026-11-08 14:34:59",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "processEnemyTurns queues summons in newMonsters, but _isOccupied only checks this.monsters. A real seed 4242 B3F run put the boss and a skeleton both on (9,2).",
+        "benefits": "Summoned bodies are solid immediately; the lich keeps its normal move/drain/attack; all living monsters keep unique tiles; any future summon gets the same protection",
+        "risks": "contract: _pendingMonsters tracking plus _isOccupied check; dependency: none; concurrency: none; state: no save/RNG/gameplay-value change; UI: none",
+        "mitigation": "Failing-first harness check, source guard test, real Space turn with a forced non-drain roll, same-state zoom crops, full gates"
+      },
+      "plan_digest": "a9a484669a4263fdf93ccf597138f6ffe93bdedad916bb96136ba49d8993e29c"
+    },
+    {
+      "task_id": "CC-068",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Summon occupancy fixed: _pendingMonsters is registered for processEnemyTurns and _isOccupied rejects living pending bodies; tests/test_summon_occupancy.py and malakor_summon_keeps_unique_tiles. Failing-first check failed on HEAD (boss and skeleton both at 9,2) and passes now (boss 10,3; skeletons 9,2/9,4; unique true). Real seed 4242 B3F Space turn with Math.random 0.99: before unique false, after true, 2 skeletons, turn 2, no page errors; same-state zoom crops. Unit 204 OK, harness 127/127, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-080, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794137710.2601666,
+      "timestamp_str": "2026-11-08 14:35:10",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 39, then cycle 40 (levels)",
+        "evidence": "204 tests, harness 127/127, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-068",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-068' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794137816.90963,
+      "timestamp_str": "2026-11-08 14:36:56",
       "agent": "opencode:cycles"
     }
   ]
