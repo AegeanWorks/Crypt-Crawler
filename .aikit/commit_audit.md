@@ -135,3 +135,21 @@ recorded dry. Every run ends with `python aikit.py publish crypt-crawler`.
 - **Action**: none.
 
 - **Push (24/27/30 batch)**: via `python aikit.py publish crypt-crawler`.
+
+## Batch 1 → 33 through 1 → 182 (original end `6f9f644`)
+
+- **Command**: `python .inspect/cycles/audit_history.py` → **checked 51, ok 50,
+  failed 1**. Full per-checkpoint results: `.aikit/commit_audit_results.json`.
+- **Result**: every checkpoint from 33 through 182 passed its own canonical suite except
+  `f6610ca` (1→84, procedural depth and telegraphed bosses). Test counts grew from 48 at
+  checkpoint 33 to 208 at the end.
+- **Historical failure**: `f6610ca` ran 26 tests with 28 errors:
+  `ModuleNotFoundError: No module named 'crawler.foundry_packs'`. That commit imports
+  the foundry loader in `crawler/entities.py` before the module is added by `034137b`
+  (1→96). Current `HEAD` contains the loader and its tests, so this is an intermediate
+  historical break, not a surviving defect. No history rewrite was attempted.
+- **Current gates**: unit 210 OK; harness 137 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; `aikit check` 5/5.
+- **Action**: no code change at `HEAD`; the historical break is documented with the full
+  result set.
+- **Push**: via `python aikit.py publish crypt-crawler`.
