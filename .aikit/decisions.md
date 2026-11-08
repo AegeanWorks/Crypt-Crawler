@@ -541,6 +541,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: The minimap agrees with the hover cards and with a resumed save; live objectives still glow, spent ones read as explored floor. 182 unit tests green, harness 107/107, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, all three sigils collected and vault opened, before/after minimap crops.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first pixel check), PRINCIPLE-011 (the map and the hover card tell the same truth).
 
+### ADR-068: All three bounties fit the contract modal (improvement cycle 27)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The Bounties modal wrapped three 99px contract cards in a fixed 280px inner scroller. At 1920x1080 and 1366x768 the content is 321px, so the third contract's reward line was below the fold while the modal occupied only 462px of the viewport. The content was reachable only by an unprompted scroll.
+- **Decision**: Replace the fixed cap with `max-height: min(52vh, 420px)` and keep `overflow-y: auto`. All three cards fit on desktop/laptop; short viewports still scroll. Guard with `test_bounty_list_cap_is_viewport_relative` (source drift) and `bounties_modal_shows_all_contracts` (last card fully visible, list not scrolling, modal inside the viewport). No bounty, save or rule change.
+- **Consequences**: Every floor contract and its reward is readable in one view on typical screens; a small screen retains the scroll fallback. 183 unit tests green, harness 109/109, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, real Bounties click, before 66/99px -> after 99/99px visible.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first fold check), PRINCIPLE-005/011 (readable without a hidden gesture).
+
 
 
 

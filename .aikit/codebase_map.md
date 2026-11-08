@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `48`
-- **Total Classes**: `50`
+- **Total Python Modules**: `49`
+- **Total Classes**: `51`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `267`
-- **Total Source Lines**: `10370`
+- **Total Class Methods**: `269`
+- **Total Source Lines**: `10435`
 
 ---
 
@@ -288,6 +288,18 @@
   - Method `.test_malakor_phases_are_type_gated()`
   - Method `.test_other_bosses_have_their_own_phase_text()`
   - Method `.test_choir_split_searches_wider_rings_and_retries()`
+
+---
+
+### [`tests/test_bounty_modal.py`](tests/test_bounty_modal.py)
+> *Bounty modal readability: all three contracts fit above the fold.*
+
+**Size**: `25` lines (`898` bytes)
+
+**Classes:**
+- `class TestBountyModal`
+  - Method `.setUp()`
+  - Method `.test_bounty_list_cap_is_viewport_relative()`
 
 ---
 
@@ -742,7 +754,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2902` lines (`121112` bytes)
+**Size**: `2942` lines (`122814` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

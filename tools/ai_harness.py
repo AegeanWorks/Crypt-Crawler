@@ -2596,6 +2596,46 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_multi_killer", not harness.errors, harness.errors))
     page.context.close()
 
+    # All three floor contracts must fit above the bounty modal's fold, not
+    # disappear behind a fixed 280px inner scroller on a tall desktop.
+    page = harness.open_page(seed)
+    page.click("#btnBounties")
+    page.wait_for_selector("#modalBody .bounty-card")
+    bounty_fold = page.evaluate(
+        """() => {
+            const body = document.getElementById("modalBody");
+            const list = [...body.querySelectorAll("div")].find(
+                (n) => n.querySelector(":scope > .bounty-card")
+            );
+            const cards = [...body.querySelectorAll(".bounty-card")];
+            const listRect = list.getBoundingClientRect();
+            const last = cards[cards.length - 1].getBoundingClientRect();
+            return {
+                cards: cards.length,
+                client: list.clientHeight,
+                scroll: list.scrollHeight,
+                lastVisible: Math.round(
+                    Math.min(last.bottom, listRect.bottom) - Math.max(last.top, listRect.top)
+                ),
+                lastHeight: Math.round(last.height),
+                modalFits: document.getElementById("modalCard")
+                    .getBoundingClientRect().bottom <= innerHeight,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "bounties_modal_shows_all_contracts",
+        bounty_fold["cards"] == 3
+        and bounty_fold["scroll"] <= bounty_fold["client"] + 1
+        and bounty_fold["lastVisible"] >= bounty_fold["lastHeight"] - 1
+        and bounty_fold["modalFits"] is True,
+        bounty_fold,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_bounties_modal", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # A collected sigil or an opened vault keeps its tile type, but the minimap
     # must stop advertising it; otherwise the map sends the player back to a
     # spent objective that the hover cards already hide.

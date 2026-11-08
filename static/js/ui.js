@@ -682,7 +682,7 @@ export class UIController {
           Active contract bounties issued on every floor.
           Fulfill them before descending to reap instant gold and experience!
         </p>
-        <div style="max-height: 280px; overflow-y: auto;">
+        <div style="max-height: min(52vh, 420px); overflow-y: auto;">
           ${listHtml}
         </div>
       </div>

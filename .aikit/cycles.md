@@ -726,3 +726,34 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(levels): clear spent objective markers from the minimap`.
+
+## Cycle 27 — All three bounties fit the contract modal (2026-11-08)
+
+- **Area**: UI readability (Bounties modal).
+- **Find**: `showBountiesModal` wrapped three 99px contract cards in a fixed
+  `max-height: 280px` scroller. At 1920x1080 and 1366x768 the list needed 321px, so the
+  third card showed only 66/99px and its reward line sat below the fold, even though the
+  modal used 462 of 1080px. Failing guards: `bounties_modal_shows_all_contracts` and
+  `test_bounty_list_cap_is_viewport_relative`.
+- **Analyze**: The list is already scrollable, so the content is reachable, but a fixed cap
+  wastes the viewport and hides a contract's reward. Replace it with a viewport-aware cap
+  (`min(52vh, 420px)`) that fits all three cards on desktop/laptop and still scrolls on
+  short screens. Killed: removing the cap entirely (a small phone would push the modal
+  past the viewport); shrinking the cards (hurts readability).
+- **Fix**: `ui.js` modal list cap; `tests/test_bounty_modal.py` drift test;
+  `bounties_modal_shows_all_contracts` selftest check.
+- **Screenshots** (same seed 42 B1F, 1920x1080, dsf 2; real Bounties button click):
+  - before: `.inspect/cycles/c27/before-1-bounties-modal.png` (third card clipped at the
+    progress bar) and `before-2-bounties-scrolled.png` (reward visible only after scroll)
+  - after: `after-1-bounties-modal.png` (all three rewards visible) and
+    `after-2-bounties-scrolled.png` (identical; no scroll needed)
+  - command: `python .inspect/cycles/play_c27.py before|after` (before uses HEAD ui.js)
+- **Played run**: real click on the header Bounties button, seed 42 B1F; before the list was
+  280px tall with 321px of content and the last card 66/99px visible, so the third reward
+  required a scroll; after the list is 321px with 321px of content, the last card 99/99px,
+  modal 502px tall and fully inside 1080px; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 183 OK;
+  `python tools/ai_harness.py selftest` -> 109 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(ui): show all floor bounties in the contract modal`.
