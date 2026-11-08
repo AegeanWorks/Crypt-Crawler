@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-068",
+    "task_id": "CC-069",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794137710.2601666,
+    "updated_at": 1794138869.641039,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794137816.9096289
+    "completed_at": 1794139054.6296673
   },
   "checkpoints": [
-    {
-      "task_id": "CC-062",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Merchant placement fixed: walk rooms[1:] skipping the farthest/stairs room, place at the first free FLOOR center, fall back to any free floor tile on two-room maps. Failing-first tests/test_merchant_spawn.py failed 6/6 regression subtests on HEAD and passes now; fairness 90/90 for seeds 1-30 x depths 1-3 (84/90 before). Real seed 1 B2F ArrowRight: before no merchant, soul at (18,23), soul modal; after merchant at (18,23), soul at (32,3), Grimbold shop with 4 wares; no page errors. Before/after room zoom and modal crops at 1920x1080. Unit 194 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-074, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794132416.5059128,
-      "timestamp_str": "2026-11-08 13:06:56",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit cycle 33, then cycle 34 (UI readability)",
-        "evidence": "194 tests, fairness 90/90, harness 117/117, inspector 75/75, aikit check 5/5"
-      }
-    },
-    {
-      "task_id": "CC-062",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-062' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794132643.6833498,
-      "timestamp_str": "2026-11-08 13:10:43",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-063",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] UI readability: give narrow canvases a CSS-pixel minimap key instead of the 7px canvas legend that renders at 3.43px on a 390px mobile viewport; prove with same-state mobile before/after crops, live measurements at mobile and desktop, and a source drift test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794133233.982008,
-      "timestamp_str": "2026-11-08 13:20:33",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The minimap legend is drawn into the 760x540 canvas at 7px; at a 372px canvas it is 3.43px on-screen and unreadable, while the README promises every blip is named.",
-        "benefits": "The nine minimap labels stay legible on mobile and narrow center panels; desktop keeps the compact canvas key; the labels/colors have one source",
-        "risks": "contract: renderer DOM key plus ResizeObserver toggle and CSS; dependency: none; concurrency: none; state: no game/save change; UI: renderer.js and style.css in the game-ui surface",
-        "mitigation": "Live mobile and desktop measurement, same-state before/after crops, source drift test, three-viewport inspector, full gates"
-      },
-      "plan_digest": "d8309020f5797720016d0ea4b52eb6d04cf63300f806810a5664b100e0b88448"
-    },
     {
       "task_id": "CC-063",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794137816.90963,
       "timestamp_str": "2026-11-08 14:36:56",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-069",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Progression/records: give foundry pack bosses a named bestiary row instead of recording their kill invisibly under a static-list gap; prove with a failing-first records check, a real seed 42 B3F Ashen Warden kill, and same-state last-row crops",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794138852.2800696,
+      "timestamp_str": "2026-11-08 14:54:12",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "recordMonsterDefeat stores only {slain}; the Records bestiary is a static 13-type list. Killing boss_ashen_warden_s42 stored {slain:1} but the list stayed 13 rows with no Ashen Warden.",
+        "benefits": "Every recorded kill, including installed pack bosses, has a named row and live count; new packs need no static list edit; old saves get a readable fallback",
+        "risks": "contract: name field on bestiary entries plus dynamic UI rows; dependency: none; concurrency: none; state: additive record field, no save version bump; UI: Records modal",
+        "mitigation": "Failing-first harness check, source tests, real key-1 pack boss kill, same-state last-row crops, full gates"
+      },
+      "plan_digest": "77519e612fc82596dd11b55162184a2bf298c054a45461e2ab5ab7138322463d"
+    },
+    {
+      "task_id": "CC-069",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Foundry bosses in the codex: recordMonsterDefeat stores the display name and showHallOfRecordsModal appends unknown killed ids after the static rows with name/fallback. Failing-first harness check failed on HEAD (13 rows, no Ashen Warden) and passes now (14 rows, Ashen Warden, Slayed 1); tests/test_bestiary.py extended. Real seed 42 B3F key-1 kill: before entry {slain:1}, 13 rows, has_row false; after {slain:1,name:Ashen Warden}, 14 rows, has_row true; last-row crops. Unit 205 OK, harness 129/129, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-081, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794138869.641039,
+      "timestamp_str": "2026-11-08 14:54:29",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 40, then cycle 41 (UI readability)",
+        "evidence": "205 tests, harness 129/129, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-069",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-069' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794139054.629669,
+      "timestamp_str": "2026-11-08 14:57:34",
       "agent": "opencode:cycles"
     }
   ]
