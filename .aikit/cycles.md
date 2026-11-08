@@ -1137,3 +1137,37 @@ class, difficulty and viewport.
 - **Gates**: unit 202 OK; harness 125 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(combat): make Molten armor bite with hit feedback`.
+
+## Cycle 39 — Malakor cannot stand on his own skeletons (2026-11-08)
+
+- **Area**: Enemies and bosses (Malakor summon occupancy).
+- **Find**: Malakor's 50% summon queues two skeletons in `newMonsters`, but `_isOccupied`
+  only checks `this.monsters`. The lich could therefore raise a skeleton directly north
+  and then step north onto that same tile in the same enemy turn. A real seed 4242 B3F
+  run with the lich at (9,3) and the player at (9,1) ended with the boss and a skeleton
+  both on (9,2); the second skeleton stood at (9,4). `uniqueTiles: false`. The harness
+  check `malakor_summon_keeps_unique_tiles` failed on HEAD with the same overlap.
+- **Analyze**: Every body raised during an enemy turn should occupy its tile for the rest
+  of that turn, not only for the summoner's spawn search. Track the pending array on the
+  engine and include it in `_isOccupied`; the lich can still move, drain or attack, it
+  just cannot step onto a body it just created. Killed: `continue` after the summon (it
+  would skip the lich's drain/attack and the 25% enrage check), and patching only the
+  lich's spot list (the same occupancy hole would remain for any future summon).
+- **Fix**: `_isOccupied` also rejects living `_pendingMonsters`; `processEnemyTurns`
+  registers the `newMonsters` array and clears it after the loop. Add
+  `tests/test_summon_occupancy.py` and the `malakor_summon_keeps_unique_tiles` harness
+  check.
+- **Screenshots** (seed 4242 B3F, lich staged at (9,3) with 47/95 HP, player at (9,1),
+  real Space with `Math.random = 0.99` so the lich moves instead of draining, 1920x1080,
+  dsf 2; before uses HEAD `engine.js`):
+  - before: `.inspect/cycles/c39/before-summon-zoom.png` shows the crowned lich and a
+    risen skeleton sharing the (9,2) tile.
+  - after: `after-summon-zoom.png` shows the lich at (10,3) and the two skeletons at
+    (9,2) and (9,4), all separate.
+  - command: `python .inspect/cycles/play_c39.py before|after`
+- **Played run**: Real browser Space at seed 4242 B3F. Before: boss (9,2), skeletons
+  (9,2) and (9,4), `uniqueTiles: false`. After: boss (10,3), skeletons (9,2) and (9,4),
+  `uniqueTiles: true`; both runs raised 2 skeletons, turn 2, no page errors.
+- **Gates**: unit 204 OK; harness 127 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(bosses): keep summoned skeletons off the summoner's tile`.

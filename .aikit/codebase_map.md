@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `57`
-- **Total Classes**: `59`
+- **Total Python Modules**: `58`
+- **Total Classes**: `60`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `298`
-- **Total Source Lines**: `11111`
+- **Total Class Methods**: `301`
+- **Total Source Lines**: `11192`
 
 ---
 
@@ -843,6 +843,19 @@
 
 ---
 
+### [`tests/test_summon_occupancy.py`](tests/test_summon_occupancy.py)
+> *Bodies summoned during an enemy turn block movement on that same turn.*
+
+**Size**: `25` lines (`825` bytes)
+
+**Classes:**
+- `class TestSummonOccupancy`
+  - Method `.setUp()`
+  - Method `.test_pending_monsters_are_registered_and_cleared()`
+  - Method `.test_occupancy_includes_pending_bodies()`
+
+---
+
 ### [`tests/test_swarm_fixes.py`](tests/test_swarm_fixes.py)
 > *Swarm-triage regression locks: verified true findings only (failing-first).*
 
@@ -863,7 +876,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3329` lines (`138932` bytes)
+**Size**: `3385` lines (`141156` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

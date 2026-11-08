@@ -637,6 +637,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: The counter-burn is now legible as a hit on the hero, matching enemy melee, traps and statuses. No damage, turn, save or RNG change. 202 unit tests green, harness 125/125, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real key 1, HP 65 -> 63, hit calls 1 -> 2, flash age null -> 13.8ms; same-state hit-frame crops in `.inspect/cycles/c38/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first feedback check), PRINCIPLE-011 (damage the player can see and hear).
 
+### ADR-080: Pending summons occupy their tiles for the turn (improvement cycle 39)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Malakor's 50% summon queues two skeletons in `newMonsters`, but `_isOccupied` only checked `this.monsters`. The lich could raise a skeleton directly north and then step north onto that same tile in the same enemy turn. A real seed 4242 B3F run with the lich at (9,3) and the player at (9,1) ended with the boss and a skeleton both on (9,2); `uniqueTiles` was false. The `malakor_summon_keeps_unique_tiles` harness check failed on HEAD.
+- **Decision**: Track `this._pendingMonsters = newMonsters` for the duration of `processEnemyTurns` and have `_isOccupied` reject living pending bodies as well. Clear the field after the loop. This lets the lich keep its normal action while preventing it (or any other acting monster) from stepping onto a body raised earlier in the same turn. Add `tests/test_summon_occupancy.py` and the harness check.
+- **Consequences**: Summoned bodies are solid immediately, all living monsters keep unique tiles, and the lich's drain/attack/enrage flow is unchanged. No save format, RNG or gameplay-value change. 204 unit tests green, harness 127/127, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 4242 B3F real Space, before boss/skeleton both on (9,2), after boss (10,3) and skeletons (9,2)/(9,4); same-state zoom crops in `.inspect/cycles/c39/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first boss check), PRINCIPLE-011 (boss bodies never share a tile).
+
 
 
 

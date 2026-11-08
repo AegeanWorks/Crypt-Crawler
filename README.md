@@ -256,6 +256,7 @@ crypt-crawler/
 │   ├── test_room_themes.py   <- every generated room theme has a rendered emblem
 │   ├── test_save_version.py  <- one save version constant, unsupported saves refused
 │   ├── test_strike_target.py <- Strike prefers the hovered adjacent enemy
+│   ├── test_summon_occupancy.py <- newly summoned bodies block the same turn
 │   ├── test_engagement.py    <- tuning table bounds, determinism, distribution tests
 │   ├── test_odds_parity.py   <- stated-vs-coded odds parity tests
 │   ├── test_player_stun.py   <- a stun costs the next turn action

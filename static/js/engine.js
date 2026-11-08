@@ -2643,6 +2643,7 @@ export class GameEngine {
 
   processEnemyTurns() {
     const newMonsters = [];
+    this._pendingMonsters = newMonsters;
     for (const monster of this.monsters) {
       if (monster.hp <= 0) continue;
       if (this.player.hp <= 0) break;
@@ -2952,6 +2953,7 @@ export class GameEngine {
       }
     }
     if (newMonsters.length) this.monsters.push(...newMonsters);
+    this._pendingMonsters = null;
   }
 
   _stepToward(monster) {
@@ -3067,6 +3069,11 @@ export class GameEngine {
   _isOccupied(x, y) {
     if (this.player.x === x && this.player.y === y) return true;
     if (this.monsters.some((m) => m.x === x && m.y === y && m.hp > 0)) return true;
+    // Bodies raised during this enemy turn are not in this.monsters yet.
+    if (this._pendingMonsters
+        && this._pendingMonsters.some((m) => m.x === x && m.y === y && m.hp > 0)) {
+      return true;
+    }
 
     // Interactive props are never covered by a moving or summoned monster.
     const dungeon = this.dungeon;

@@ -2324,6 +2324,62 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_lich_phase", not harness.errors, harness.errors))
     page.context.close()
 
+    # Malakor's freshly raised skeletons are queued in newMonsters; his own
+    # step must not land on one of those bodies in the same enemy turn.
+    page = harness.open_page(seed, depth=3)
+    summon_overlap = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            const boss = e.monsters.find((m) => m.type === 'boss_lich');
+            if (!boss) return { found: false };
+            let spot = null;
+            for (let y = 2; y < d.height - 2 && !spot; y += 1) {
+                for (let x = 2; x < d.width - 2 && !spot; x += 1) {
+                    let clear = true;
+                    for (let yy = y - 2; yy <= y + 2; yy += 1) {
+                        for (let xx = x - 2; xx <= x + 2; xx += 1) {
+                            if (!d.isWalkable(xx, yy)) clear = false;
+                        }
+                    }
+                    if (clear) spot = { x, y };
+                }
+            }
+            if (!spot) return { found: false };
+            const p = e.player;
+            p.x = spot.x;
+            p.y = spot.y - 2;
+            p.hp = p.max_hp;
+            e.monsters = [boss];
+            boss.x = spot.x;
+            boss.y = spot.y;
+            boss.hp = Math.floor(boss.max_hp * 0.5);
+            boss.phase_two = false;
+            d.updateFOV(p.x, p.y, 7);
+            e.processEnemyTurns();
+            const live = e.monsters.filter((m) => m.hp > 0).map((m) => `${m.x},${m.y}`);
+            return {
+                found: true,
+                boss: { x: boss.x, y: boss.y },
+                skeletons: e.monsters.filter((m) => m.type === 'skeleton')
+                    .map((m) => ({ x: m.x, y: m.y })),
+                uniqueTiles: new Set(live).size === live.length,
+                tiles: live,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "malakor_summon_keeps_unique_tiles",
+        summon_overlap.get("found") is True
+        and len(summon_overlap["skeletons"]) > 0
+        and summon_overlap["uniqueTiles"] is True,
+        summon_overlap,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_summon_overlap", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # Ranged attacks and boss telegraphs need an entrance cue, not only an impact
     # sound. Record the oscillator starts the shipped audio module schedules.
     page = harness.open_page(seed)
