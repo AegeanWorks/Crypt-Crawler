@@ -1102,3 +1102,38 @@ class, difficulty and viewport.
 - **Gates**: unit 201 OK; harness 123 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(save): keep the explored map across a reload`.
+
+## Cycle 38 — Molten armor bites like a hit (2026-11-08)
+
+- **Area**: Combat feel (Molten champion counter-burn feedback).
+- **Find**: The Molten branch in `attackMonster` applied 2 damage with a floating "-2
+  BURN", a log line and a 5px shake, but it never stamped `player._hitFlash` and never
+  played the hit cue. Every other blow on the hero flashes the sprite coral for 160ms and
+  plays the 160 Hz hit; the Molten bite was the only silent, unflashed damage. The harness
+  check `molten_counter_burn_flashes_and_sounds` failed on HEAD: HP 65 -> 63, `hitCalls:
+  1` (the player's strike only), `flashAge: null`.
+- **Analyze**: Molten armor retaliates with a real hit, so it should reuse the real hit
+  feedback instead of inventing a new effect. Killed: a bigger screen shake (the event
+  already shakes, but the player cannot see what hit them), treating it as a burn status
+  (it is immediate armor damage, not a damage-over-time), and leaving it silent (the log
+  is easy to miss mid-fight).
+- **Fix**: Stamp `this.player._hitFlash = performance.now()` and call
+  `sounds.playHit(false)` beside the 2 damage in the Molten branch. Add
+  `tests/test_molten_feedback.py` and the `molten_counter_burn_flashes_and_sounds`
+  harness check.
+- **Screenshots** (seed 42 B1F, player staged at (29,3), Molten Champion at (30,3) with
+  999 HP and a 1-turn stun so it cannot retaliate, real key 1, render frozen at the hit
+  frame, 1920x1080, dsf 2; before uses HEAD `engine.js`):
+  - before: `.inspect/cycles/c38/before-strike-zoom.png` shows the normal player sprite
+    and "-2 BURN".
+  - after: `after-strike-zoom.png` shows the coral hit flash over the player and the same
+    "-2 BURN".
+  - command: `python .inspect/cycles/play_c38.py before|after`
+- **Played run**: Real key 1 Strike. Before: HP 65 -> 63, `hitCalls: 1`, `flashAge:
+  null`, log "You strike ... 7 damage" + "Molten armor singed you for 2 burn damage!".
+  After: HP 65 -> 63, `hitCalls: 2`, `flashAge: 13.8ms`, same log; the stunned champion
+  does not act; no page errors in either run. The screenshot pair is from the same
+  state/build pair.
+- **Gates**: unit 202 OK; harness 125 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(combat): make Molten armor bite with hit feedback`.

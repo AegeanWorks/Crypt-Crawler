@@ -249,6 +249,7 @@ crypt-crawler/
 │   ├── test_merchant_spawn.py <- every depth>=2 floor has its Hermit Merchant
 │   ├── test_minimap_legend.py <- every minimap colour is named in the legend
 │   ├── test_minimap_legend_dom.py <- narrow canvases get a readable DOM key
+│   ├── test_molten_feedback.py <- Molten armor bites with flash and sound
 │   ├── test_bounty_modal.py  <- all three floor contracts fit the bounty modal
 │   ├── test_reduced_motion_flash.py <- reduced motion freezes ambience, not hit flashes
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests

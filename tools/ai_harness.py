@@ -2693,6 +2693,67 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_hover_target", not harness.errors, harness.errors))
     page.context.close()
 
+    # Molten armor bites the attacker; that bite is a hit and must flash and
+    # sound exactly like any other damage the hero takes.
+    page = harness.open_page(seed)
+    molten = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            let spot = null;
+            for (let y = 1; y < d.height - 1 && !spot; y += 1) {
+                for (let x = 1; x < d.width - 1 && !spot; x += 1) {
+                    let clear = true;
+                    for (let yy = y - 1; yy <= y + 1; yy += 1) {
+                        for (let xx = x - 1; xx <= x + 1; xx += 1) {
+                            if (d.tiles[yy][xx] !== 1) clear = false;
+                        }
+                    }
+                    if (clear) spot = { x, y };
+                }
+            }
+            if (!spot) return { found: false };
+            e.monsters = [{
+                name: 'Molten Champion', type: 'skeleton', x: spot.x + 1, y: spot.y,
+                hp: 999, max_hp: 999, attack: 0, defense: 0, xp_reward: 0,
+                gold_reward: 0, loot_drop: null, is_boss: false, is_champion: true,
+                champion_affix: 'Molten', status_effects: {},
+            }];
+            const p = e.player;
+            p.x = spot.x;
+            p.y = spot.y;
+            p.hp = p.max_hp;
+            d.updateFOV(p.x, p.y, 7);
+            const { sounds } = await import('/js/audio.js');
+            const originalHit = sounds.playHit;
+            let hitCalls = 0;
+            sounds.playHit = (...args) => {
+                hitCalls += 1;
+                return originalHit.apply(sounds, args);
+            };
+            const beforeHp = p.hp;
+            e.attackMonster(e.monsters[0]);
+            const flashAge = p._hitFlash ? performance.now() - p._hitFlash : null;
+            sounds.playHit = originalHit;
+            return {
+                found: true, beforeHp, afterHp: p.hp, hitCalls, flashAge,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .slice(-3).map((el) => el.textContent),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "molten_counter_burn_flashes_and_sounds",
+        molten.get("found") is True
+        and molten["afterHp"] == molten["beforeHp"] - 2
+        and molten["flashAge"] is not None
+        and molten["flashAge"] < 250
+        and molten["hitCalls"] >= 2,
+        molten,
+    ))
+    checks.append(_check("no_page_errors_after_molten", not harness.errors, harness.errors))
+    page.context.close()
+
     # The killing blow deserves a beat: death feedback first, the modal after.
     page = harness.open_page(seed)
     death = page.evaluate(

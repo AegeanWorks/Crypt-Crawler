@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `56`
-- **Total Classes**: `58`
+- **Total Python Modules**: `57`
+- **Total Classes**: `59`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `296`
-- **Total Source Lines**: `11026`
+- **Total Class Methods**: `298`
+- **Total Source Lines**: `11111`
 
 ---
 
@@ -692,6 +692,18 @@
 
 ---
 
+### [`tests/test_molten_feedback.py`](tests/test_molten_feedback.py)
+> *Molten counter-burn gives the same hit feedback as any other blow.*
+
+**Size**: `24` lines (`819` bytes)
+
+**Classes:**
+- `class TestMoltenFeedback`
+  - Method `.setUp()`
+  - Method `.test_counter_burn_is_a_real_hit()`
+
+---
+
 ### [`tests/test_odds_parity.py`](tests/test_odds_parity.py)
 > *Odds parity: stated README odds match coded odds in Python and shipped JS.*
 
@@ -851,7 +863,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3268` lines (`136362` bytes)
+**Size**: `3329` lines (`138932` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

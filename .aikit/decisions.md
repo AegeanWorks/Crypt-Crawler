@@ -629,6 +629,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: A resumed run keeps the map knowledge the player earned; the minimap, hover cards and navigation agree with the pre-reload state. The save grows by a 45x30 boolean grid; no version bump is needed because the field is additive and guarded. 201 unit tests green, harness 123/123, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real 44-step walk + reload, explored 435 -> 77 before, 435 -> 435 after; same-state minimap crops in `.inspect/cycles/c37/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first resume check), PRINCIPLE-013 (atomic additive save state).
 
+### ADR-079: Molten armor uses the real hit feedback (improvement cycle 38)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The Molten champion branch applied 2 counter-burn damage with a floating "-2 BURN", a log line and a shake, but never stamped `player._hitFlash` or called the hit cue; every other blow on the hero flashes coral for 160ms and plays the 160 Hz hit. The `molten_counter_burn_flashes_and_sounds` harness check failed on HEAD with `hitCalls: 1` (the player's strike only) and `flashAge: null`.
+- **Decision**: Add `this.player._hitFlash = performance.now()` and `sounds.playHit(false)` beside the 2 damage in the Molten branch of `attackMonster`. Reuse the existing hit feedback rather than a new effect. Add `tests/test_molten_feedback.py` (the Molten block contains the damage, flash and sound) and the harness check.
+- **Consequences**: The counter-burn is now legible as a hit on the hero, matching enemy melee, traps and statuses. No damage, turn, save or RNG change. 202 unit tests green, harness 125/125, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real key 1, HP 65 -> 63, hit calls 1 -> 2, flash age null -> 13.8ms; same-state hit-frame crops in `.inspect/cycles/c38/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first feedback check), PRINCIPLE-011 (damage the player can see and hear).
+
 
 
 

@@ -1731,6 +1731,8 @@ export class GameEngine {
     // Molten Champion Counter-Burn
     if (monster.champion_affix === "Molten" && monster.hp > 0) {
       this.player.hp = Math.max(0, this.player.hp - 2);
+      this.player._hitFlash = performance.now();
+      sounds.playHit(false);
       this.renderer.addFloatingText("-2 BURN", this.player.x, this.player.y, "#dd6b20");
       this.ui.logMessage(`🔥 Molten armor singed you for 2 burn damage!`, "hit");
       this.renderer.shake(5, 140);
