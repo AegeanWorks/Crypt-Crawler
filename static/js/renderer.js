@@ -2371,7 +2371,7 @@ export class DungeonRenderer {
     // Revealed traps
     for (const trap of dungeon.traps || []) {
       if (trap.disarmed) ctx.fillStyle = "#718096";
-      else if (trap.discovered && !trap.triggered) ctx.fillStyle = "#d69e2e";
+      else if (trap.discovered && !trap.triggered) ctx.fillStyle = "#f6ad55";
       else continue;
       ctx.fillRect(mx + trap.x * scaleX, my + trap.y * scaleY, 2, 2);
     }
@@ -2388,6 +2388,39 @@ export class DungeonRenderer {
     ctx.fillStyle = "#48bb78";
     ctx.fillRect(mx + player.x * scaleX - 1.5, my + player.y * scaleY - 1.5, 4, 4);
 
+    this._drawMinimapLegend(ctx, mx, my, mw, mh);
+
+    ctx.restore();
+  }
+
+  _drawMinimapLegend(ctx, mx, my, mw, mh) {
+    const legendY = my + mh + 2;
+    const legendH = 32;
+    ctx.save();
+    ctx.fillStyle = "rgba(10, 14, 20, 0.8)";
+    ctx.strokeStyle = "#c89b3c";
+    ctx.lineWidth = 1;
+    ctx.fillRect(mx, legendY, mw, legendH);
+    ctx.strokeRect(mx, legendY, mw, legendH);
+    ctx.font = "7px 'SFMono-Regular', Consolas, monospace";
+    ctx.textBaseline = "middle";
+    const rows = [
+      [["Stairs", "#ecc94b"], ["Chest", "#ed8936"], ["Shop", "#b794f4"]],
+      [["Sigil", "#63b3ed"], ["Vault", "#d69e2e"], ["Trap", "#f6ad55"]],
+      [["Shrine", "#38b2ac"], ["Pact", "#f56565"], ["Soul", "#d6bcfa"]],
+    ];
+    let y = legendY + 7;
+    for (const row of rows) {
+      let x = mx + 4;
+      for (const [label, color] of row) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y - 2, 4, 4);
+        ctx.fillStyle = "#a0aec0";
+        ctx.fillText(label, x + 6, y);
+        x += 6 + ctx.measureText(label).width + 5;
+      }
+      y += 10;
+    }
     ctx.restore();
   }
 

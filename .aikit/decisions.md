@@ -477,4 +477,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: The Choir splits into 2 echoes even beside the vault/warden (ring-2 tiles), the Ashen Warden escalates under its own name with no summons, and Malakor keeps his 2-skeleton summon and enrage. 170 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B2F Choir: before 0 echoes + 2 risen skeletons + "Malakor" log; after 2 echoes + split log. Seed 42 B3F Ashen Warden: before 5 skeletons + Malakor log; after 3 skeletons + "Ashen Warden's seal breaks" and attack 15 -> 18.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first phase checks), PRINCIPLE-009 (each boss owns its phase block; no new subsystem).
 
+### ADR-060: Named minimap legend (improvement cycle 19, display only)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The minimap drew nine different blip colours (stairs gold, chest orange, merchant purple, sigil blue, vault dark gold, trap amber, shrine teal, pact red, soul lilac) plus the green player and red enemies, with no key anywhere in the UI or README. A new player could not tell a vault from a trap, and the trap amber (`#d69e2e`) was the same as the vault. The map is a core level-navigation aid, so an unlabelled colour code is a real readability defect.
+- **Decision**: Draw a three-row legend under the minimap frame naming Stairs, Chest, Shop, Sigil, Vault, Trap, Shrine, Pact and Soul with their swatches; change the revealed-trap blip to `#f6ad55` so it no longer matches the vault gold. Add `tests/test_minimap_legend.py` (legend call + all nine labels + distinct trap/vault/stairs colours). The legend is 120x32 in the canvas buffer below the 120x84 map; no rule, save or RNG change.
+- **Consequences**: Every minimap colour is self-explanatory; the map/trap/vault colours are distinct. 172 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, three real steps to (8,25), turn 4: before map only, after the nine-label legend. Also stabilized the inspector's `damage_flash_active` check by reading the class in the same synchronous evaluate as `flashDamage()`; it passed two consecutive full runs.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (legend drift test), PRINCIPLE-011 (navigation legible without a manual).
+
+
 

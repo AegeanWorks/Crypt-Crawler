@@ -514,3 +514,29 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(enemies): give each boss its own phase`.
+
+## Cycle 19 — Named minimap legend (2026-11-08)
+
+- **Area**: Levels (minimap navigation).
+- **Find**: The minimap used nine colours (stairs, chest, shop, sigil, vault, trap,
+  shrine, pact, soul) plus player/enemy with no key; trap amber was the same as vault gold.
+  A new player could not tell a vault from a trap. Failing test: no legend labels in the
+  renderer.
+- **Analyze**: Add a three-row legend under the 120x84 map; distinguish the trap blip. No rule
+  or save change. Killed: replacing the minimap with a DOM panel (bigger surface, no need).
+- **Fix**: `_drawMinimapLegend` with nine labelled swatches; trap `#f6ad55`; README
+  "Minimap Key"; `tests/test_minimap_legend.py`.
+- **Screenshots** (same seed 42 B1F, three real `stepPlayer` moves (6,26)->(8,25), turn 4,
+  1920x1080, 4x nearest upscales for legibility):
+  - before: `.inspect/cycles/c19/before-minimap.png` / `before-minimap-4x.png` (map only)
+  - after: `after-minimap.png` / `after-minimap-4x.png` (Stairs/Chest/Shop,
+    Sigil/Vault/Trap, Shrine/Pact/Soul)
+  - command: `python .inspect/cycles/play_c19.py before|after` (before uses HEAD renderer.js)
+- **Played run**: real three-step walk; turn 4, player (8,25); no page errors. Gate stability:
+  `damage_flash_active` flaked once, so the inspector now reads the class in the same
+  synchronous evaluate as `flashDamage()`; two consecutive full runs passed 75/75.
+- **Gates**: `python -m unittest discover -s tests` -> 172 OK;
+  `python tools/ai_harness.py selftest` -> 99 checks, 0 failed (JSON `ok: true`);
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(levels): label every minimap blip`.

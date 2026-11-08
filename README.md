@@ -68,6 +68,9 @@ The Dungeon Chronicle auto-scrolls to the newest line. Scroll it back and the to
 ### 🕯️ Biome Readability
 The crypt, cavern and inferno biomes keep distinct palettes; the B2F cavern's visible floor and wall stones are bright enough to read the room shape at a glance, while unexplored tiles stay black and the water shimmers keep the dark-cavern mood.
 
+### 🗺️ Minimap Key
+The minimap names every blip: Stairs (gold), Chest (orange), Shop (purple), Sigil (blue), Vault (dark gold), Trap (amber), Shrine (teal), Pact (red) and Soul (lilac). The green blip is the hero and red dots are visible enemies.
+
 ### 🎲 Seeds
 The class-selection screen accepts an optional positive run seed; leave it blank for a random run. The same seed, class and difficulty reproduce the same dungeon, and the Records modal shows the current seed with a **Copy Seed** button so a run can be replayed or shared.
 
@@ -225,6 +228,7 @@ crypt-crawler/
 │   ├── test_foundry_packs.py <- foundry pack integration tests
 │   ├── test_inspect.py       <- inspection configuration tests
 │   ├── test_lore.py          <- codex data and /api/lore endpoint tests
+│   ├── test_minimap_legend.py <- every minimap colour is named in the legend
 │   ├── test_rewards.py       <- reward jackpots, near-miss & bounty tests
 │   ├── test_room_themes.py   <- every generated room theme has a rendered emblem
 │   ├── test_save_version.py  <- one save version constant, unsupported saves refused

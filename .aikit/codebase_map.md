@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `44`
-- **Total Classes**: `46`
+- **Total Python Modules**: `45`
+- **Total Classes**: `47`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `251`
-- **Total Source Lines**: `10005`
+- **Total Class Methods**: `254`
+- **Total Source Lines**: `10030`
 
 ---
 
@@ -569,6 +569,19 @@
 
 ---
 
+### [`tests/test_minimap_legend.py`](tests/test_minimap_legend.py)
+> *Minimap legend contract: every map colour is named next to the map.*
+
+**Size**: `26` lines (`919` bytes)
+
+**Classes:**
+- `class TestMinimapLegend`
+  - Method `.setUp()`
+  - Method `.test_minimap_draws_a_named_legend()`
+  - Method `.test_trap_blip_is_distinct_from_vault_and_stairs()`
+
+---
+
 ### [`tests/test_odds_parity.py`](tests/test_odds_parity.py)
 > *Odds parity: stated README odds match coded odds in Python and shipped JS.*
 
@@ -726,7 +739,7 @@
 ### [`tools/inspect_ui.py`](tools/inspect_ui.py)
 > *Headless browser visual inspection and UI auditing tool for Crypt-Crawler.*
 
-**Size**: `1606` lines (`91875` bytes)
+**Size**: `1605` lines (`91952` bytes)
 
 **Functions:**
 - `def check_failed(value)` - *Gate predicate: any falsy audit value fails, any truthy value passes.*

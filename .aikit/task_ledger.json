@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-047",
+    "task_id": "CC-048",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794097079.5192976,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794098357.0080645,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794097125.120224
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-041",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Room themes persisted: room_themes added to the saved dungeon; test_room_themes writer contract + resume_restores_room_themes (85 checks). Real reload at seed 42 (11,6): before all ossuary (chapel/urn skulls), after original gallery/chapel/choke/ossuary/urn_crypt list and cross/urn emblems. Unit 158 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-053, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794088994.252368,
-      "timestamp_str": "2026-11-08 01:03:14",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-041, then cycle 13 (UI readability)",
-        "evidence": "158 tests, harness 85/85, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-041",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-041' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794089045.2657974,
-      "timestamp_str": "2026-11-08 01:04:05",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-042",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794097125.1202266,
       "timestamp_str": "2026-11-08 03:18:45",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-048",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Levels: label every minimap colour with a three-row legend (Stairs/Chest/Shop, Sigil/Vault/Trap, Shrine/Pact/Soul), distinguish the trap blip, lock it with a legend test, and stabilize the inspector damage-flash check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794098332.2829638,
+      "timestamp_str": "2026-11-08 03:38:52",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The minimap drew nine colours plus player/enemy with no key and used the same amber for traps and vaults, so players could not tell a vault from a trap; the inspector damage_flash check also flaked when the 180ms class window expired between round-trips",
+        "benefits": "The minimap is self-explanatory, vault and trap colours are distinct, the README documents the key, and the inspector gate is deterministic",
+        "risks": "contract: minimap draws a legend below the map; trap blip colour changes; dependency: none; concurrency: none; state: no save/RNG change; UI: renderer.js in the game-ui surface plus a test-tool timing fix",
+        "mitigation": "Failing legend test before the fix; real three-step seed 42 before/after minimap capture; legend labels test; two consecutive inspector 75/75 runs; full gates"
+      },
+      "plan_digest": "5d6e32ded0c373d10f24e7192e5c24b6e17b26ae5de70710652dc3616a01deff"
+    },
+    {
+      "task_id": "CC-048",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Minimap legend shipped: 3-row key for all nine blip colours, trap blip #f6ad55, README key, test_minimap_legend; inspector damage-flash reads synchronously. Same seed 42 B1F 3-step path turn 4: map only -> full legend; two consecutive inspector 75/75. Unit 172 OK, harness 99/99 (JSON ok true), aikit check 5/5. checklists: passed. ADR-060, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794098357.0080645,
+      "timestamp_str": "2026-11-08 03:39:17",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "legend uncommitted, inspector fix committed 0e5d519",
+        "next": "commit legend, complete CC-048, then cycle 20",
+        "evidence": "172 tests, harness 99/99, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }
