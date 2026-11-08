@@ -653,6 +653,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Every recorded kill, including installed-pack bosses, has a named row with its live count; no static list edit is needed for a new pack, and old saves without a stored name still show a readable fallback. No save version bump; the field is additive. 205 unit tests green, harness 129/129, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B3F real key-1 kill, 13 -> 14 rows, last row "Ashen Warden / Slayed: 1"; same-state row crops in `.inspect/cycles/c40/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first records check), PRINCIPLE-011 (every kill is legible in the codex).
 
+### ADR-082: Each boss owns its death and victory identity (improvement cycle 41)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `_handleMonsterDefeat` treated every `monster.is_boss` as Malakor: it printed "ARCH-LICH MALAKOR HAS FALLEN!", unlocked the three Malakor journal entries, granted the Crown of Eternity and scheduled `handleVictory`. Killing the B2F Hollow Choir ended the run and handed over the final boss's crown; killing the seed 42 B3F foundry Ashen Warden showed Malakor's name and gave the Crown instead of its configured `hammer_thunder`. The `pack_boss_death_uses_its_own_identity` and `choir_death_does_not_end_the_run` harness checks failed on HEAD.
+- **Decision**: Add a client `BOSS_LOOT_ITEMS` table keyed by the monster's `loot_drop`. In the boss branch, use `monster.name` for the death line and loot, reserve Malakor's journal entries/text for `boss_lich`, and only record `finalBoss` plus schedule victory when `depth >= 3`. `handleVictory` reads the recorded name/loot and uses the Malakor epilogue only for Malakor. The stairs barrier names the living boss. Add `tests/test_boss_identity.py` and the two harness checks.
+- **Consequences**: The B2F Choir pays its tome and the run continues; a foundry B3F boss ends the run under its own name and with its own loot; Malakor keeps his crown and journal entries. The victory modal's relic line follows the actual drop. No save-format or turn-rule change. 208 unit tests green, harness 133/133, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 real key 1, before pack/choir both Malakor + crown, after pack Ashen Warden + Warhammer and choir no victory + tome; same-state full-page captures in `.inspect/cycles/c41/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first boss checks), PRINCIPLE-011 (a boss's name, loot and ending match the fight).
+
 
 
 

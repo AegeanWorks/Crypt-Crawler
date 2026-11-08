@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `58`
-- **Total Classes**: `60`
+- **Total Python Modules**: `59`
+- **Total Classes**: `61`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `302`
-- **Total Source Lines**: `11247`
+- **Total Class Methods**: `306`
+- **Total Source Lines**: `11369`
 
 ---
 
@@ -277,6 +277,20 @@
   - Method `.test_every_killable_type_has_a_records_row()`
   - Method `.test_choir_echo_is_a_real_spawned_type()`
   - Method `.test_foundry_bosses_get_a_dynamic_row()`
+
+---
+
+### [`tests/test_boss_identity.py`](tests/test_boss_identity.py)
+> *Only Malakor uses Malakor's death text, lore and crown.*
+
+**Size**: `31` lines (`1186` bytes)
+
+**Classes:**
+- `class TestBossIdentity`
+  - Method `.setUp()`
+  - Method `.test_boss_death_uses_the_monster_payload()`
+  - Method `.test_victory_modal_reads_the_recorded_boss()`
+  - Method `.test_stairs_barrier_names_the_living_boss()`
 
 ---
 
@@ -877,7 +891,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3435` lines (`143240` bytes)
+**Size**: `3526` lines (`147206` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

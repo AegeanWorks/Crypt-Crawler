@@ -1206,3 +1206,42 @@ class, difficulty and viewport.
 - **Gates**: unit 205 OK; harness 129 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(records): give foundry pack bosses a bestiary row`.
+
+## Cycle 41 — Each boss owns its death and victory (2026-11-08)
+
+- **Area**: Enemies and bosses (boss death/victory identity).
+- **Find**: `_handleMonsterDefeat` treated every `monster.is_boss` as Malakor: it printed
+  "ARCH-LICH MALAKOR HAS FALLEN!", unlocked the three Malakor journal entries, granted the
+  Crown of Eternity and scheduled `handleVictory`. Killing the B2F Hollow Choir therefore
+  ended the run and handed over the final boss's crown; killing the seed 42 B3F foundry
+  Ashen Warden showed Malakor's name and gave the Crown instead of its configured
+  `hammer_thunder`. The harness checks `pack_boss_death_uses_its_own_identity` and
+  `choir_death_does_not_end_the_run` failed on HEAD.
+- **Analyze**: Only the depth-3 guardian ends a run. Each boss payload already carries its
+  own `name` and `loot_drop`; the client needs a small item table for those ids and a
+  recorded final-boss identity for the victory modal. Malakor's journal entries belong to
+  `boss_lich` only. The Choir is a vault boss on B2F and should pay its tome without a
+  victory. Killed: keying the victory modal off `depth` alone (a pack boss is still a
+  depth-3 boss), and leaving the Crown as a universal boss drop (ignores pack data).
+- **Fix**: Add `BOSS_LOOT_ITEMS`; use the monster's own name/loot in the boss branch;
+  only `boss_lich` unlocks Malakor lore and prints the Arch-Lich text; only depth >= 3
+  records `finalBoss` and schedules victory. `handleVictory` reads the recorded name/loot
+  and only uses the Malakor epilogue for Malakor. The stairs barrier names the living
+  boss. Add `tests/test_boss_identity.py` and the two harness checks; update the README.
+- **Screenshots** (seed 42, real key 1, 1920x1080, dsf 2; before uses HEAD `engine.js`):
+  - pack: `.inspect/cycles/c41/before-pack-full.png` is the victory modal "defeated
+    Arch-Lich Malakor ... Crown of Eternity"; `after-pack-full.png` is "defeated Ashen
+    Warden ... Stormforged Warhammer".
+  - choir: `before-choir-full.png` is the same Malakor triumph modal on B2F;
+    `after-choir-full.png` is the live B2F HUD with no modal, "HOLLOW CHOIR HAS FALLEN!"
+    and "Recovered Tome of Blazing Embers."
+  - command: `python .inspect/cycles/play_c41.py before|after`
+- **Played run**: Real key 1 on both bosses. Before: pack victory true, log "ARCH-LICH
+  MALAKOR", inventory crown; choir victory true, modal "TRIUMPH OF THE DUNGEON",
+  inventory crown. After: pack victory true, log "ASHEN WARDEN HAS FALLEN!", inventory
+  `hammer_thunder`, modal names Ashen Warden/Warhammer, no Malakor lore; choir victory
+  false, modal false, inventory `tome_pyromancy`, log "HOLLOW CHOIR HAS FALLEN!"; no page
+  errors in either run.
+- **Gates**: unit 208 OK; harness 133 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(bosses): give each boss its own death and victory identity`.

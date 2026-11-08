@@ -1609,6 +1609,97 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # A foundry boss is not Malakor: its death must use its own name, loot and
+    # final-boss identity, not the canon lich's crown and journal entries.
+    page = harness.open_page(42, depth=3)
+    pack_death = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const boss = e.monsters.find((m) => m.type === 'boss_ashen_warden_s42');
+            if (!boss) return { found: false };
+            const step = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .find(([dx, dy]) => e.dungeon.isWalkable(boss.x + dx, boss.y + dy));
+            if (!step) return { found: false, reason: 'no stand' };
+            e.monsters = [boss];
+            const p = e.player;
+            p.x = boss.x + step[0];
+            p.y = boss.y + step[1];
+            p.hp = p.max_hp;
+            e.dungeon.updateFOV(p.x, p.y, 7);
+            boss.hp = 1;
+            const malakorLore = [e.loreEvents?.boss, e.loreEvents?.crown, e.loreEvents?.debt]
+                .filter(Boolean);
+            e.attackMonster(boss);
+            return {
+                found: true,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .map((el) => el.textContent),
+                inventory: e.player.inventory.map((item) => item.id),
+                unlockedMalakor: malakorLore.filter((id) => e.loreUnlocked.includes(id)),
+                finalBoss: e.finalBoss,
+                victory: e.victory,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "pack_boss_death_uses_its_own_identity",
+        pack_death.get("found") is True
+        and any("ASHEN WARDEN" in line for line in pack_death["log"])
+        and "hammer_thunder" in pack_death["inventory"]
+        and "crown_eternity" not in pack_death["inventory"]
+        and pack_death["unlockedMalakor"] == []
+        and pack_death["finalBoss"] is not None
+        and pack_death["finalBoss"]["name"] == "Ashen Warden"
+        and pack_death["finalBoss"]["lootId"] == "hammer_thunder",
+        pack_death,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_pack_death", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
+    # The Hollow Choir guards a B2F vault. Its death is a boss kill, not the
+    # end of the run, and its own tome is the drop.
+    page = harness.open_page(42, depth=2)
+    choir_death = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const choir = e.monsters.find((m) => m.type === 'boss_choir');
+            if (!choir) return { found: false };
+            e.monsters = [choir];
+            choir.hp = 1;
+            e.attackMonster(choir);
+            await new Promise((r) => setTimeout(r, 1800));
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            return {
+                found: true,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .map((el) => el.textContent),
+                inventory: e.player.inventory.map((item) => item.id),
+                victory: e.victory,
+                finalBoss: e.finalBoss,
+                modal: overlay ? !overlay.classList.contains('hidden') : false,
+                title: title ? title.textContent : null,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "choir_death_does_not_end_the_run",
+        choir_death.get("found") is True
+        and any("HOLLOW CHOIR" in line for line in choir_death["log"])
+        and "tome_pyromancy" in choir_death["inventory"]
+        and "crown_eternity" not in choir_death["inventory"]
+        and choir_death["victory"] is False
+        and choir_death["finalBoss"] is None
+        and choir_death["modal"] is False,
+        choir_death,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_choir_death", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # A deterministic mimic chest springs a fight instead of paying loot.
     page = harness.open_page(2, depth=1)
     mimic_setup = page.evaluate(

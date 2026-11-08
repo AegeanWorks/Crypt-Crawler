@@ -86,6 +86,32 @@ export const TUNING = {
   combo: { base: 12, perDepth: 3 },
 };
 
+// Boss loot is DATA: the monster payload names an item id, the client owns the
+// display stats. Regular monsters/chests keep their own reward paths.
+export const BOSS_LOOT_ITEMS = {
+  crown_eternity: {
+    id: "crown_eternity", name: "Crown of Eternity", type: "ring", rarity: "legendary",
+    description: "Imperial artifact of the Lich King (+25 Max HP, +15 Max MP, +5 ATK, +3 DEF).",
+    stats: { max_hp: 25, max_mana: 15, attack: 5, defense: 3 },
+  },
+  hammer_thunder: {
+    id: "hammer_thunder", name: "Stormforged Warhammer", type: "weapon", rarity: "epic",
+    description: "+13 ATK, 25% stun chance.", stats: { attack: 13, stun_chance: 25 },
+  },
+  ring_shadow: {
+    id: "ring_shadow", name: "Band of the Shadowstalker", type: "ring", rarity: "rare",
+    description: "+15% Crit Rate, +3 ATK.", stats: { attack: 3, crit_bonus: 15 },
+  },
+  tome_pyromancy: {
+    id: "tome_pyromancy", name: "Tome of Blazing Embers", type: "amulet", rarity: "epic",
+    description: "+4 ATK, +20 Max MP.", stats: { attack: 4, max_mana: 20 },
+  },
+  amulet_bloodstone: {
+    id: "amulet_bloodstone", name: "Bloodstone Talisman", type: "amulet", rarity: "rare",
+    description: "+18 Max HP, +2 ATK.", stats: { max_hp: 18, attack: 2 },
+  },
+};
+
 export function depthSeed(runSeed, depth) {
   let h = (Number(runSeed) >>> 0) ^ (Math.imul(Number(depth) || 1, 0x9e3779b1) >>> 0);
   h >>>= 0;
@@ -123,6 +149,7 @@ export class GameEngine {
     this.difficulty = "normal";
     this.gameOver = false;
     this.victory = false;
+    this.finalBoss = null;
     this.animFrameId = null;
     this.musicStarted = false;
     this.transitioning = false;
@@ -177,6 +204,7 @@ export class GameEngine {
     this.surgeFloor = 0;
     this.gameOver = false;
     this.victory = false;
+    this.finalBoss = null;
     this.heroClass = heroClass || "paladin";
     this.difficulty = DIFFICULTIES[difficulty] ? difficulty : "normal";
     await this._loadLore();
@@ -1665,9 +1693,9 @@ export class GameEngine {
     if (this.dungeon.tiles[ny][nx] === TileType.STAIRS_DOWN) {
       if (this.depth >= 3) {
         // Check if boss defeated
-        const bossAlive = this.monsters.some((m) => m.is_boss && m.hp > 0);
-        if (bossAlive) {
-          this.ui.logMessage("The vault barrier holds! You must slay Arch-Lich Malakor first!", "hit");
+        const livingBoss = this.monsters.find((m) => m.is_boss && m.hp > 0);
+        if (livingBoss) {
+          this.ui.logMessage(`The vault barrier holds! You must slay ${livingBoss.name} first!`, "hit");
         } else {
           this.handleVictory();
           return;
@@ -1838,29 +1866,38 @@ export class GameEngine {
       this.ui.logMessage("💀 RAMPAGE! Slicing through foes like wheat in the scythe (+25 XP, +5 Gold)!", "level");
     }
 
-    // Boss victory check
+    // Boss victory check. Only the depth-3 guardian ends the run; the Choir
+    // guards a vault on B2F and must not be treated as Malakor.
     if (monster.is_boss) {
+      const finalBoss = this.depth >= 3;
       sounds.playLevelUp();
-      this.renderer.addFloatingText("ARCH-LICH SLAIN!", monster.x, monster.y, "#d69e2e");
-      this.ui.logMessage("🏆 ARCH-LICH MALAKOR HAS FALLEN! The realm is redeemed!", "level");
-      this.unlockLore(this.loreEvents?.boss);
-      this.unlockLore(this.loreEvents?.crown);
-      this.unlockLore(this.loreEvents?.debt);
-      // Add legendary drop
-      const crown = {
-        id: "crown_eternity",
-        name: "Crown of Eternity",
-        type: "ring",
-        rarity: "legendary",
-        description: "Imperial artifact of the Lich King (+25 Max HP, +15 Max MP, +5 ATK, +3 DEF).",
-        stats: { max_hp: 25, max_mana: 15, attack: 5, defense: 3 },
-      };
-      if (this.player.inventory.length < 12) {
-        this.player.inventory.push(crown);
-        this.renderer.addFloatingItemBadge(crown.name, crown.rarity, monster.x, monster.y);
+      if (monster.type === "boss_lich") {
+        this.renderer.addFloatingText("ARCH-LICH SLAIN!", monster.x, monster.y, "#d69e2e");
+        this.ui.logMessage("🏆 ARCH-LICH MALAKOR HAS FALLEN! The realm is redeemed!", "level");
+        this.unlockLore(this.loreEvents?.boss);
+        this.unlockLore(this.loreEvents?.crown);
+        this.unlockLore(this.loreEvents?.debt);
+      } else {
+        this.renderer.addFloatingText("BOSS SLAIN!", monster.x, monster.y, "#d69e2e");
+        this.ui.logMessage(`🏆 ${monster.name.toUpperCase()} HAS FALLEN!`, "level");
+        if (monster.type === "boss_choir") this.unlockLore(this.loreEvents?.choir);
       }
-      const victoryToken = this.runToken;
-      setTimeout(() => { if (victoryToken === this.runToken && !this.gameOver && !this.victory) this.handleVictory(); }, 1500);
+      const bossLoot = BOSS_LOOT_ITEMS[monster.loot_drop] || null;
+      if (bossLoot && this.player.inventory.length < 12) {
+        this.player.inventory.push({ ...bossLoot });
+        this.renderer.addFloatingItemBadge(bossLoot.name, bossLoot.rarity, monster.x, monster.y);
+        this.ui.logMessage(`Recovered ${bossLoot.name}.`, "loot");
+      }
+      if (finalBoss) {
+        this.finalBoss = {
+          name: monster.name,
+          lootId: bossLoot ? bossLoot.id : null,
+          lootName: bossLoot ? bossLoot.name : null,
+          malakor: monster.type === "boss_lich",
+        };
+        const victoryToken = this.runToken;
+        setTimeout(() => { if (victoryToken === this.runToken && !this.gameOver && !this.victory) this.handleVictory(); }, 1500);
+      }
       return;
     }
 
@@ -3126,25 +3163,40 @@ export class GameEngine {
 
   handleVictory() {
     this.victory = true;
-    const crownKept = this.player.inventory.some((item) => item.id === "crown_eternity")
-      || (this.player.equipped?.ring?.id === "crown_eternity");
+    const finalBoss = this.finalBoss || {
+      name: "Arch-Lich Malakor",
+      lootId: "crown_eternity",
+      lootName: "Crown of Eternity",
+      malakor: true,
+    };
+    const equippedLoot = Object.values(this.player.equipped || {}).some(
+      (item) => item && item.id === finalBoss.lootId
+    );
+    const lootKept = Boolean(finalBoss.lootId)
+      && (this.player.inventory.some((item) => item.id === finalBoss.lootId) || equippedLoot);
+    const lootLine = finalBoss.lootName
+      ? (lootKept ? finalBoss.lootName : `${finalBoss.lootName} (left on the altar — backpack full)`)
+      : "None";
+    const flavor = finalBoss.malakor
+      ? "The ledger closes. Somewhere above, a lantern-keeper finally sets down a flame he has carried too long — and the debt of Malakor is paid in full."
+      : "The foundry-born keeper is broken. Its ledger closes, and the vault's stolen light returns to the realm.";
     sounds.stopMusic();
     sounds.playVictory();
     this.clearSavedRun();
     this.recordRunEnd(true);
     this.ui.showModal(
       "🏆 TRIUMPH OF THE DUNGEON",
-      `<p>You conquered the deepest vault, defeated Arch-Lich Malakor${crownKept ? ", and recovered the legendary <strong>Crown of Eternity</strong>" : ""}!</p>
+      `<p>You conquered the deepest vault, defeated ${finalBoss.name}${lootKept ? `, and recovered the legendary <strong>${finalBoss.lootName}</strong>` : ""}!</p>
        <br>
        <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; border: 1px solid #d69e2e;">
          <p><strong>Hero Archetype:</strong> ${this.player.class_title || "Champion"}</p>
          <p><strong>Hero Level:</strong> ${this.player.level}</p>
          <p><strong>Monsters Slain:</strong> ${this.kills}</p>
          <p><strong>Total Gold:</strong> ${this.player.gold} 🪙</p>
-         <p><strong>Relics Recovered:</strong> ${crownKept ? "Crown of Eternity" : "Crown of Eternity (left on the altar — backpack full)"}</p>
+         <p><strong>Relics Recovered:</strong> ${lootLine}</p>
        </div>
        <br>
-        <p>The ledger closes. Somewhere above, a lantern-keeper finally sets down a flame he has carried too long — and the debt of Malakor is paid in full.</p>
+        <p>${flavor}</p>
         <p>The light returns to the realm. Descend again for a new challenge?</p>`
     );
     this.ui.btnModalClose.textContent = "Descend Again";
