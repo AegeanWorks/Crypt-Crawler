@@ -237,6 +237,7 @@ crypt-crawler/
 │   ├── test_deck_costs.py    <- deck dimming matches the engine mana costs
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_enemy_pathing.py <- blocked melee steps detour around props
+│   ├── test_equipment_save.py <- free equip/drop/unequip changes save immediately
 │   ├── test_execute_marker.py <- skull/EXECUTE preview belongs to the rogue
 │   ├── test_fairness.py      <- fairness validator tests
 │   ├── test_foundry_packs.py <- foundry pack integration tests

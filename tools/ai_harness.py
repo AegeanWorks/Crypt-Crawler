@@ -1732,6 +1732,53 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_streak_resume", not harness.errors, harness.errors))
     page.context.close()
 
+    # Equipment is persistent state: a free equip must save immediately, not
+    # only at the next turn, or a reload silently unequips it.
+    page = harness.open_page(seed)
+    equipment = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const idx = e.player.inventory.findIndex((i) => i.type === "weapon");
+            if (idx < 0) return { found: false };
+            const itemId = e.player.inventory[idx].id;
+            e.useInventoryItem(idx);
+            const raw = JSON.parse(localStorage.getItem("crypt_crawler_save_v2"));
+            return {
+                found: true,
+                itemId,
+                equipped: e.player.equipped.weapon ? e.player.equipped.weapon.id : null,
+                saved: raw && raw.player.equipped.weapon
+                    ? raw.player.equipped.weapon.id : null,
+            };
+        }"""
+    )
+    page.reload(wait_until="domcontentloaded")
+    page.wait_for_function("window.gameEngine && window.gameEngine.player", timeout=15000)
+    page.wait_for_timeout(300)
+    resumed_equipment = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            return {
+                depth: e.depth,
+                equipped: e.player.equipped.weapon ? e.player.equipped.weapon.id : null,
+                inventory: e.player.inventory.map((i) => i.id),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "equipment_change_survives_reload",
+        equipment.get("found") is True
+        and equipment["equipped"] == equipment["itemId"]
+        and equipment["saved"] == equipment["itemId"]
+        and resumed_equipment["equipped"] == equipment["itemId"]
+        and equipment["itemId"] not in resumed_equipment["inventory"],
+        {"equipment": equipment, "resumed": resumed_equipment},
+    ))
+    checks.append(_check(
+        "no_page_errors_after_equipment_reload", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # Deck affordability must match the shipped mana checks: the rogue's slot 4
     # is Fireball (10) and the mage's slot 4 is Nova (10), not the 8 the old table said.
     for hero_class in ("rogue", "mage"):

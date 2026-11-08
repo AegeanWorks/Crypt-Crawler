@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `50`
-- **Total Classes**: `52`
+- **Total Python Modules**: `51`
+- **Total Classes**: `53`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `274`
-- **Total Source Lines**: `10586`
+- **Total Class Methods**: `279`
+- **Total Source Lines**: `10666`
 
 ---
 
@@ -508,6 +508,21 @@
 
 ---
 
+### [`tests/test_equipment_save.py`](tests/test_equipment_save.py)
+> *Free inventory and equipment actions persist immediately.*
+
+**Size**: `33` lines (`1056` bytes)
+
+**Classes:**
+- `class TestEquipmentSave`
+  - Method `.setUp()`
+  - Method `._body(start_marker, end_marker)`
+  - Method `.test_equip_saves()`
+  - Method `.test_drop_saves()`
+  - Method `.test_unequip_saves()`
+
+---
+
 ### [`tests/test_execute_marker.py`](tests/test_execute_marker.py)
 > *Execute feedback contract: the skull and bonus preview belong to the rogue.*
 
@@ -769,7 +784,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3052` lines (`127348` bytes)
+**Size**: `3099` lines (`129313` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

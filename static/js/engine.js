@@ -2445,6 +2445,7 @@ export class GameEngine {
       this.ui.clearItemSelection();
       this.ui.logMessage(`Equipped ${item.name}.`, "system");
       this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
+      this.saveGameState();
     }
   }
 
@@ -2454,6 +2455,7 @@ export class GameEngine {
     this.ui.clearItemSelection();
     this.ui.logMessage(`Dropped ${item.name} onto the stone floor.`, "system");
     this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
+    this.saveGameState();
   }
 
   unequipSlot(slot) {
@@ -2468,6 +2470,7 @@ export class GameEngine {
     this._recalculatePlayerStats();
     this.ui.logMessage(`Unequipped ${item.name}.`, "system");
     this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
+    this.saveGameState();
   }
 
   _recalculatePlayerStats() {

@@ -817,3 +817,33 @@ class, difficulty and viewport.
 - **Gates**: unit 186 OK; harness 113 checks, 0 failed; inspector 75/75 at three viewports,
   0 console errors; aikit check 5/5.
 - **Commit**: `feat(audio): give death and victory their own cues`.
+
+## Cycle 30 — Equipment changes survive the reload (2026-11-08)
+
+- **Area**: Progression and saves (free inventory actions).
+- **Find**: The shop's buy/sell calls saved, but `useInventoryItem`'s equipment branch,
+  `dropInventoryItem` and `unequipSlot` are free actions that mutate persistent state
+  without calling `saveGameState`. Starting seed 42 B1F, equipping `sword_iron` showed the
+  slot filled but the stored save still had `equipped: null` and the sword in the bag; a
+  real page reload resumed with the weapon slot `Empty` and the sword back in the bag.
+  Failing guards: `equipment_change_survives_reload`, `test_equipment_save.py` (3 checks).
+- **Analyze**: These are the same class of free, persistent inventory actions as the
+  merchant's already-saved transactions. Save immediately after equip/drop/unequip; no
+  save-format, combat or RNG change. Killed: saving only on the next turn (the action is
+  free and can be followed by a reload), and a global dirty flag (three calls are enough).
+- **Fix**: one `this.saveGameState()` after each of the three actions in `engine.js`;
+  `tests/test_equipment_save.py` and the reload selftest check.
+- **Screenshots** (same seed 42 B1F, real UI click on the sword slot and Equip, then a real
+  page reload, 1920x1080, dsf 2):
+  - before: `.inspect/cycles/c30/before-1-equipped-slot.png` ("⚔️ Forged Iron Sword") and
+    `before-2-resumed-slot.png` ("Empty" after reload)
+  - after: `after-1-equipped-slot.png` (same) and `after-2-resumed-slot.png`
+    ("⚔️ Forged Iron Sword" after reload)
+  - command: `python .inspect/cycles/play_c30.py before|after`
+- **Played run**: real UI selection of the starting iron sword and the Equip button, then a
+  real page reload/resume at depth 1; before the saved/resumed weapon was null and the
+  sword was in the 3-item bag; after the saved/resumed weapon is `sword_iron` and the bag
+  holds 2 items; no page errors.
+- **Gates**: unit 189 OK; harness 115 checks, 0 failed; inspector 75/75 at three viewports,
+  0 console errors; aikit check 5/5.
+- **Commit**: `fix(save): persist equipment and inventory changes`.

@@ -565,6 +565,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: A run now ends audibly: a knell on death, a fanfare on victory, both distinct from floor descent and vault rewards. No save, RNG or combat change. 186 unit tests green, harness 113/113, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: real death and boss-kill recordings, `[160,160]` -> `[160,160,98,196,73,147]` and `[]` -> `[440,554,659,880,...]`; modal crops for state.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped audio path), PRINCIPLE-014 (failing-first cue tests), PRINCIPLE-011 (the biggest moments are not silent).
 
+### ADR-071: Free equipment and inventory actions save immediately (improvement cycle 30)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Merchant buy/sell already called `saveGameState`, but equipping, unequipping and dropping are free actions that mutate the player's persistent inventory without saving. A starting `sword_iron` equipped into the weapon slot left the stored save with `equipped: null`; a real reload resumed with the slot empty and the sword back in the bag.
+- **Decision**: Call `saveGameState()` at the end of the equipment branch of `useInventoryItem`, and of `dropInventoryItem` and `unequipSlot`. No turn is consumed and no save field changes; the existing payload already carries `equipped` and `inventory`. Guard with three source checks in `tests/test_equipment_save.py` and the `equipment_change_survives_reload` selftest (equip -> saved/resumed `sword_iron`, sword absent from the bag).
+- **Consequences**: Free inventory actions survive a reload immediately, matching the merchant's save behavior. 189 unit tests green, harness 115/115, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: real UI equip and page reload, before `Empty` -> after `Forged Iron Sword`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first reload test), PRINCIPLE-013 (state atomicity and recovery).
+
 
 
 
