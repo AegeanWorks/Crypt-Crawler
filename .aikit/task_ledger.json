@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-063",
+    "task_id": "CC-064",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794133242.0727599,
+    "updated_at": 1794133921.4905427,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794133357.4259613
+    "completed_at": 1794134052.8945928
   },
   "checkpoints": [
-    {
-      "task_id": "CC-057",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Reduced-motion hit flashes expire on the live clock: _drawMonster/_drawPlayer now read performance.now() for the 140/160ms flash checks instead of the frozen render timestamp. Failing-first tests: reduced_motion_hit_flash_expires (base 14 -> expired 1240) + test_player/monster_flash_uses_live_clock; after base 14 -> expired 14. Seed 42 B1F reduced motion, real tacticalStrike + retaliation, waited 919ms: before solid coral player/cream goblin, after normal sprites. Unit 185 OK, harness 111/111, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-069, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794112504.2315779,
-      "timestamp_str": "2026-11-08 07:35:04",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-057, then cycle 29 (audio cues)",
-        "evidence": "185 tests, harness 111/111, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-057",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-057' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794112580.4204335,
-      "timestamp_str": "2026-11-08 07:36:20",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-058",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Audio cues: give the two run-ending beats their own sounds - a low funeral knell on death and an A-major victory fanfare - because handlePlayerDeath/handleVictory stop the music and record no cue at all; prove with failing-first oscillator recordings, same-state death/victory modal pairs and real death/boss-kill runs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794112856.9710727,
-      "timestamp_str": "2026-11-08 07:40:56",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "A recorded probe of the shipped audio path returns [] for both handlePlayerDeath and handleVictory; the two biggest moments in a run are silent after the killing blow or boss death",
-        "benefits": "Death and victory get distinct, recognizable cues; existing music, sfx and save state are unchanged",
-        "risks": "contract: two new audio methods plus two call sites; dependency: none; concurrency: none; state: no save/RNG change; UI: audio.js and engine.js in the game-ui surface",
-        "mitigation": "Failing-first source test and oscillator selftest; real death and boss-kill runs; same-state death/victory modal screenshots at 1920x1080; three-viewport inspector; full gates"
-      },
-      "plan_digest": "05ca043309ef8a94aaddd3cd66cc01371d17a9c0ca7fcbbedee4f48cf6b897af"
-    },
     {
       "task_id": "CC-058",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794133357.4259634,
       "timestamp_str": "2026-11-08 13:22:37",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-064",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Graphics/effects: isolate every renderer Math.random call into a visual-only LCG so projectile sparks, flicker and particles never advance the seeded gameplay stream; prove with a failing-first RNG-consumption harness check, immediate-vs-delayed snare runs, and projectile-in-flight captures",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794133907.673294,
+      "timestamp_str": "2026-11-08 13:31:47",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "renderer.js calls Math.random 42 times, including per-frame projectile sparks. The render loop advances the seeded gameplay RNG, so the same seed/state can roll different trap damage depending on frame timing; before the fix the same snare took 2 vs 1 damage.",
+        "benefits": "Same seed/actions produce the same gameplay outcome regardless of frame timing; visual effects keep their variation; the harness's reproducibility contract holds",
+        "risks": "contract: renderer-local LCG plus 42 call-site replacements; dependency: none; concurrency: none; state: no save/gameplay value change; UI: renderer.js in the game-ui surface",
+        "mitigation": "Failing-first harness check counting Math.random calls during a projectile; immediate-vs-delayed snare play; projectile screenshots; source drift test; full gates"
+      },
+      "plan_digest": "51e057a52eb40045a7264a73f7f31e7c202dd707d2b98d8225b9064bb8f56988"
+    },
+    {
+      "task_id": "CC-064",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Effects RNG isolated: added renderer-local LCG _fxRandomState/_fxRandom and replaced all 42 Math.random calls in renderer.js; tests/test_effects_rng.py (2 checks) and visual_effects_do_not_consume_gameplay_rng (42 calls -> 0 during a projectile). Real seed 42 B1F snare: before immediate 2 damage vs 1.1s projectile delay 1 damage; after both 1 damage, same position/turn, no page errors. Projectile still renders in flight before/after. Unit 199 OK, harness 119/119, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-076, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794133921.4905427,
+      "timestamp_str": "2026-11-08 13:32:01",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 35, then cycle 36 (audio cues)",
+        "evidence": "199 tests, harness 119/119, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-064",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-064' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794134052.894595,
+      "timestamp_str": "2026-11-08 13:34:12",
       "agent": "opencode:cycles"
     }
   ]
