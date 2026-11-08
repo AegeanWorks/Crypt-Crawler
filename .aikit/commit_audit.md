@@ -71,3 +71,15 @@ recorded dry. Every run ends with `python aikit.py publish crypt-crawler`.
 - **Action**: test gap closed.
 - **Commit**: `test(harness): cover the equipment comparison`.
 - **Push**: via `python aikit.py publish crypt-crawler`.
+
+## 1 → 15 — `6d1e583` (low-HP warning and damage feedback)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **37 tests OK**.
+- **Cumulative changes**: low-HP vignette and HP-bar warning, transient damage flash,
+  weapon stun/poison procs, filterable inventory and capacity meter.
+- **Findings**: no surviving defect. The low-HP and damage-feedback paths are exercised
+  by the three-viewport inspector (`low_hp_warning_visible`, `damage_flash_active`) and
+  its 75/75 audit; weapon procs are covered by `tests/test_combat.py`; the filter and
+  capacity paths are exercised by the inspector inventory audit.
+- **Action**: none.
+- **Push**: via `python aikit.py publish crypt-crawler`.
