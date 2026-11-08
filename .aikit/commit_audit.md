@@ -95,3 +95,14 @@ recorded dry. Every run ends with `python aikit.py publish crypt-crawler`.
   check also exercises the same selection path at current `HEAD`.
 - **Action**: none.
 - **Push**: via `python aikit.py publish crypt-crawler`.
+
+## 1 → 21 — `4770907` (mobile layout)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **39 tests OK**.
+- **Cumulative changes**: below 768px the three panels stack into one scrolling column,
+  the action deck and D-pad stay visible, and the header wraps instead of overflowing.
+- **Findings**: no surviving defect. The current inspector runs the mobile 390×844
+  viewport with 75/75 checks and 0 console errors; the canvas/action deck/D-pad and
+  panel order are exercised there.
+- **Action**: none.
+- **Push**: via `python aikit.py publish crypt-crawler`.
