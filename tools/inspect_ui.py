@@ -236,24 +236,23 @@ def run_inspection(
                         time.sleep(0.1)
 
                         hp_before = page.evaluate("() => window.gameEngine.player.hp")
-                        page.evaluate(
+                        probe = page.evaluate(
                             """() => {
                                 const e = window.gameEngine;
                                 e.player.hp = Math.max(1, Math.floor(e.player.max_hp * 0.2));
                                 e.ui.updateHero(e.player, e.turn, e.depth, e.kills);
                                 e.ui.flashDamage();
                                 e.ui.renderStatusTray({ poison: 2 });
+                                return {
+                                    lowHp: !document.getElementById('lowHpVignette').classList.contains('hidden'),
+                                    flash: document.getElementById('damageFlash').classList.contains('active'),
+                                    tooltip: document.querySelector('#heroStatusTray .status-badge')?.title || '',
+                                };
                             }"""
                         )
-                        low_hp_visible = page.eval_on_selector(
-                            "#lowHpVignette", "el => !el.classList.contains('hidden')"
-                        )
-                        flash_active = page.eval_on_selector(
-                            "#damageFlash", "el => el.classList.contains('active')"
-                        )
-                        status_tooltip = page.eval_on_selector(
-                            "#heroStatusTray .status-badge", "el => el.title"
-                        )
+                        low_hp_visible = probe["lowHp"]
+                        flash_active = probe["flash"]
+                        status_tooltip = probe["tooltip"]
                         page.evaluate(
                             """(hp) => {
                                 const e = window.gameEngine;
