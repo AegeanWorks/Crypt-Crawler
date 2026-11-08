@@ -106,3 +106,32 @@ recorded dry. Every run ends with `python aikit.py publish crypt-crawler`.
   panel order are exercised there.
 - **Action**: none.
 - **Push**: via `python aikit.py publish crypt-crawler`.
+
+## 1 → 24 — `4e5733d` (AGL-1.1 licensing migration)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **48 tests OK**.
+- **Cumulative changes**: licensing switch to Aegean Game License 1.1, commercial rider,
+  license metadata and README license copy.
+- **Findings**: no surviving defect. `LICENSE` is AGL-1.1, `COMMERCIAL.md` is present,
+  and the README links both. No game code path is affected.
+- **Action**: none.
+
+## 1 → 27 — `a8dcbed` (reviewed media assets)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **48 tests OK**.
+- **Cumulative changes**: reviewed social previews, project identity media and the
+  accepted-assets set.
+- **Findings**: no surviving defect. `assets/social-preview.png` exists and is the image
+  referenced at the top of the README; no broken media path.
+- **Action**: none.
+
+## 1 → 30 — `ab1e7c7` (brand identity)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **48 tests OK**.
+- **Cumulative changes**: reviewed AI-art brand marks and identity assets replacing the
+  procedural marks.
+- **Findings**: no surviving defect. The README brand-assets section points at the
+  current assets and the historical markup is gone; no game behavior changed.
+- **Action**: none.
+
+- **Push (24/27/30 batch)**: via `python aikit.py publish crypt-crawler`.
