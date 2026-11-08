@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-059",
+    "task_id": "CC-060",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794115221.7743492,
+    "updated_at": 1794129234.798046,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794115287.1695652
+    "completed_at": 1794130260.5070376
   },
   "checkpoints": [
-    {
-      "task_id": "CC-053",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Hover targeting shipped: tacticalStrike prefers a living adjacent hoverTile, falls back to first adjacent; tests/test_strike_target.py + strike_hits_the_hovered_adjacent_enemy (105 checks). Seed 42 two adjacent targets, B hovered + key 1: before A 89/B 100 log Target A, after A 100/B 90 log Target B; real mouse+keyboard, no page errors. Unit 179 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-065, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794106999.6288514,
-      "timestamp_str": "2026-11-08 06:03:19",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-053, then cycle 25 (enemies/bosses)",
-        "evidence": "179 tests, harness 105/105, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-053",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-053' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794107065.2333255,
-      "timestamp_str": "2026-11-08 06:04:25",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-054",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Enemies/bosses: explain the four champion affixes in the hover card and README, prove with a failing-first hint test, a same-state Swift champion before/after and a real hover run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794108238.0724173,
-      "timestamp_str": "2026-11-08 06:23:58",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Swift/Fortified/Molten/Vampiric enforce real combat rules (two steps, +3 DEF, burn attacker, leech 3 HP) but were explained only as a word in the champion's name; the hover card/README said nothing",
-        "benefits": "Champion mechanics are discoverable on hover and in the README; boss/regular cards are unchanged; no rule change",
-        "risks": "contract: champion cards gain a fitted hint line and 12px height; dependency: none; concurrency: none; state: no save/RNG change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Failing hint test; seed 42 Swift champion 60/200 hover before/after; Hollow Choir card unchanged; README affix table; inspector at three viewports; full gates"
-      },
-      "plan_digest": "4249dc88819d1abc96071f5be491c3b991ab2596534a70c039bdc581b5cf5612"
-    },
     {
       "task_id": "CC-054",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794115287.1695673,
       "timestamp_str": "2026-11-08 08:21:27",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-060",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Combat feel: make the player's stun actually skip the next turn action and consume the status instead of leaving a permanent 'Stunned (1)' badge while the hero moves and attacks; prove with a failing-first snare check, same-state before/after stun crops and a real snare-step run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794115606.710342,
+      "timestamp_str": "2026-11-08 08:26:46",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The snare trap and Hollow Choir set player.status_effects.stun, and the UI says 'Stunned: skips its next action', but no action guard or tick consumes it. A probe: step on a snare -> stun 1, tray 'Stunned (1)'; step away -> player moves from (11,6) to (12,6), stun still 1, turn 3.",
+        "benefits": "The snare and Choir silence now cost the hero one action, and the badge clears; all other statuses and actions are unchanged",
+        "risks": "contract: one helper plus guards on turn actions; dependency: none; concurrency: none; state: no save/RNG/format change; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing-first snare check and source guard test; real snare-step played run; same-state before/after stun crops at 1920x1080; three-viewport inspector; full gates"
+      },
+      "plan_digest": "8e0d95c5a7e26b8f6bd4de4e36b74f05ed7caeb1bb905e2288b602b8826de983"
+    },
+    {
+      "task_id": "CC-060",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Player stun now costs the next turn action and clears: added _consumePlayerStun() with guards on movement, deck, potion, wait, search and potion/scroll use; tests/test_player_stun.py and player_stun_skips_next_action. Real seed 1 B1F keyboard run: before ArrowRight moved (10,4)->(11,4), stun 1, tray Stunned (1); after stays at (10,4), stun 0, tray empty, log You are stunned and cannot act!; no page errors. Before/after panel and 5x5 canvas crops at 1920x1080. Unit 191 OK, harness 117/117, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-072, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794129234.798046,
+      "timestamp_str": "2026-11-08 12:13:54",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 31, then cycle 32 (enemies/bosses)",
+        "evidence": "191 tests, harness 117/117, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-060",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-060' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794130260.5070403,
+      "timestamp_str": "2026-11-08 12:31:00",
       "agent": "opencode:cycles"
     }
   ]
