@@ -2769,7 +2769,13 @@ export class GameEngine {
         }
         continue;
       }
-      if (monster.type === "boss_choir" && !monster.hymnCharged && isVisible && dist <= 4 && Math.random() < 0.3) {
+      // A new hum must not preempt the 50% split or the 25% silence: the phase
+      // transition wins the turn its threshold is crossed.
+      const choirPhaseDue = monster.type === "boss_choir"
+        && ((!monster.phase_two && monster.hp <= monster.max_hp * 0.5)
+          || (!monster.phase_three && monster.hp <= monster.max_hp * 0.25));
+      if (monster.type === "boss_choir" && !choirPhaseDue && !monster.hymnCharged
+          && isVisible && dist <= 4 && Math.random() < 0.3) {
         monster.hymnCharged = true;
         monster.intent = "HYMN";
         sounds.playTelegraph("hymn");
@@ -2819,6 +2825,9 @@ export class GameEngine {
           this.renderer.addFloatingText("THE CHOIR SPLITS!", monster.x, monster.y, "#d6bcfa");
           this.ui.logMessage(`🎵 The Hollow Choir splits into ${split} echoing voices!`, "crit");
           this.unlockLore(this.loreEvents?.choir);
+          // The split is the phase action. Do not also move onto a fresh echo
+          // tile (the new bodies are not in this.monsters until the loop ends).
+          continue;
         } else {
           // Every nearby tile is crowded: keep the phase unspent and retry
           // rather than announcing a split into zero voices.

@@ -229,6 +229,7 @@ crypt-crawler/
 │   ├── test_boss_phases.py   <- Malakor, Choir and pack bosses own their phases
 │   ├── test_canvas_fit.py    <- canvas aspect-ratio and pointer-mapping contract
 │   ├── test_cavern_contrast.py <- B2F cavern floor/wall readability floor
+│   ├── test_choir_phase_priority.py <- Choir phases preempt a new hum roll
 │   ├── test_chronicle_fade.py <- scrolled chronicle fades its top edge
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger

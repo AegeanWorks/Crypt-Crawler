@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `52`
-- **Total Classes**: `54`
+- **Total Python Modules**: `53`
+- **Total Classes**: `55`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `283`
-- **Total Source Lines**: `10759`
+- **Total Class Methods**: `286`
+- **Total Source Lines**: `10796`
 
 ---
 
@@ -334,6 +334,19 @@
 
 **Functions:**
 - `def _luminance(hex_color)`
+
+---
+
+### [`tests/test_choir_phase_priority.py`](tests/test_choir_phase_priority.py)
+> *The Hollow Choir's phase transition must beat a new hum roll.*
+
+**Size**: `27` lines (`980` bytes)
+
+**Classes:**
+- `class TestChoirPhasePriority`
+  - Method `.setUp()`
+  - Method `.test_hum_waits_for_a_due_phase()`
+  - Method `.test_split_turn_does_not_move_onto_the_new_echoes()`
 
 ---
 
@@ -798,7 +811,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3156` lines (`131705` bytes)
+**Size**: `3166` lines (`132238` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

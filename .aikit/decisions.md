@@ -581,6 +581,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Both the snare and the Choir's silence now cost exactly one turn action and clear their badge; equipment, drop and unequip remain free. No save, RNG, combat-value or format change: `player` (including status effects) was already serialized. 191 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 1 B1F real keyboard run, before (10,4)->(11,4) with stun 1, after stays at (10,4) with stun 0 and "You are stunned and cannot act!"; same-state panel/canvas crops in `.inspect/cycles/c31/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first action check), PRINCIPLE-011 (the badge and the rule agree).
 
+### ADR-073: The Choir's phase transition beats a new hum (improvement cycle 32)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `processEnemyTurns` evaluates the Hollow Choir's 30% new-hum branch before its 50% split and 25% silence branches, and the hum branch ends with `continue`. A Choir crossing a threshold could therefore hum, skip the phase, resolve the hymn next turn, then hum again — indefinitely delaying the phase. A seed 42 B1F probe staged the Choir at 35/70, forced the hum roll (`Math.random = () => 0`), and pressed Space: the log said "hums one note", `phase_two` stayed false and there were 0 echoes. The harness check failed on HEAD. The first after-run also showed the Choir moving onto an echo's tile because `newMonsters` is not in `this.monsters` during the spawning turn.
+- **Decision**: Add `choirPhaseDue` (split due at <=50% or silence due at <=25%) and require `!choirPhaseDue` for a new hum. Add `continue` after a successful split so the phase turn is the Choir's action and it cannot move onto a body it just created. Force the hum roll in the harness check and assert every living monster has a unique tile; add `tests/test_choir_phase_priority.py` as the source guard.
+- **Consequences**: The Choir splits or silences on the first enemy turn after its threshold, then resumes humming once the phase is spent; a split turn never overlaps a new echo. No save, RNG format, damage or turn-order change outside the Choir's phase turn. 193 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real Space run, before hum/0 echoes/phase false, after split/2 echoes/phase true with the Choir still on (3,6); same-state full and zoom crops in `.inspect/cycles/c32/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first phase check), PRINCIPLE-011 (a boss phase that always arrives).
+
 
 
 

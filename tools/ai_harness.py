@@ -2184,17 +2184,26 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
                 mk('Block A', 1, 0), mk('Block B', -1, 0),
                 mk('Block C', 0, 1), mk('Block D', 0, -1),
             ];
+            // Force the Hum branch's 30% roll to succeed: crossing 50% must
+            // still split instead of letting a new hum preempt the phase.
+            const originalRandom = Math.random;
+            Math.random = () => 0;
             e.processEnemyTurns();
+            Math.random = originalRandom;
             const echoes = e.monsters.filter((m) => m.type === 'choir_echo');
             const splitLog = Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
                 .map((el) => el.textContent)
                 .filter((text) => text.includes('splits into'));
+            const livingTiles = e.monsters
+                .filter((m) => m.hp > 0)
+                .map((m) => `${m.x},${m.y}`);
             return {
                 found: true,
                 echoes: echoes.length,
                 echoTiles: echoes.map((m) => [m.x, m.y]),
                 phase: Boolean(choir.phase_two),
                 splitLog,
+                uniqueTiles: new Set(livingTiles).size === livingTiles.length,
             };
         }"""
     )
@@ -2203,6 +2212,7 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
         choir_split.get("found") is True
         and choir_split["echoes"] == 2
         and choir_split["phase"] is True
+        and choir_split["uniqueTiles"] is True
         and any("splits into 2" in line for line in choir_split["splitLog"]),
         choir_split,
     ))

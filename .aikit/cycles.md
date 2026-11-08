@@ -887,3 +887,41 @@ class, difficulty and viewport.
 - **Gates**: unit 191 OK; harness 117 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(combat): make the snare stun cost the hero a turn`.
+
+## Cycle 32 — The Choir's phase beats the hum (2026-11-08)
+
+- **Area**: Enemies and bosses (Hollow Choir phase priority).
+- **Find**: The Choir's new-hum branch (`Math.random() < 0.3`) runs before its 50% split
+  and 25% silence checks and ends with `continue`. A Choir crossing 50% could therefore
+  roll a hum, skip the split, spend the next turn resolving the hymn, then roll another
+  hum — delaying or avoiding its signature phase. A seed 42 B1F probe staged the Choir at
+  35/70, forced the hum roll with `Math.random = () => 0`, and pressed Space: the Choir
+  logged "hums one note", `phase_two` was false, and there were 0 echoes. The harness check
+  `choir_split_finds_room_beyond_crowded_neighbours` failed on HEAD with the same detail.
+- **Analyze**: A phase threshold is a promise, not a random branch. Suppress a new hum
+  while the 50% split or 25% silence is due, but let humming resume once that phase is
+  spent. The first after-run also showed the Choir moving onto a fresh echo's tile (echo
+  and Choir both at (4,6)) because the echoes are queued in `newMonsters` and are not in
+  `this.monsters` during the same enemy turn; make the split consume the Choir's action so
+  the phase turn cannot also move onto a body it just created. Killed: disabling the hum
+  entirely (removes a pre-phase attack), and making the split a normal attack (the phase
+  should be the turn's action).
+- **Fix**: Add `choirPhaseDue` (split due at <=50% or silence due at <=25%) and require
+  `!choirPhaseDue` for a new hum; `continue` after a successful split so the Choir stays on
+  its tile. Add `uniqueTiles` to the harness check and force its hum roll, plus
+  `tests/test_choir_phase_priority.py`.
+- **Screenshots** (seed 42 B1F, staged 5x5 clear room, Choir 35/70 at (3,6), player at
+  (5,8), real Space, 1920x1080, dsf 2, full page and 820x680 crop; before uses HEAD
+  `engine.js`):
+  - before: `.inspect/cycles/c32/before-choir-full.png` / `before-choir-zoom.png` show one
+    Choir, the "HYMN!" float and the chronicle "hums one note"; no echoes.
+  - after: `after-choir-full.png` / `after-choir-zoom.png` show the Choir plus two Choir
+    Echoes, no overlap, and "The Hollow Choir splits into 2 echoing voices!".
+  - command: `python .inspect/cycles/play_c32.py before|after`
+- **Played run**: Real browser Space key. Before: turn 2, `phase_two: false`,
+  `intent: "HYMN"`, 0 echoes, log "hums one note…"; after: turn 2, `phase_two: true`,
+  2 echoes at (4,6) and (2,6), Choir still at (3,6), `uniqueTiles: true`, log "splits into
+  2 echoing voices!"; `errors: []` in both runs.
+- **Gates**: unit 193 OK; harness 117 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(bosses): let the Choir split before it can hum again`.
