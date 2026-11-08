@@ -3318,6 +3318,38 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_fx_rng", not harness.errors, harness.errors))
     page.context.close()
 
+    # The CRT scanline toggle is a display preference like reduced motion; it
+    # must survive a reload instead of resetting to off.
+    page = harness.open_page(seed)
+    crt_state = """() => {
+        const overlay = document.getElementById('crtOverlay');
+        const btn = document.getElementById('btnCrtToggle');
+        return {
+            active: document.body.classList.contains('crt-active'),
+            overlayHidden: overlay ? overlay.classList.contains('hidden') : null,
+            stored: localStorage.getItem('crypt_crawler_crt'),
+            title: btn ? btn.title : null,
+        };
+    }"""
+    page.click("#btnCrtToggle")
+    crt_on = page.evaluate(crt_state)
+    page.reload(wait_until="domcontentloaded")
+    page.wait_for_function("window.gameEngine && window.gameEngine.player", timeout=15000)
+    crt_after = page.evaluate(crt_state)
+    checks.append(_check(
+        "crt_preference_survives_reload",
+        crt_on["active"] is True
+        and crt_on["stored"] == "1"
+        and crt_after["active"] is True
+        and crt_after["stored"] == "1"
+        and crt_after["overlayHidden"] is False,
+        {"on": crt_on, "afterReload": crt_after},
+    ))
+    checks.append(_check(
+        "no_page_errors_after_crt_reload", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)

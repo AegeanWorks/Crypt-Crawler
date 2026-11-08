@@ -82,6 +82,11 @@ export class UIController {
     this._damageFlashTimer = null;
     this.crtOverlay = document.getElementById("crtOverlay");
     this.crtActive = false;
+    try {
+      this.crtActive = localStorage.getItem("crypt_crawler_crt") === "1";
+    } catch (err) {
+      this.crtActive = false;
+    }
 
     // Modal
     this.modalOverlay = document.getElementById("modalOverlay");
@@ -98,6 +103,7 @@ export class UIController {
     this.shopOpen = false;
     this.shopTab = "buy";
 
+    this._applyCrtState();
     this._bindEvents();
   }
 
@@ -595,16 +601,26 @@ export class UIController {
     }
   }
 
-  toggleCrt() {
-    this.crtActive = !this.crtActive;
+  _applyCrtState() {
     if (this.crtOverlay) {
       this.crtOverlay.classList.toggle("hidden", !this.crtActive);
     }
     document.body.classList.toggle("crt-active", this.crtActive);
     const btn = document.getElementById("btnCrtToggle");
     if (btn) {
-      btn.style.color = this.crtActive ? "#4fd1c5" : "inherit";
+      btn.style.color = this.crtActive ? "#4fd1c5" : "";
+      btn.title = this.crtActive
+        ? "Retro CRT scanlines: on"
+        : "Toggle Retro CRT Scanlines";
     }
+  }
+
+  toggleCrt() {
+    this.crtActive = !this.crtActive;
+    this._applyCrtState();
+    try {
+      localStorage.setItem("crypt_crawler_crt", this.crtActive ? "1" : "0");
+    } catch (err) { /* storage unavailable: keep the in-memory toggle */ }
     return this.crtActive;
   }
 

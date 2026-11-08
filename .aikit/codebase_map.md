@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `59`
-- **Total Classes**: `61`
+- **Total Python Modules**: `60`
+- **Total Classes**: `62`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `306`
-- **Total Source Lines**: `11369`
+- **Total Class Methods**: `309`
+- **Total Source Lines**: `11426`
 
 ---
 
@@ -430,6 +430,19 @@
   - Method `.test_champion_enrage_bonus_at_low_hp()`
   - Method `.test_no_enrage_above_threshold()`
   - Method `.test_no_enrage_for_common_foes()`
+
+---
+
+### [`tests/test_crt_persistence.py`](tests/test_crt_persistence.py)
+> *The CRT scanline preference is persisted across reloads.*
+
+**Size**: `25` lines (`796` bytes)
+
+**Classes:**
+- `class TestCrtPersistence`
+  - Method `.setUp()`
+  - Method `.test_crt_preference_is_loaded_and_applied()`
+  - Method `.test_toggle_writes_the_preference()`
 
 ---
 
@@ -891,7 +904,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3526` lines (`147206` bytes)
+**Size**: `3558` lines (`148528` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

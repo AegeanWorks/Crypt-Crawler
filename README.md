@@ -136,7 +136,7 @@ The hover card names the rule next to the champion's title. "Elder" is the Elder
 
 Chests can be **Gilded Mimics**: opening one pushes you back and springs a depth-scaled fight instead of paying gold. The mimic is chosen deterministically from the run seed and chest order, so a known seed reproduces the same trapped chest. Trap search reveals traps, not mimics.
 
-QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, and the 🎞️ header button toggles reduced motion (persisted, disables screen shake and pulsing accents). Story: three new codex entries — *Signs in the Blood*, *The Lantern-Keeper* and *The Debt of Malakor* — plus *Ember Tithe*, *Hollow Silence* and *Hollow Choir*, and a victory epilogue that closes the ledger.
+QoL: `?` opens the guide, `R` searches for traps, `Escape` closes any dialog, and the 🎞️ header button toggles reduced motion (persisted, disables screen shake and pulsing accents). The CRT scanline toggle is persisted too, so the chosen display mode survives a reload. Story: three new codex entries — *Signs in the Blood*, *The Lantern-Keeper* and *The Debt of Malakor* — plus *Ember Tithe*, *Hollow Silence* and *Hollow Choir*, and a victory epilogue that closes the ledger.
 
 ### 🔍 Trap Search
 Press `R` or the deck's **Search** button to spend a turn revealing armed traps within three visible tiles. Traps come as **Spike** (8-13), **Dart volley** (4-6 x2) and **Snare** (0-2 + stun 1); a revealed trap gets a dashed amber grille and a hover card with odds, but it still triggers if stepped on: the search buys information, not safety. Press `R` again while beside a revealed trap to disarm it for `4+depth*2` XP (`x2` on Hollow Silence); the trap becomes a grey crossed grille, is safe to cross, and stays disarmed in saves. The revealed state survives saves; each new floor starts with fresh hidden traps. Deep Fog shortens the search because it uses the same line of sight as the lantern.
@@ -233,6 +233,7 @@ crypt-crawler/
 │   ├── test_choir_phase_priority.py <- Choir phases preempt a new hum roll
 │   ├── test_chronicle_fade.py <- scrolled chronicle fades its top edge
 │   ├── test_combat.py        <- combat rules tests
+│   ├── test_crt_persistence.py <- CRT scanline toggle survives a reload
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger
 │   ├── test_death_cause.py   <- status causes end the turn and name the cause
 │   ├── test_death_effect.py  <- every defeat leaves a death burst at its tile

@@ -661,6 +661,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: The B2F Choir pays its tome and the run continues; a foundry B3F boss ends the run under its own name and with its own loot; Malakor keeps his crown and journal entries. The victory modal's relic line follows the actual drop. No save-format or turn-rule change. 208 unit tests green, harness 133/133, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 real key 1, before pack/choir both Malakor + crown, after pack Ashen Warden + Warhammer and choir no victory + tome; same-state full-page captures in `.inspect/cycles/c41/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first boss checks), PRINCIPLE-011 (a boss's name, loot and ending match the fight).
 
+### ADR-083: The CRT scanline preference persists (commit audit 1→9)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The 1→9 audit found that the CRT scanline toggle introduced in commit 8 was not persisted, while the adjacent reduced-motion preference was. A probe toggled CRT on (`active: true, stored: null`) and reloaded to CRT off (`active: false, overlayHidden: true`), so the player's display choice was lost on every reload.
+- **Decision**: Read `crypt_crawler_crt` in the `UIController` constructor and apply it through `_applyCrtState()`; `toggleCrt()` writes `"1"`/`"0"` to the same key. Guard with `tests/test_crt_persistence.py` and the `crt_preference_survives_reload` harness check (toggle, reload, assert body class, overlay, storage and button title). Document the persistence in the README QoL line.
+- **Consequences**: The CRT display choice survives reloads and matches the reduced-motion preference model; storage failures fall back to the in-memory toggle. No game, save, combat or RNG change. 210 unit tests green, harness 135/135, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real toggle + reload, before off/no key, after on/`"1"`; same-state full-page captures in `.inspect/cycles/c42/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first reload check), PRINCIPLE-011 (display preferences behave consistently).
+
 
 
 
