@@ -1066,3 +1066,39 @@ class, difficulty and viewport.
 - **Gates**: unit 200 OK; harness 121 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `feat(audio): give poison and burn ticks a voice`.
+
+## Cycle 37 — The explored map survives a reload (2026-11-08)
+
+- **Area**: Progression and saves (fog-of-war persistence).
+- **Find**: `saveGameState` stored tiles, props, themes and objectives but not
+  `dungeon.explored`. `ClientDungeon` rebuilt it as an all-false grid, so a resume kept
+  the turn, player and loot but erased the map knowledge. A real seed 42 B1F walk of 44
+  arrow-key steps reached (29,6) with 435 explored tiles at turn 45; a real page reload
+  resumed at the same turn and tile with only 77 explored tiles. The minimap collapsed
+  from the walked rooms/corridors to the current lantern circle. The harness check
+  `explored_map_survives_resume` failed on HEAD with `after: false`.
+- **Analyze**: Fog-of-war knowledge is run state, not a visual cache: the minimap, hover
+  cards and navigation all read `explored`. Save the boolean grid and restore it in
+  `ClientDungeon`; old saves without the field keep the all-false default and the current
+  FOV still reveals as usual. Killed: saving only `visible` (the resume FOV would still
+  lose history), rebuilding explored from tiles (visits are not encoded in tiles), and
+  replaying the move path (fragile and longer).
+- **Fix**: Add `explored: this.dungeon.explored` to the save payload and read
+  `data.explored` in `ClientDungeon` with a ragged/absent-safe `Boolean` map. Add the
+  `explored_map_survives_resume` harness check and a `test_explored_map_is_saved_and_restored`
+  source check; document the persistence in the README minimap section.
+- **Screenshots** (seed 42 B1F, 44 real arrow-key steps to (29,6), turn 45, 1920x1080,
+  dsf 2; before uses HEAD `engine.js`/`dungeon.js`):
+  - before: `.inspect/cycles/c37/before-1-before-reload-minimap.png` shows the walked
+    rooms and corridors; `before-2-after-reload-minimap.png` shows only the current
+    lantern circle after a real reload.
+  - after: `after-1-before-reload-minimap.png` and `after-2-after-reload-minimap.png` show
+    the same full explored map before and after the reload.
+  - command: `python .inspect/cycles/play_c37.py before|after`
+- **Played run**: Real browser walk (44 arrow presses) then a real page reload. Before:
+  explored 435 -> 77 at the same turn 45 and player (29,6), no page errors. After:
+  explored 435 -> 435 at the same turn/tile, no page errors. Harness check:
+  `explored_map_survives_resume` false -> true.
+- **Gates**: unit 201 OK; harness 123 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(save): keep the explored map across a reload`.

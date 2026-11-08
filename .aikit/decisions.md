@@ -621,6 +621,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Turn-boundary damage is audible and distinct by type without reusing the generic hit cue, the shrine chime or the run-ending knells. No gameplay, save or RNG change; the cue is short enough to repeat each turn. 200 unit tests green, harness 121/121, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real Space turn, HP 50 -> 43 with badges 2 -> 1; oscillator events `55,73,0` -> `55,73,0,260,180,200,520`; same-state panels in `.inspect/cycles/c36/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped turn path), PRINCIPLE-014 (failing-first cue check), PRINCIPLE-011 (a visible HP loss also has an audible cause).
 
+### ADR-078: Fog-of-war exploration is part of the save (improvement cycle 37)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `saveGameState` stored the dungeon tiles, props, themes and objectives but not `dungeon.explored`; `ClientDungeon` rebuilt it as all false. A real seed 42 B1F walk of 44 arrow-key steps reached (29,6) at turn 45 with 435 explored tiles, but a real page reload resumed at the same turn and tile with 77 explored tiles, collapsing the minimap to the current lantern circle. The `explored_map_survives_resume` harness check failed on HEAD with `after: false`.
+- **Decision**: Save `explored: this.dungeon.explored` with the dungeon payload and restore it in `ClientDungeon` from `data.explored`, using a ragged/absent-safe `Boolean(savedExplored?.[y]?.[x])` map. Old saves without the field keep the all-false default; `updateFOV` still adds the current circle. Guard with the harness resume check and `test_explored_map_is_saved_and_restored`; document the persistence in the README minimap section.
+- **Consequences**: A resumed run keeps the map knowledge the player earned; the minimap, hover cards and navigation agree with the pre-reload state. The save grows by a 45x30 boolean grid; no version bump is needed because the field is additive and guarded. 201 unit tests green, harness 123/123, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real 44-step walk + reload, explored 435 -> 77 before, 435 -> 435 after; same-state minimap crops in `.inspect/cycles/c37/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first resume check), PRINCIPLE-013 (atomic additive save state).
+
 
 
 

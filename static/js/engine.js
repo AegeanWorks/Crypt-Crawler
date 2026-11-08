@@ -3168,6 +3168,7 @@ export class GameEngine {
           depth: this.dungeon.depth,
           biome: this.dungeon.biome,
           tiles: this.dungeon.tiles,
+          explored: this.dungeon.explored,
           player_spawn: this.dungeon.playerSpawn,
           stairs_pos: this.dungeon.stairsPos,
           rooms: this.dungeon.rooms,

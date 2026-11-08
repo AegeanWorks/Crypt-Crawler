@@ -93,9 +93,11 @@ export class ClientDungeon {
     this.sconces = (data.sconces || []).map(point);
     this.merchants = (data.merchants || []).map(point);
 
-    // Fog of War: explored (2D boolean array) and visible (Set of "x,y" keys)
-    this.explored = Array.from({ length: this.height }, () =>
-      Array(this.width).fill(false)
+    // Fog of War: explored (2D boolean array) and visible (Set of "x,y" keys).
+    // A resumed save carries the explored grid; old saves default to all false.
+    const savedExplored = Array.isArray(data.explored) ? data.explored : null;
+    this.explored = Array.from({ length: this.height }, (_, y) =>
+      Array.from({ length: this.width }, (_, x) => Boolean(savedExplored?.[y]?.[x]))
     );
     this.visible = new Set();
   }

@@ -1836,6 +1836,42 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # Fog-of-war knowledge is part of the run: a reload must not erase the
+    # minimap back to the current lantern circle.
+    page = harness.open_page(seed)
+    explored_resume = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            let spot = null;
+            for (let y = 1; y < d.height - 1 && !spot; y += 1) {
+                for (let x = 1; x < d.width - 1 && !spot; x += 1) {
+                    if (d.isWalkable(x, y)
+                        && Math.abs(x - e.player.x) + Math.abs(y - e.player.y) > 3) {
+                        spot = { x, y };
+                    }
+                }
+            }
+            if (!spot) return { found: false };
+            d.explored[spot.y][spot.x] = true;
+            const before = d.isExplored(spot.x, spot.y);
+            e.saveGameState();
+            await e.start(null, 1, 'paladin', true);
+            return { found: true, before, after: e.dungeon.isExplored(spot.x, spot.y), spot };
+        }"""
+    )
+    checks.append(_check(
+        "explored_map_survives_resume",
+        explored_resume.get("found") is True
+        and explored_resume["before"] is True
+        and explored_resume["after"] is True,
+        explored_resume,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_explored_resume", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # Deck affordability must match the shipped mana checks: the rogue's slot 4
     # is Fireball (10) and the mage's slot 4 is Nova (10), not the 8 the old table said.
     for hero_class in ("rogue", "mage"):

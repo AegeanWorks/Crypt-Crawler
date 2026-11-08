@@ -69,7 +69,7 @@ The Dungeon Chronicle auto-scrolls to the newest line. Scroll it back and the to
 The crypt, cavern and inferno biomes keep distinct palettes; the B2F cavern's visible floor and wall stones are bright enough to read the room shape at a glance, while unexplored tiles stay black and the water shimmers keep the dark-cavern mood.
 
 ### 🗺️ Minimap Key
-The minimap names every blip: Stairs (gold), Chest (orange), Shop (purple), Sigil (blue), Vault (dark gold), Trap (amber), Shrine (teal), Pact (red) and Soul (lilac). The green blip is the hero and red dots are visible enemies. Collected sigils and opened vaults lose their blip, so the map only marks live objectives.
+The minimap names every blip: Stairs (gold), Chest (orange), Shop (purple), Sigil (blue), Vault (dark gold), Trap (amber), Shrine (teal), Pact (red) and Soul (lilac). The green blip is the hero and red dots are visible enemies. Collected sigils and opened vaults lose their blip, so the map only marks live objectives. Explored floor stays on the minimap after a reload; the save carries the fog-of-war grid, while old saves without it still load with the current lantern circle.
 
 ### 🎲 Seeds
 The class-selection screen accepts an optional positive run seed; leave it blank for a random run. The same seed, class and difficulty reproduce the same dungeon, and the Records modal shows the current seed with a **Copy Seed** button so a run can be replayed or shared.

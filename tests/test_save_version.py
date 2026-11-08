@@ -31,6 +31,12 @@ class TestSaveVersion(unittest.TestCase):
         self.assertIn("this.ui.updateStreak(this.killStreak)", self.js)
         self.assertIn("this.ui.updateStreak(0)", self.js)
 
+    def test_explored_map_is_saved_and_restored(self):
+        self.assertIn("explored: this.dungeon.explored", self.js)
+        dungeon_js = (ROOT / "static" / "js" / "dungeon.js").read_text(encoding="utf-8")
+        self.assertIn("const savedExplored", dungeon_js)
+        self.assertIn("Boolean(savedExplored?.[y]?.[x])", dungeon_js)
+
 
 if __name__ == "__main__":
     unittest.main()

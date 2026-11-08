@@ -9,8 +9,8 @@
 - **Total Python Modules**: `56`
 - **Total Classes**: `58`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `295`
-- **Total Source Lines**: `10984`
+- **Total Class Methods**: `296`
+- **Total Source Lines**: `11026`
 
 ---
 
@@ -781,7 +781,7 @@
 ### [`tests/test_save_version.py`](tests/test_save_version.py)
 > *Save version contract: write and read the same SAVE_VERSION, refuse others.*
 
-**Size**: `36` lines (`1402` bytes)
+**Size**: `42` lines (`1740` bytes)
 
 **Classes:**
 - `class TestSaveVersion`
@@ -789,6 +789,7 @@
   - Method `.test_save_and_loader_share_one_version_constant()`
   - Method `.test_refusal_leaves_the_stored_save_untouched()`
   - Method `.test_kill_streak_is_saved_restored_and_cleared()`
+  - Method `.test_explored_map_is_saved_and_restored()`
 
 ---
 
@@ -850,7 +851,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3232` lines (`134953` bytes)
+**Size**: `3268` lines (`136362` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*
