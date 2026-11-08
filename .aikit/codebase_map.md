@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `55`
-- **Total Classes**: `57`
+- **Total Python Modules**: `56`
+- **Total Classes**: `58`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `291`
-- **Total Source Lines**: `10887`
+- **Total Class Methods**: `294`
+- **Total Source Lines**: `10936`
 
 ---
 
@@ -494,6 +494,19 @@
 
 ---
 
+### [`tests/test_effects_rng.py`](tests/test_effects_rng.py)
+> *Visual effects never consume the seeded gameplay RNG.*
+
+**Size**: `24` lines (`728` bytes)
+
+**Classes:**
+- `class TestEffectsRng`
+  - Method `.setUp()`
+  - Method `.test_renderer_has_its_own_random_stream()`
+  - Method `.test_renderer_never_calls_the_gameplay_rng()`
+
+---
+
 ### [`tests/test_enemy_pathing.py`](tests/test_enemy_pathing.py)
 > *Enemy pathing contract: a blocked greedy step falls back to a free BFS step.*
 
@@ -836,7 +849,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3166` lines (`132238` bytes)
+**Size**: `3191` lines (`133230` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

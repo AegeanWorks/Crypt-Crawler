@@ -237,6 +237,7 @@ crypt-crawler/
 │   ├── test_death_effect.py  <- every defeat leaves a death burst at its tile
 │   ├── test_deck_costs.py    <- deck dimming matches the engine mana costs
 │   ├── test_dungeon.py       <- procedural generation tests
+│   ├── test_effects_rng.py   <- effects use their own RNG, not the gameplay seed
 │   ├── test_enemy_pathing.py <- blocked melee steps detour around props
 │   ├── test_equipment_save.py <- free equip/drop/unequip changes save immediately
 │   ├── test_execute_marker.py <- skull/EXECUTE preview belongs to the rogue

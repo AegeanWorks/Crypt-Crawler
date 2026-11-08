@@ -994,3 +994,40 @@ class, difficulty and viewport.
 - **Gates**: unit 197 OK; harness 117 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(ui): keep the minimap key readable on narrow canvases`.
+
+## Cycle 35 — Effects stop rolling the gameplay dice (2026-11-08)
+
+- **Area**: Graphics and effects (visual RNG isolation).
+- **Find**: `renderer.js` called `Math.random()` in 42 places, including the 0.6
+  chance-per-frame spark emission inside `_renderProjectiles`. The render loop therefore
+  advanced the seeded gameplay stream by frame count. A real seed 42 B1F snare run with
+  the same staged state took 2 damage when the player stepped immediately, but 1 damage
+  after a 1.1s projectile flight. The new harness check
+  `visual_effects_do_not_consume_gameplay_rng` failed on HEAD with `calls: 42` during one
+  projectile.
+- **Analyze**: Visual randomness is presentation, not game state. Give the renderer its
+  own deterministic LCG and replace every `Math.random()` call in `renderer.js`; leave the
+  seeded `Math.random` stream for engine rolls. Killed: reseeding or restoring
+  `Math.random` around render frames (fragile and order-dependent), and using
+  `performance.now()` (removes the gameplay RNG dependency but is not reproducible for a
+  test). No effect appearance change is intended; only the source of the spark/flicker
+  values changes.
+- **Fix**: Add `_fxRandomState` and `_fxRandom()` (LCG: `imul(state, 1664525) +
+  1013904223`) to `renderer.js`, replace all 42 `Math.random()` calls, add
+  `tests/test_effects_rng.py`, and add the `visual_effects_do_not_consume_gameplay_rng`
+  harness check (counts gameplay-RNG calls during a 350ms projectile flight).
+- **Screenshots** (seed 42 B1F, staged snare at (11,6), player at (12,6), real ArrowLeft,
+  1920x1080, dsf 2; before uses HEAD `renderer.js`):
+  - before: `.inspect/cycles/c35/before-quick-full.png` shows "Took 2 damage";
+    `before-delayed-full.png` shows "Took 1 damage" after the same seed/state with a
+    projectile wait; `before-delayed-projectile.png` shows the bolt in flight.
+  - after: `after-quick-full.png` and `after-delayed-full.png` both show "Took 1 damage";
+    `after-delayed-projectile.png` shows the bolt still rendering.
+  - command: `python .inspect/cycles/play_c35.py before|after`
+- **Played run**: Real browser ArrowLeft onto the snare in two variants: immediate and
+  after a 1.1s projectile flight. Before: trap damage 2 vs 1, same turn/position, no page
+  errors. After: trap damage 1 vs 1, same turn/position, no page errors. Harness check:
+  gameplay RNG calls during the projectile flight 42 -> 0.
+- **Gates**: unit 199 OK; harness 119 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(effects): isolate visual randomness from the seeded run`.

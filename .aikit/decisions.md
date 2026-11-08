@@ -605,6 +605,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: The minimap key is legible at mobile and narrow-center-panel widths without changing the canvas resolution or desktop rendering; the DOM key covers part of the map on narrow screens but remains a static, pointer-transparent note. 197 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: mobile probe 3.43px canvas text -> 10px DOM text with 9 items (106.5x84), desktop DOM key hidden and canvas key unchanged; same-state mobile crops in `.inspect/cycles/c34/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (measured in the live renderer), PRINCIPLE-014 (source drift test), PRINCIPLE-011 (the map key is readable on every supported viewport).
 
+### ADR-076: Visual effects get their own RNG (improvement cycle 35)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `renderer.js` used `Math.random()` for 42 presentation decisions, including a per-frame 60% spark roll in `_renderProjectiles`. Because the harness seeds `Math.random` to make a run reproducible, visual effects advanced the gameplay stream by frame count: a seed 42 B1F snare took 2 damage when stepped on immediately, but 1 damage after a 1.1s projectile flight. The new harness check counted 42 gameplay-RNG calls during one projectile.
+- **Decision**: Give `DungeonRenderer` a private deterministic LCG (`_fxRandomState`, `_fxRandom()`: `imul(state, 1664525) + 1013904223`) and replace every `Math.random()` call in `renderer.js` with it. Keep `Math.random` exclusively for game rolls. Guard with `tests/test_effects_rng.py` (the renderer has its own stream and never calls `Math.random(`) and the `visual_effects_do_not_consume_gameplay_rng` harness check.
+- **Consequences**: Effects still flicker and emit sparks, but they no longer shift seed-reproducible damage, loot, traps or AI rolls; the same seed/actions produce the same outcome regardless of frame timing. No save format or gameplay-value change. 199 unit tests green, harness 119/119, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real snare step immediate vs 1.1s projectile delay, 2 vs 1 damage before, 1 vs 1 after; projectile still visible in flight in both builds; same-state captures in `.inspect/cycles/c35/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped render path), PRINCIPLE-014 (failing-first RNG check), PRINCIPLE-013 (reproducible seeded state).
+
 
 
 

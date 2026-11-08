@@ -2958,6 +2958,31 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # Visual effects must never draw from the seeded gameplay RNG: a flying
+    # projectile used to shift the next damage roll by the frame count.
+    page = harness.open_page(seed)
+    fx_rng = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const original = Math.random;
+            let calls = 0;
+            Math.random = () => { calls += 1; return original(); };
+            e.renderer.addProjectile(
+                e.player.x, e.player.y, e.player.x + 3, e.player.y, "#63b3ed", "bolt"
+            );
+            await new Promise((r) => setTimeout(r, 350));
+            Math.random = original;
+            return { calls, projectiles: e.renderer.projectiles.length };
+        }"""
+    )
+    checks.append(_check(
+        "visual_effects_do_not_consume_gameplay_rng",
+        fx_rng["calls"] == 0,
+        fx_rng,
+    ))
+    checks.append(_check("no_page_errors_after_fx_rng", not harness.errors, harness.errors))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)

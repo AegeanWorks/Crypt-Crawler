@@ -35,6 +35,8 @@ export class DungeonRenderer {
     this.healColor = "#68d391";
     this.arcaneColor = "#9f7aea";
     this.poisonColor = "#48bb78";
+    // Visual-only RNG: effects must never advance the seeded gameplay stream.
+    this._fxRandomState = 0x9e3779b9;
     this._minimapLegendCompact = false;
     this._minimapLegend = this._buildMinimapLegendDom();
     if (typeof ResizeObserver !== "undefined") {
@@ -92,22 +94,29 @@ export class DungeonRenderer {
     this._minimapLegend.style.top = `${Math.max(8, (canvasRect.top - wrapperRect.top) + 94 * scale + 4)}px`;
   }
 
+  _fxRandom() {
+    this._fxRandomState = (
+      Math.imul(this._fxRandomState, 1664525) + 1013904223
+    ) >>> 0;
+    return this._fxRandomState / 4294967296;
+  }
+
   addJackpotExplosion(x, y) {
     const cx = x * this.tileSize + this.tileSize / 2;
     const cy = y * this.tileSize + this.tileSize / 2;
     for (let i = 0; i < 36; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 2.0 + Math.random() * 4.5;
-      const isCoin = Math.random() < 0.6;
+      const angle = this._fxRandom() * Math.PI * 2;
+      const speed = 2.0 + this._fxRandom() * 4.5;
+      const isCoin = this._fxRandom() < 0.6;
       this.particles.push({
         x: cx,
         y: cy,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 1.5,
-        color: isCoin ? "#ecc94b" : (Math.random() < 0.5 ? "#f6ad55" : "#fff"),
+        color: isCoin ? "#ecc94b" : (this._fxRandom() < 0.5 ? "#f6ad55" : "#fff"),
         size: isCoin ? 3.5 : 2,
         alpha: 1.0,
-        decay: 0.015 + Math.random() * 0.01,
+        decay: 0.015 + this._fxRandom() * 0.01,
         gravity: 0.08,
       });
     }
@@ -118,17 +127,17 @@ export class DungeonRenderer {
     const cy = y * this.tileSize + this.tileSize / 2;
     const colors = ["#ecc94b", "#f6ad55", "#63b3ed", "#b794f4", "#ffffff"];
     for (let i = 0; i < 40; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 2.5 + Math.random() * 5.0;
+      const angle = this._fxRandom() * Math.PI * 2;
+      const speed = 2.5 + this._fxRandom() * 5.0;
       this.particles.push({
         x: cx,
         y: cy,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 2.5,
         color: colors[i % colors.length],
-        size: 3 + Math.random() * 3,
+        size: 3 + this._fxRandom() * 3,
         alpha: 1.0,
-        decay: 0.018 + Math.random() * 0.012,
+        decay: 0.018 + this._fxRandom() * 0.012,
         gravity: 0.09,
       });
     }
@@ -195,17 +204,17 @@ export class DungeonRenderer {
     const cx = x * this.tileSize + this.tileSize / 2;
     const cy = y * this.tileSize + this.tileSize / 2;
     for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 1.0 + Math.random() * 2.5;
+      const angle = this._fxRandom() * Math.PI * 2;
+      const speed = 1.0 + this._fxRandom() * 2.5;
       this.particles.push({
         x: cx,
         y: cy,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         color,
-        size: 2 + Math.random() * 3,
+        size: 2 + this._fxRandom() * 3,
         alpha: 1.0,
-        decay: 0.03 + Math.random() * 0.02,
+        decay: 0.03 + this._fxRandom() * 0.02,
       });
     }
   }
@@ -257,8 +266,8 @@ export class DungeonRenderer {
       const elapsed = performance.now() - this.shakeStartTime;
       if (elapsed < this.shakeDuration) {
         const decay = 1.0 - elapsed / this.shakeDuration;
-        shakeX = (Math.random() - 0.5) * this.shakeIntensity * decay * 2;
-        shakeY = (Math.random() - 0.5) * this.shakeIntensity * decay * 2;
+        shakeX = (this._fxRandom() - 0.5) * this.shakeIntensity * decay * 2;
+        shakeY = (this._fxRandom() - 0.5) * this.shakeIntensity * decay * 2;
       } else {
         this.shakeDuration = 0;
       }
@@ -276,14 +285,14 @@ export class DungeonRenderer {
     const biome = dungeon.biome || (dungeon.depth <= 1 ? "crypt" : (dungeon.depth === 2 ? "cavern" : "inferno"));
 
     // Spawn floating embers in inferno biome
-    if (biome === "inferno" && Math.random() < 0.22) {
+    if (biome === "inferno" && this._fxRandom() < 0.22) {
       this.particles.push({
-        x: (player.x + (Math.random() - 0.5) * 12) * ts,
-        y: (player.y + (Math.random() - 0.5) * 10) * ts,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: -0.7 - Math.random() * 0.7,
-        color: Math.random() < 0.5 ? "#f6ad55" : "#e53e3e",
-        size: 1.5 + Math.random() * 2,
+        x: (player.x + (this._fxRandom() - 0.5) * 12) * ts,
+        y: (player.y + (this._fxRandom() - 0.5) * 10) * ts,
+        vx: (this._fxRandom() - 0.5) * 0.4,
+        vy: -0.7 - this._fxRandom() * 0.7,
+        color: this._fxRandom() < 0.5 ? "#f6ad55" : "#e53e3e",
+        size: 1.5 + this._fxRandom() * 2,
         alpha: 0.85,
         decay: 0.02,
       });
@@ -538,7 +547,7 @@ export class DungeonRenderer {
         }
         if (tile === TileType.FLOOR) {
           // Deterministic hairline cracks: hash tile coords so the pattern is
-          // stable frame-to-frame (never Math.random here — it would shimmer).
+          // stable frame-to-frame (never the gameplay RNG here — it would shimmer).
           const h = ((x * 73856093) ^ (y * 19349663)) >>> 0;
           if (h % 7 === 0) {
             ctx.strokeStyle = isVis ? "rgba(0, 0, 0, 0.45)" : "rgba(0, 0, 0, 0.3)";
@@ -612,12 +621,12 @@ export class DungeonRenderer {
       ctx.fillRect(px + w / 2 - 0.5, py + h / 2, 1, 2);
 
       // Treasure glint sparkle
-      if (isVis && Math.random() < 0.08) {
+      if (isVis && this._fxRandom() < 0.08) {
         this.particles.push({
-          x: px + w / 2 + (Math.random() - 0.5) * 8,
-          y: py + h / 2 + (Math.random() - 0.5) * 6,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: -0.4 - Math.random() * 0.4,
+          x: px + w / 2 + (this._fxRandom() - 0.5) * 8,
+          y: py + h / 2 + (this._fxRandom() - 0.5) * 6,
+          vx: (this._fxRandom() - 0.5) * 0.4,
+          vy: -0.4 - this._fxRandom() * 0.4,
           color: "#ecc94b",
           size: 1.5,
           alpha: 0.9,
@@ -1090,14 +1099,14 @@ export class DungeonRenderer {
     ctx.fill();
 
     // Spawn subtle ambient embers that drift upward
-    if (Math.random() < 0.04) {
+    if (this._fxRandom() < 0.04) {
       this.particles.push({
-        x: cx + (Math.random() - 0.5) * 4,
+        x: cx + (this._fxRandom() - 0.5) * 4,
         y: cy - 8,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: -0.6 - Math.random() * 0.5,
+        vx: (this._fxRandom() - 0.5) * 0.4,
+        vy: -0.6 - this._fxRandom() * 0.5,
         color: innerColor,
-        size: 1 + Math.random() * 1.5,
+        size: 1 + this._fxRandom() * 1.5,
         alpha: 0.8,
         decay: 0.025,
       });
@@ -1838,12 +1847,12 @@ export class DungeonRenderer {
     if (heroClass === "rogue") {
       // Shadow Rogue Sprite: Obsidian stealth cowl with emerald assassin eyes, dual daggers & shadow smoke
       // Ambient shadow smoke at feet
-      if (Math.random() < 0.15) {
+      if (this._fxRandom() < 0.15) {
         this.particles.push({
-          x: px + ts / 2 + (Math.random() - 0.5) * 6,
+          x: px + ts / 2 + (this._fxRandom() - 0.5) * 6,
           y: py + ts - 4,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: -0.35 - Math.random() * 0.3,
+          vx: (this._fxRandom() - 0.5) * 0.3,
+          vy: -0.35 - this._fxRandom() * 0.3,
           color: "#4a5568",
           size: 2,
           alpha: 0.6,
@@ -2192,14 +2201,14 @@ export class DungeonRenderer {
       const angle = Math.atan2(p.ty - p.sy, p.tx - p.sx);
 
       // Emit flight sparks
-      if (Math.random() < 0.6) {
+      if (this._fxRandom() < 0.6) {
         this.particles.push({
-          x: currX + (Math.random() - 0.5) * 4,
-          y: currY + (Math.random() - 0.5) * 4,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: (Math.random() - 0.5) * 0.6,
+          x: currX + (this._fxRandom() - 0.5) * 4,
+          y: currY + (this._fxRandom() - 0.5) * 4,
+          vx: (this._fxRandom() - 0.5) * 0.6,
+          vy: (this._fxRandom() - 0.5) * 0.6,
           color: p.color,
-          size: 1.5 + Math.random() * 2,
+          size: 1.5 + this._fxRandom() * 2,
           alpha: 0.85,
           decay: 0.06,
         });
