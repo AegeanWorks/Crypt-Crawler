@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-048",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794098357.0080645,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794098392.2766974
   },
   "checkpoints": [
-    {
-      "task_id": "CC-042",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] UI readability: fix the deck affordability table so the rogue's 10-MP Fireball and mage's 10-MP Nova are dimmed at 8-9 MP, with a failing-first selftest, a cost parity test and same-state deck before/after",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794090736.4378374,
-      "timestamp_str": "2026-11-08 01:32:16",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The affordance table keyed costs by button id, but slot 4 is class-dependent: rogue Fireball and mage Nova cost 10 while the table said 8, so at 8-9 MP both looked enabled and lacked aria-disabled; only the engine refused the cast",
-        "benefits": "The deck now tells the truth at a glance and marks unaffordable 10-MP spells aria-disabled; the engine remains the authority",
-        "risks": "contract: two UI cost values change, stale slot-4 assertion corrected; dependency: none; concurrency: none; state: no save/rule change; UI: ui.js in the game-ui surface",
-        "mitigation": "Failing checks at 8/9 not dimmed; after dimmed+aria and clear at 10; cost parity test; real rogue/mage deck captures and forced-click refusal; inspector at three viewports; full gates"
-      },
-      "plan_digest": "c1edaaa7476f062149d04df24784f1a98b233f2b69bc2a4e7fc2195ee4e683af"
-    },
     {
       "task_id": "CC-042",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit legend, complete CC-048, then cycle 20",
         "evidence": "172 tests, harness 99/99, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-048",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-048' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794098392.2766986,
+      "timestamp_str": "2026-11-08 03:39:52",
+      "agent": "opencode:cycles"
     }
   ]
 }
