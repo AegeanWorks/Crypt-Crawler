@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-047",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794097079.5192976,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794097125.120224
   },
   "checkpoints": [
-    {
-      "task_id": "CC-041",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Levels: persist room_themes in the saved dungeon so a resumed floor keeps its chapels/urn crypts instead of defaulting every room to ossuary, prove with a failing-first resume check and a real save/reload before/after",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794088963.40931,
-      "timestamp_str": "2026-11-08 01:02:43",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "saveGameState omitted room_themes and ClientDungeon defaults a missing list to ossuary, so after any autosave reload a floor's chapel, urn crypt and choke rooms all rendered as skulls (failing check: 4 distinct themes saved, 13x ossuary resumed)",
-        "benefits": "Room theme identity survives autosave/reload; old saves still default safely; no save version bump",
-        "risks": "contract: additive room_themes field in the version-2 dungeon save; dependency: none; concurrency: none; state: old saves default to ossuary as before; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing selftest resume_restores_room_themes (4 distinct -> all ossuary); writer contract test; real page.reload capture at seed 42 (chapel skull->cross, urn skull->urn); inspector at three viewports; full gates"
-      },
-      "plan_digest": "a202ab8689a38b501b6076587ea12800b2f51ec9cb6b5a779cb3f669801a9e01"
-    },
     {
       "task_id": "CC-041",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-047, then cycle 19 (levels)",
         "evidence": "170 tests, harness 99/99, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-047",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-047' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794097125.1202266,
+      "timestamp_str": "2026-11-08 03:18:45",
+      "agent": "opencode:cycles"
     }
   ]
 }
