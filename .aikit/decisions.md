@@ -493,6 +493,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Champion titles read cleanly ("★ Swift Crypt Skeleton"), boss cards keep a separate BOSS badge, and overlong names truncate instead of spilling. 174 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F Swift Crypt Skeleton 60/200: before "SkeletonSWIFT" collision, after clean title; seed 42 B2F Hollow Choir keeps "BOSS" without overlap.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (title-fit drift test), PRINCIPLE-012 (one measure/ellipsis helper).
 
+### ADR-062: A death burst for every defeated monster (improvement cycle 21)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `_handleMonsterDefeat` removed a regular monster with only the attack's hit slash/particles and a damage float; the sprite simply vanished. Champions had a champion-slay shake/text and bosses a victory sequence, but an ordinary kill had no distinct death beat. A same-state kill of a Sneaky Goblin showed 8 particles and 0 shockwaves on the before frame.
+- **Decision**: Add `renderer.addDeathBurst(x, y, color)` (a 48px shockwave plus 16 colored and 8 steel particles) and call it from `_handleMonsterDefeat` for every defeat, colored steel for regular foes, amber for champions and gold for bosses. No rule, save or RNG change. Add `tests/test_death_effect.py`.
+- **Consequences**: Every kill leaves a visible ring/burst at the tile while the hit slash and damage float still read; boss/champion feedback is preserved. 176 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F Sneaky Goblin at (19,6), 14 HP, one attack, 80ms frame: before 8 particles/0 shockwaves, after 30 particles/1 ring.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (death-effect drift test), PRINCIPLE-010 (16+8 particles and one ring per kill).
+
+
 
 
 

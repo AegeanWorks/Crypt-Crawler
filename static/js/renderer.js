@@ -156,6 +156,12 @@ export class DungeonRenderer {
     });
   }
 
+  addDeathBurst(x, y, color = "#a0aec0") {
+    this.addShockwave(x, y, color, 48);
+    this.addParticles(x, y, color, 16);
+    this.addParticles(x, y, "#4a5568", 8);
+  }
+
   addProjectile(startX, startY, targetX, targetY, color = "#f6ad55", kind = "bolt") {
     this.projectiles.push({
       sx: startX * this.tileSize + this.tileSize / 2,

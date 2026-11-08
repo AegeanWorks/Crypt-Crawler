@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `46`
-- **Total Classes**: `48`
+- **Total Python Modules**: `47`
+- **Total Classes**: `49`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `257`
-- **Total Source Lines**: `10054`
+- **Total Class Methods**: `260`
+- **Total Source Lines**: `10083`
 
 ---
 
@@ -414,6 +414,19 @@
   - Method `.test_status_ticks_return_their_cause()`
   - Method `.test_status_death_short_circuits_the_enemy_turn()`
   - Method `.test_enemy_loop_stops_when_the_hero_falls()`
+
+---
+
+### [`tests/test_death_effect.py`](tests/test_death_effect.py)
+> *Death effect contract: every defeat leaves a visible burst at its tile.*
+
+**Size**: `29` lines (`1062` bytes)
+
+**Classes:**
+- `class TestDeathEffect`
+  - Method `.setUp()`
+  - Method `.test_renderer_has_a_death_burst()`
+  - Method `.test_defeat_uses_the_death_burst()`
 
 ---
 

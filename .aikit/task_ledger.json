@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-049",
+    "task_id": "CC-050",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794099037.1789353,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794099815.9145954,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794099069.5157242
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-043",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Cavern contrast shipped: visible walls #1b3a40/grid #2a565e, floors #14343a/#102c31/grid #24535c; unexplored stays #0b1a1d/#08181b; tests/test_cavern_contrast.py (floor>=0.02, wall>=0.025, unexplored<half). Same-path seed 42 B2F rogue turn 5 HP 48: near-black -> readable teal room; no page errors. Unit 162 OK, harness 89/89, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-055, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794092051.7719374,
-      "timestamp_str": "2026-11-08 01:54:11",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-043, then cycle 15 (audio cues)",
-        "evidence": "162 tests, harness 89/89, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-043",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-043' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794092113.404803,
-      "timestamp_str": "2026-11-08 01:55:13",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-044",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794099069.5157263,
       "timestamp_str": "2026-11-08 03:51:09",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-050",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Graphics: add a death burst (shockwave + particles, tier-colored) at every defeated monster tile, prove with a failing-first effect test, a same-monster 80ms kill before/after and a real attack run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794099797.0129273,
+      "timestamp_str": "2026-11-08 04:03:17",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "A regular kill removed the sprite with only the attack's hit slash/particles and a float; the same-state kill showed 8 particles and no shockwave, so ordinary kills had no death beat while champions/bosses did",
+        "benefits": "Every kill leaves a visible ring/burst at the tile; regular/champion/boss colors differ; the hit slash and damage float still read",
+        "risks": "contract: _handleMonsterDefeat calls addDeathBurst; dependency: none; concurrency: none; state: no save/rule/RNG change; UI: renderer.js and engine.js in the game-ui surface",
+        "mitigation": "Failing effect test before the fix; same goblin (19,6) 14 HP one-attack 80ms before/after (8/0 -> 30/1 particles/rings); real attack kill log; inspector at three viewports; full gates"
+      },
+      "plan_digest": "11d715d23e12c2808251e0bd657f226c2a7f173776c4be0b18dad0ca6a1f6c4c"
+    },
+    {
+      "task_id": "CC-050",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Death burst shipped: addDeathBurst (48px ring + 16 tier + 8 steel particles) called from _handleMonsterDefeat; test_death_effect. Seed 42 goblin (19,6) 14 HP single attack: before 8 particles/0 rings, after 30 particles/1 ring, kills 1, log Defeated. Unit 176 OK, harness 99/99, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-062, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794099815.9145954,
+      "timestamp_str": "2026-11-08 04:03:35",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-050, then cycle 22 (audio cues)",
+        "evidence": "176 tests, harness 99/99, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

@@ -1759,6 +1759,7 @@ export class GameEngine {
     this.kills += 1;
     this.player.gold += monster.gold_reward;
     this.ui.logMessage(`Defeated ${monster.name}! Gained ${monster.xp_reward} XP, ${monster.gold_reward} Gold.`, "loot");
+    this.renderer.addDeathBurst(monster.x, monster.y, monster.is_boss ? "#d69e2e" : (monster.is_champion ? "#f6ad55" : "#a0aec0"));
 
     // Bestiary recording
     this.recordMonsterDefeat(monster.type);

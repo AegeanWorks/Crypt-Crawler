@@ -98,7 +98,7 @@ The passive is printed on each class card before you choose, and the in-game gui
 Combos reward sequencing: apply burn with Fireball, then shatter it with Frost; or poison with a dagger/Shadow Strike, then detonate it with fire.
 
 ### 💥 Combat Feedback
-When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible. The skull marker and **EXECUTE** hover suffix appear only for the rogue — the class with the Executioner passive — and the hover strike range includes the +25% execute bonus; other classes see the plain range.
+When several enemies land hits in one enemy phase, their damage numbers stack vertically instead of drawing on top of each other, so a twin hit reads as two numbers that add up to the HP actually lost. When the killing blow lands, the HP bar drops to zero and a ☠ **YOU PERISHED** marker holds for 0.75s before the death ledger opens, so the final hit is visible. A defeated monster leaves a short shockwave ring and a particle burst at its tile — steel for regular foes, amber for champions, gold for bosses — so every kill has a death beat. The skull marker and **EXECUTE** hover suffix appear only for the rogue — the class with the Executioner passive — and the hover strike range includes the +25% execute bonus; other classes see the plain range.
 
 ### 🏷️ Hover Cards
 Champion names already start with their affix (Swift, Fortified, Molten, Vampiric), so the hover card does not repeat it; boss cards keep a right-aligned BOSS badge. Long titles are measured and ellipsized before they can spill past the card edge. Poison or burn that finishes the hero ends the turn immediately and names the status as the cause; no later enemy acts after the hero falls.
@@ -223,6 +223,7 @@ crypt-crawler/
 │   ├── test_combat.py        <- combat rules tests
 │   ├── test_death_beat.py    <- HP/feedback before the delayed death ledger
 │   ├── test_death_cause.py   <- status causes end the turn and name the cause
+│   ├── test_death_effect.py  <- every defeat leaves a death burst at its tile
 │   ├── test_deck_costs.py    <- deck dimming matches the engine mana costs
 │   ├── test_dungeon.py       <- procedural generation tests
 │   ├── test_enemy_pathing.py <- blocked melee steps detour around props

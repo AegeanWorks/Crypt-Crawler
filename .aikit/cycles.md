@@ -565,3 +565,28 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `fix(ui): fit hover titles and drop the duplicate affix`.
+
+## Cycle 21 — A death burst for every defeated monster (2026-11-08)
+
+- **Area**: Graphics and effects (death feedback).
+- **Find**: A regular kill left only the attack's hit slash/particles and a float; the
+  monster sprite vanished with no death beat. The same-state kill read 8 particles and
+  0 shockwaves. Champions/bosses had their own feedback, but ordinary foes did not.
+- **Analyze**: Add one death burst at the defeat tile, colored by tier; no rule/save change.
+  Killed: a corpse/fade sprite (needs keeping dead monsters in the render list; the burst
+  conveys the kill without that state).
+- **Fix**: `renderer.addDeathBurst` (48px shockwave + 16 colored + 8 steel particles) called
+  from `_handleMonsterDefeat`; `tests/test_death_effect.py`.
+- **Screenshots** (same seed 42 B1F, Sneaky Goblin at (19,6) with 14 HP, one attack, 80ms
+  frame, 1920x1080):
+  - before: `.inspect/cycles/c21/before-death-burst.png` (-17, slash + 8 particles, no ring)
+  - after: `after-death-burst.png` (-21, large ring + 30 particles)
+  - full pages: `before-death-full.png`, `after-death-full.png`
+  - command: `python .inspect/cycles/play_c21.py before|after` (before uses HEAD engine/renderer)
+- **Played run**: real `attackMonster` kill of the goblin; kills 0 -> 1, log "Defeated Sneaky
+  Goblin! Gained 16 XP, 18 Gold.", 30 particles/1 shockwave; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 176 OK;
+  `python tools/ai_harness.py selftest` -> 99 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(gfx): burst every defeated monster into dust`.
