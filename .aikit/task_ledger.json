@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-064",
+    "task_id": "CC-065",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794133921.4905427,
+    "updated_at": 1794134728.5266786,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794134052.8945928
+    "completed_at": 1794135212.615659
   },
   "checkpoints": [
-    {
-      "task_id": "CC-058",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Run-ending cues shipped: playDeath() (98/196 + 73.42/146.83 Hz sine tolls) and playVictory() (440/554.37/659.25/880 triangle fanfare + held A-major chord) in audio.js, called after stopMusic in handlePlayerDeath/handleVictory; test_audio_cues extended + run_endings_have_their_own_cues recorder check. Before: death [160,160], victory-after-delay []; after: death [160,160,98,196,73,147], victory [440,554,659,880,440,554,659]. Real fatal goblin hit B1F and boss kill B3F; death/victory modals captured before/after (visual state unchanged). Unit 186 OK, harness 113/113, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-070, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794113826.4496071,
-      "timestamp_str": "2026-11-08 07:57:06",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-058, then cycle 30 (progression and saves)",
-        "evidence": "186 tests, harness 113/113, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-058",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-058' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794113883.8442655,
-      "timestamp_str": "2026-11-08 07:58:03",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-059",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Progression/saves: persist free equipment and inventory actions - equip, unequip and drop mutate the player but never call saveGameState, so a reload immediately after equipping reverts it (starting sword_iron: equip -> saved equipped null, reload -> slot empty, sword back in bag); prove with a failing-first reload selftest, same-state post-reload before/after crops and a real equip+reload run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794114222.7043948,
-      "timestamp_str": "2026-11-08 08:03:42",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "useInventoryItem's equipment branch, dropInventoryItem and unequipSlot are free actions that change persistent state but never save; merchant buy/sell already save, so the asymmetry is a bug. A probe: equip sword_iron, saved equipped null, reload -> empty slot.",
-        "benefits": "Equipment, drop and unequip changes survive a reload; no combat, RNG or save-format change",
-        "risks": "contract: three saveGameState calls only; dependency: none; concurrency: none; state: save fields already exist; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing-first reload check and source test; real equip and page reload; same-state post-reload screenshots at 1920x1080; three-viewport inspector; full gates"
-      },
-      "plan_digest": "200329f08f04536d8ad8d4e72fe1b16ff9934015c05434660ed49f25066a4e0c"
-    },
     {
       "task_id": "CC-059",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794134052.894595,
       "timestamp_str": "2026-11-08 13:34:12",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-065",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Audio cues: give the hero's poison and burn turn ticks distinct short sounds instead of silent HP loss; prove with a failing-first oscillator check, a real Space turn with poison/burn, same-state panel crops, and a full gate run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794134717.2551603,
+      "timestamp_str": "2026-11-08 13:45:17",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "_tickPlayerStatuses logs and floats poison/burn damage but schedules no audio; a real turn with both statuses recorded only ambient music while HP fell 50 -> 43.",
+        "benefits": "Damage-over-time is audible, with distinct poison and burn identities; the player can notice HP loss without watching the log; no reuse of the generic hit cue",
+        "risks": "contract: one audio method plus two engine calls; dependency: none; concurrency: none; state: no gameplay/save/RNG change; UI: none",
+        "mitigation": "Failing-first harness oscillator check and source test; real Space turn with both statuses; before/after panel crops; full gates"
+      },
+      "plan_digest": "f503f75cadfb8dba6dbd84f520909f6a54b034d588357f6583fcd9625c43858a"
+    },
+    {
+      "task_id": "CC-065",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] DoT ticks audible: playStatusTick(kind) adds a poison pair (sine 260->150, triangle 180->120) and burn pair (sawtooth 200->80, square 520->360); _tickPlayerStatuses calls it for the hero only. Failing-first harness check failed on HEAD (freqs []) and passes now (260,180,200,520); tests/test_audio_cues.py extended. Real seed 42 B1F Space turn with poison 2/burn 2: HP 50 -> 43, badges 2 -> 1 in both builds, ambient-only before vs four tick oscillators after, no page errors. Same-state panel crops. Unit 200 OK, harness 121/121, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-077, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794134728.5266786,
+      "timestamp_str": "2026-11-08 13:45:28",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit cycle 36, then cycle 37 (progression/saves)",
+        "evidence": "200 tests, harness 121/121, inspector 75/75, aikit check 5/5"
+      }
+    },
+    {
+      "task_id": "CC-065",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-065' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794135212.6156611,
+      "timestamp_str": "2026-11-08 13:53:32",
       "agent": "opencode:cycles"
     }
   ]
