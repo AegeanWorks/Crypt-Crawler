@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-052",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794101419.9231973,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794101450.7306461
   },
   "checkpoints": [
-    {
-      "task_id": "CC-046",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Combat feel: gate the execute skull and EXECUTE hover suffix to the rogue and apply the 1.25x bonus to the hover range, prove with a failing-first source test and paladin/rogue hover before/after plus a real attack",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794095884.2515154,
-      "timestamp_str": "2026-11-08 02:58:04",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The skull and EXECUTE suffix appeared for every class at <=30% HP even though only the rogue has the +25% passive, and the rogue's preview ignored the bonus (before ~5-8 vs actual ~10)",
-        "benefits": "Only the rogue sees an execute window, and its hover range matches the actual bonus; other classes see the plain range; the engine's damage rule is unchanged",
-        "risks": "contract: renderer consumes player.hero_class for the marker/tooltip; dependency: none; concurrency: none; state: no save/rule change; UI: renderer.js in the game-ui surface",
-        "mitigation": "Failing source test before the fix (no heroClass gate); paladin/rogue hover captures at 60/200 HP; rogue damage selftest unchanged; inspector at three viewports; full gates"
-      },
-      "plan_digest": "329a36519452dee7743b197a25fd3b5fa952efe4ea238ceeea04aa3a07d31b00"
-    },
     {
       "task_id": "CC-046",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-052, then cycle 24 (combat feel)",
         "evidence": "178 tests, harness 103/103, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-052",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-052' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794101450.7306483,
+      "timestamp_str": "2026-11-08 04:30:50",
+      "agent": "opencode:cycles"
     }
   ]
 }
