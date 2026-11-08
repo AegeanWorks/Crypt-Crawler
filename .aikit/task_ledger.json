@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-057",
+    "task_id": "CC-058",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794112504.2315779,
+    "updated_at": 1794113826.4496071,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794112580.4204316
+    "completed_at": 1794113883.8442633
   },
   "checkpoints": [
-    {
-      "task_id": "CC-051",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Descent cue shipped: playDescend 220->55 saw + 110->40 sine in descendFloor; test_audio_cues + descent_has_a_sound_cue (101 checks). Real seed 42 step onto stairs (38,6 -> 37,6): before [90], after [90,220,110], depth 1->2; no page errors. Unit 177 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-063, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794100609.7254362,
-      "timestamp_str": "2026-11-08 04:16:49",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-051, then cycle 23 (progression/saves)",
-        "evidence": "177 tests, harness 101/101, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-051",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-051' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794100649.6843553,
-      "timestamp_str": "2026-11-08 04:17:29",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-052",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Progression/saves: persist killStreak and turnsSinceKill, restore them and the header badge on resume, clear the badge on a new run, prove with a failing-first resume check, a source test and a real three-kill save/reload header before/after",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794101404.7532947,
-      "timestamp_str": "2026-11-08 04:30:04",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "The save omitted killStreak/turnsSinceKill and start reset them to 0; a 3-kill streak resumed at 0 with the HUD badge gone (and an in-page resume could leave a stale badge), so momentum and the badge disagreed",
-        "benefits": "A resumed run keeps its streak, turnsSinceKill decay and badge; a new run clears the badge; old saves default to 0",
-        "risks": "contract: additive save fields under version 2; dependency: none; concurrency: none; state: old saves default 0; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing resume check (0/0 vs 4/2); saved/resumed header captures; real 3-kill save+reload; source test; inspector at three viewports; full gates"
-      },
-      "plan_digest": "3d0a38d5ce74a32adec1713bff2fc5e2bf28664de1d827e9e3a545784db9b219"
-    },
     {
       "task_id": "CC-052",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794112580.4204335,
       "timestamp_str": "2026-11-08 07:36:20",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-058",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Audio cues: give the two run-ending beats their own sounds - a low funeral knell on death and an A-major victory fanfare - because handlePlayerDeath/handleVictory stop the music and record no cue at all; prove with failing-first oscillator recordings, same-state death/victory modal pairs and real death/boss-kill runs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794112856.9710727,
+      "timestamp_str": "2026-11-08 07:40:56",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "A recorded probe of the shipped audio path returns [] for both handlePlayerDeath and handleVictory; the two biggest moments in a run are silent after the killing blow or boss death",
+        "benefits": "Death and victory get distinct, recognizable cues; existing music, sfx and save state are unchanged",
+        "risks": "contract: two new audio methods plus two call sites; dependency: none; concurrency: none; state: no save/RNG change; UI: audio.js and engine.js in the game-ui surface",
+        "mitigation": "Failing-first source test and oscillator selftest; real death and boss-kill runs; same-state death/victory modal screenshots at 1920x1080; three-viewport inspector; full gates"
+      },
+      "plan_digest": "05ca043309ef8a94aaddd3cd66cc01371d17a9c0ca7fcbbedee4f48cf6b897af"
+    },
+    {
+      "task_id": "CC-058",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Run-ending cues shipped: playDeath() (98/196 + 73.42/146.83 Hz sine tolls) and playVictory() (440/554.37/659.25/880 triangle fanfare + held A-major chord) in audio.js, called after stopMusic in handlePlayerDeath/handleVictory; test_audio_cues extended + run_endings_have_their_own_cues recorder check. Before: death [160,160], victory-after-delay []; after: death [160,160,98,196,73,147], victory [440,554,659,880,440,554,659]. Real fatal goblin hit B1F and boss kill B3F; death/victory modals captured before/after (visual state unchanged). Unit 186 OK, harness 113/113, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-070, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794113826.4496071,
+      "timestamp_str": "2026-11-08 07:57:06",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-058, then cycle 30 (progression and saves)",
+        "evidence": "186 tests, harness 113/113, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-058",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-058' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794113883.8442655,
+      "timestamp_str": "2026-11-08 07:58:03",
       "agent": "opencode:cycles"
     }
   ]
