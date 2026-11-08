@@ -1309,6 +1309,63 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_search", not harness.errors, harness.errors))
     page.context.close()
 
+    # The snare trap and the Choir's silence set player.status_effects.stun, and
+    # the HUD promises it skips the next action; prove the action is consumed once.
+    page = harness.open_page(seed)
+    stun = page.evaluate(
+        """() => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            e.monsters = [];
+            const trap = d.traps[0];
+            if (!trap) return { found: false, reason: "no trap" };
+            trap.kind = "snare";
+            trap.triggered = false;
+            trap.disarmed = false;
+            const step = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .find(([dx, dy]) => d.isWalkable(trap.x + dx, trap.y + dy));
+            if (!step) return { found: false, reason: "no walkable neighbour" };
+            e.player.x = trap.x + step[0];
+            e.player.y = trap.y + step[1];
+            e.player.hp = 500;
+            e.player.max_hp = 500;
+            d.updateFOV(e.player.x, e.player.y, 7);
+            e.stepPlayer(-step[0], -step[1]);
+            const tray = document.getElementById("heroStatusTray");
+            const afterTrap = {
+                stun: e.player.status_effects.stun || 0,
+                tray: tray ? tray.textContent.trim() : null,
+            };
+            const fromX = e.player.x;
+            const fromY = e.player.y;
+            e.stepPlayer(step[0], step[1]);
+            return {
+                found: true,
+                afterTrap,
+                moved: e.player.x !== fromX || e.player.y !== fromY,
+                stunAfter: e.player.status_effects.stun || 0,
+                trayAfter: tray ? tray.textContent.trim() : null,
+                log: Array.from(document.querySelectorAll("#chronicleLog .log-entry"))
+                    .slice(-4).map((n) => n.textContent.trim()),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "player_stun_skips_next_action",
+        stun.get("found") is True
+        and stun["afterTrap"]["stun"] == 1
+        and "Stunned" in (stun["afterTrap"]["tray"] or "")
+        and stun["moved"] is False
+        and stun["stunAfter"] == 0
+        and "Stunned" not in (stun["trayAfter"] or "")
+        and any("stunned" in line.lower() for line in stun["log"]),
+        stun,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_player_stun", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # The offline fallback must carry the trap the new Search action looks for.
     page = harness.open_page(seed)
     offline_trap = page.evaluate(

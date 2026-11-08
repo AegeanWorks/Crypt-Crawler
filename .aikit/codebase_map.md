@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `51`
-- **Total Classes**: `53`
+- **Total Python Modules**: `52`
+- **Total Classes**: `54`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `279`
-- **Total Source Lines**: `10666`
+- **Total Class Methods**: `283`
+- **Total Source Lines**: `10759`
 
 ---
 
@@ -654,6 +654,20 @@
 
 ---
 
+### [`tests/test_player_stun.py`](tests/test_player_stun.py)
+> *A stunned hero loses the next turn action.*
+
+**Size**: `36` lines (`1053` bytes)
+
+**Classes:**
+- `class TestPlayerStun`
+  - Method `.setUp()`
+  - Method `._head(marker, size)`
+  - Method `.test_consume_helper_exists()`
+  - Method `.test_turn_actions_consume_the_stun()`
+
+---
+
 ### [`tests/test_projectile_style.py`](tests/test_projectile_style.py)
 > *Projectile style contract: arrows read physical, spells keep a glowing trail.*
 
@@ -784,7 +798,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3099` lines (`129313` bytes)
+**Size**: `3156` lines (`131705` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

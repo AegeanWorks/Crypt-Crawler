@@ -847,3 +847,43 @@ class, difficulty and viewport.
 - **Gates**: unit 189 OK; harness 115 checks, 0 failed; inspector 75/75 at three viewports,
   0 console errors; aikit check 5/5.
 - **Commit**: `fix(save): persist equipment and inventory changes`.
+
+## Cycle 31 — The snare actually holds the hero (2026-11-08)
+
+- **Area**: Combat feel (player stun).
+- **Find**: The snare trap sets `player.status_effects.stun = 1` and the HUD says
+  "Stunned: skips its next action", but no turn action checked or consumed the status.
+  A real keyboard run on seed 1 B1F stepped onto the snare at (10,4): stun 1, tray
+  "Stunned (1)", turn 2. Pressing ArrowRight then moved the hero to (11,4), kept stun 1 and
+  the "Stunned (1)" badge, and advanced to turn 3. Failing guard:
+  `player_stun_skips_next_action` in the harness (before: `moved: true`, `stunAfter: 1`).
+- **Analyze**: The stun is a pending action penalty, so the next turn action must be spent
+  instead of performed, and the badge must clear when it is spent. The snare and the Hollow
+  Choir's silence both write the same field, so one shared consumer covers both. Killed:
+  ticking stun in `_tickPlayerStatuses` (it would expire during the trap turn before the
+  player ever lost an action), and blocking free inventory actions such as equip/drop
+  (they are not turn actions and already save immediately, cycle 30).
+- **Fix**: Add `_consumePlayerStun()` in `engine.js`: decrement/delete the status, log
+  "You are stunned and cannot act!", draw a STUNNED floating label, update the hero sheet,
+  then call `finishPlayerTurn()`. Guard `stepPlayer`, `triggerSlotAction`, `quickPotion`,
+  `waitTurn`, `searchForTraps`, and potion/scroll use in `useInventoryItem`. Add
+  `tests/test_player_stun.py` and the `player_stun_skips_next_action` harness check.
+- **Screenshots** (seed 1 B1F, paladin, normal, real ArrowLeft onto the snare then
+  ArrowRight away, 1920x1080, dsf 2, panel and 5x5-tile crops; before uses HEAD
+  `engine.js`, after uses the fixed file):
+  - before: `.inspect/cycles/c31/before-1-stunned-panel.png` and
+    `before-1-stunned-canvas.png` show the trap-tile hero with "Stunned (1)";
+    `before-2-after-panel.png` and `before-2-after-canvas.png` show the hero moved one
+    tile right with the badge still "Stunned (1)".
+  - after: `after-1-stunned-panel.png` / `after-1-stunned-canvas.png` show the same
+    trap-tile state; `after-2-after-panel.png` / `after-2-after-canvas.png` show the hero
+    still on (10,4), the badge gone, and the STUNNED label over the tile.
+  - command: `python .inspect/cycles/play_c31.py before|after`
+- **Played run**: Real browser keyboard play at seed 1 B1F. Before: after ArrowLeft the
+  hero is at (10,4), stun 1, tray "Stunned (1)", turn 2; ArrowRight moves to (11,4),
+  stun stays 1, tray stays "Stunned (1)", turn 3, no stun log. After: same trap step,
+  ArrowRight leaves the hero at (10,4), stun 0, tray empty, turn 3, chronicle
+  "💫 You are stunned and cannot act!"; `errors: []` in both runs.
+- **Gates**: unit 191 OK; harness 117 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(combat): make the snare stun cost the hero a turn`.

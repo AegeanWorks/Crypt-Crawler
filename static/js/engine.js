@@ -1411,6 +1411,7 @@ export class GameEngine {
 
   stepPlayer(dx, dy) {
     if (this.gameOver || this.victory || this.transitioning) return;
+    if (this._consumePlayerStun()) return;
 
     const fromX = this.player.x;
     const fromY = this.player.y;
@@ -1866,6 +1867,7 @@ export class GameEngine {
 
   triggerSlotAction(slotNum) {
     if (this.gameOver || this.victory || this.transitioning) return;
+    if (this._consumePlayerStun()) return;
     const cls = this.heroClass || this.player?.hero_class || "paladin";
     if (slotNum === 1) {
       this.tacticalStrike();
@@ -2288,6 +2290,7 @@ export class GameEngine {
 
   quickPotion() {
     if (this.gameOver || this.victory || this.transitioning) return;
+    if (this._consumePlayerStun()) return;
     const potIdx = this.player.inventory.findIndex((i) => i.type === "potion");
     if (potIdx >= 0) {
       this.useInventoryItem(potIdx);
@@ -2298,6 +2301,7 @@ export class GameEngine {
 
   waitTurn() {
     if (this.gameOver || this.victory || this.transitioning) return;
+    if (this._consumePlayerStun()) return;
     if (this.player.mana < this.player.max_mana) {
       this.player.mana += 1;
     }
@@ -2307,6 +2311,7 @@ export class GameEngine {
 
   searchForTraps() {
     if (this.gameOver || this.victory || this.transitioning) return;
+    if (this._consumePlayerStun()) return;
     const adjacent = (this.dungeon.traps || []).find((trap) =>
       trap.discovered && !trap.triggered && !trap.disarmed
       && Math.abs(trap.x - this.player.x) + Math.abs(trap.y - this.player.y) === 1
@@ -2351,6 +2356,7 @@ export class GameEngine {
     if (this.gameOver || this.victory || this.transitioning) return;
     if (idx < 0 || idx >= this.player.inventory.length) return;
     const item = this.player.inventory[idx];
+    if ((item.type === "potion" || item.type === "scroll") && this._consumePlayerStun()) return;
 
     if (item.type === "potion") {
       sounds.playPotion();
@@ -2561,6 +2567,17 @@ export class GameEngine {
     this._recalculatePlayerStats();
     this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
     this.saveGameState();
+  }
+
+  _consumePlayerStun() {
+    if (!this.player.status_effects || !this.player.status_effects.stun) return false;
+    this.player.status_effects.stun -= 1;
+    if (this.player.status_effects.stun <= 0) delete this.player.status_effects.stun;
+    this.ui.logMessage("💫 You are stunned and cannot act!", "hit");
+    this.renderer.addFloatingText("STUNNED", this.player.x, this.player.y, "#ecc94b");
+    this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
+    this.finishPlayerTurn();
+    return true;
   }
 
   _tickPlayerStatuses() {

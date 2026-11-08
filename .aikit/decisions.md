@@ -573,6 +573,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Free inventory actions survive a reload immediately, matching the merchant's save behavior. 189 unit tests green, harness 115/115, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: real UI equip and page reload, before `Empty` -> after `Forged Iron Sword`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first reload test), PRINCIPLE-013 (state atomicity and recovery).
 
+### ADR-072: A snare stun costs the hero one action (improvement cycle 31)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The snare trap and the Hollow Choir's silence set `player.status_effects.stun`, and the HUD promises "Stunned: skips its next action", but no action checked or consumed it. A real seed 1 B1F run stepped onto the snare at (10,4), then pressed ArrowRight: the hero moved to (11,4), stun stayed 1, and "Stunned (1)" stayed on the hero sheet for the rest of the run. The harness check `player_stun_skips_next_action` failed on HEAD with `moved: true, stunAfter: 1`.
+- **Decision**: Add `_consumePlayerStun()`: decrement/delete the status, log "You are stunned and cannot act!", draw a STUNNED floating label, update the hero sheet, and call `finishPlayerTurn()`. Call it at the top of `stepPlayer`, `triggerSlotAction`, `quickPotion`, `waitTurn`, `searchForTraps`, and the potion/scroll branch of `useInventoryItem`. Do not tick stun in `_tickPlayerStatuses` (the trap turn itself must not spend it) and do not block free equipment actions. Guard with `tests/test_player_stun.py` (source routes) and the `player_stun_skips_next_action` harness check (real action).
+- **Consequences**: Both the snare and the Choir's silence now cost exactly one turn action and clear their badge; equipment, drop and unequip remain free. No save, RNG, combat-value or format change: `player` (including status effects) was already serialized. 191 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 1 B1F real keyboard run, before (10,4)->(11,4) with stun 1, after stays at (10,4) with stun 0 and "You are stunned and cannot act!"; same-state panel/canvas crops in `.inspect/cycles/c31/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first action check), PRINCIPLE-011 (the badge and the rule agree).
+
 
 
 
