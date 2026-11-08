@@ -1245,3 +1245,30 @@ class, difficulty and viewport.
 - **Gates**: unit 208 OK; harness 133 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(bosses): give each boss its own death and victory identity`.
+
+## Cycle 42 — Levels audit (dry, zero findings) (2026-11-08)
+
+- **Area**: Levels (procedural placement and reachability).
+- **Find**: No surviving defect. A generator-only sweep of seeds 101-1000 at depths 1-3
+  checked 2,700 floors with `_validate_dungeon` and found 0 failures: spawn and stairs
+  walkable, stairs reachable, exactly one soul and pact, at least three sigils, a vault,
+  a depth>=2 merchant, walkable props, and known room themes/trap kinds. The
+  server-validated sweeps remain 90/90 (seeds 1-30) and 210/210 (seeds 31-100); the
+  three-viewport inspector is 75/75 with 0 console errors; the latest cavern and inferno
+  captures show no new readability defect.
+- **Analyze**: Candidates killed: inferno wall contrast (visible in the live capture and
+  already covered by the biome palette; not a reproducible defect), vault/Choir placement
+  (300/300 server-validated floors), and merchant/sigil/vault overlaps (2,700/2,700
+  generator floors). No code change is warranted; editing here would be churn without a
+  failing proof.
+- **Fix**: None.
+- **Proof**: `python .inspect/cycles/c42_sweep.py` -> `checked 2700 bad 0`;
+  `python tools/validate_fairness.py --seeds 1..30 --depths 1,2,3` -> 90/90;
+  `python tools/validate_fairness.py --seeds 31..100 --depths 1,2,3` -> 210/210;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all --out
+  .inspect` -> 75/75, 0 console errors, 16 screenshots.
+- **Gates**: unit 208 OK; harness 133 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Stop**: A full cycle found zero verified improvements, so the goal's stop condition
+  is met. No code was changed and no binaries were committed.
+- **Commit**: `docs(cycles): record the dry levels audit`.
