@@ -2343,6 +2343,14 @@ export class DungeonRenderer {
     const scaleX = mw / dungeon.width;
     const scaleY = mh / dungeon.height;
 
+    // A collected sigil or an opened vault keeps its tile type, but the map
+    // must stop advertising an objective the hover cards already hide.
+    const spent = new Set();
+    for (const sigil of dungeon.sigils || []) {
+      if (sigil.collected) spent.add(`${sigil.x},${sigil.y}`);
+    }
+    if (dungeon.vault?.opened) spent.add(`${dungeon.vault.x},${dungeon.vault.y}`);
+
     // Explored tiles
     for (let y = 0; y < dungeon.height; y++) {
       for (let x = 0; x < dungeon.width; x++) {
@@ -2360,14 +2368,15 @@ export class DungeonRenderer {
           tile === TileType.SIGIL ||
           tile === TileType.VAULT
         ) {
+          const key = `${x},${y}`;
           if (tile === TileType.STAIRS_DOWN) ctx.fillStyle = "#ecc94b";
           else if (tile === TileType.MERCHANT) ctx.fillStyle = "#b794f4";
           else if (tile === TileType.SHRINE) ctx.fillStyle = "#38b2ac";
           else if (tile === TileType.CHEST) ctx.fillStyle = "#ed8936";
           else if (tile === TileType.PACT) ctx.fillStyle = "#f56565";
           else if (tile === TileType.SOUL) ctx.fillStyle = "#d6bcfa";
-          else if (tile === TileType.SIGIL) ctx.fillStyle = "#63b3ed";
-          else if (tile === TileType.VAULT) ctx.fillStyle = "#d69e2e";
+          else if (tile === TileType.SIGIL) ctx.fillStyle = spent.has(key) ? "#2d3748" : "#63b3ed";
+          else if (tile === TileType.VAULT) ctx.fillStyle = spent.has(key) ? "#2d3748" : "#d69e2e";
           else ctx.fillStyle = "#2d3748";
           ctx.fillRect(mx + x * scaleX, my + y * scaleY, Math.max(1, scaleX), Math.max(1, scaleY));
         }

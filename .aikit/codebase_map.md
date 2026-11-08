@@ -9,8 +9,8 @@
 - **Total Python Modules**: `48`
 - **Total Classes**: `50`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `266`
-- **Total Source Lines**: `10265`
+- **Total Class Methods**: `267`
+- **Total Source Lines**: `10370`
 
 ---
 
@@ -601,13 +601,14 @@
 ### [`tests/test_minimap_legend.py`](tests/test_minimap_legend.py)
 > *Minimap legend contract: every map colour is named next to the map.*
 
-**Size**: `26` lines (`919` bytes)
+**Size**: `33` lines (`1336` bytes)
 
 **Classes:**
 - `class TestMinimapLegend`
   - Method `.setUp()`
   - Method `.test_minimap_draws_a_named_legend()`
   - Method `.test_trap_blip_is_distinct_from_vault_and_stairs()`
+  - Method `.test_spent_objectives_do_not_keep_their_blips()`
 
 ---
 
@@ -741,7 +742,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `2804` lines (`116781` bytes)
+**Size**: `2902` lines (`121112` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

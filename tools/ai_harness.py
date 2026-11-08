@@ -2596,6 +2596,104 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_multi_killer", not harness.errors, harness.errors))
     page.context.close()
 
+    # A collected sigil or an opened vault keeps its tile type, but the minimap
+    # must stop advertising it; otherwise the map sends the player back to a
+    # spent objective that the hover cards already hide.
+    page = harness.open_page(seed)
+    objectives = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const d = e.dungeon;
+            if (!d.vault) return { reachable: false, reason: "no vault" };
+            const mw = 120, mh = 84;
+            const scaleX = mw / d.width, scaleY = mh / d.height;
+            const sample = (x, y) => Array.from(
+                e.canvas.getContext("2d").getImageData(
+                    Math.floor(e.canvas.width - mw - 10 + x * scaleX + scaleX / 2),
+                    Math.floor(10 + y * scaleY + scaleY / 2),
+                    1, 1
+                ).data
+            );
+            const wait = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+            const neighbours = (p) => [[1, 0], [-1, 0], [0, 1], [0, -1]]
+                .filter(([dx, dy]) => d.isWalkable(p.x + dx, p.y + dy))
+                .map(([dx, dy]) => ({ dx, dy, x: p.x + dx, y: p.y + dy }));
+            const targets = [...d.sigils, d.vault];
+            const farTile = () => {
+                let best = null;
+                for (let y = 1; y < d.height - 1; y += 1) {
+                    for (let x = 1; x < d.width - 1; x += 1) {
+                        if (!d.isWalkable(x, y)) continue;
+                        if (targets.some((t) => t.x === x && t.y === y)) continue;
+                        const dist = targets.reduce(
+                            (sum, t) => sum + Math.abs(x - t.x) + Math.abs(y - t.y), 0
+                        );
+                        if (!best || dist > best.dist) best = { x, y, dist };
+                    }
+                }
+                return best;
+            };
+            const park = async () => {
+                const spot = farTile();
+                e.player.x = spot.x;
+                e.player.y = spot.y;
+                d.updateFOV(e.player.x, e.player.y, 7);
+                await wait();
+            };
+            e.monsters = [];
+            for (const trap of d.traps) trap.disarmed = true;
+            for (const s of d.sigils) d.explored[s.y][s.x] = true;
+            d.explored[d.vault.y][d.vault.x] = true;
+            await park();
+            const sigil = d.sigils[0];
+            const live = {
+                sigil: sample(sigil.x, sigil.y),
+                vault: sample(d.vault.x, d.vault.y),
+            };
+            for (const s of d.sigils) {
+                const step = neighbours(s)[0];
+                if (!step) return { reachable: false, reason: "sigil has no walkable neighbour" };
+                e.player.x = step.x;
+                e.player.y = step.y;
+                d.updateFOV(e.player.x, e.player.y, 7);
+                e.stepPlayer(-step.dx, -step.dy);
+            }
+            const vstep = neighbours(d.vault)[0];
+            if (!vstep) return { reachable: false, reason: "vault has no walkable neighbour" };
+            e.player.x = vstep.x;
+            e.player.y = vstep.y;
+            d.updateFOV(e.player.x, e.player.y, 7);
+            e.stepPlayer(-vstep.dx, -vstep.dy);
+            await park();
+            return {
+                reachable: true,
+                live,
+                spent: {
+                    sigil: sample(sigil.x, sigil.y),
+                    vault: sample(d.vault.x, d.vault.y),
+                },
+                collected: d.sigils.every((s) => s.collected),
+                opened: d.vault.opened,
+                held: e.sigilCount,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "minimap_clears_spent_objectives",
+        objectives.get("reachable") is True
+        and objectives["collected"] is True
+        and objectives["opened"] is True
+        and objectives["live"]["sigil"] == [99, 179, 237, 255]
+        and objectives["live"]["vault"] == [214, 158, 46, 255]
+        and objectives["spent"]["sigil"] == [45, 55, 72, 255]
+        and objectives["spent"]["vault"] == [45, 55, 72, 255],
+        objectives,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_minimap_objectives", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # The canvas must hug its 760x540 bitmap and clicks must land on the tile the
     # player sees, including when a tall box letterboxes the bitmap vertically.
     page = harness.open_page(seed)

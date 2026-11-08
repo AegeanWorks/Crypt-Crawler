@@ -21,6 +21,13 @@ class TestMinimapLegend(unittest.TestCase):
         self.assertIn('"#d69e2e"', self.js)
         self.assertIn('"#ecc94b"', self.js)
 
+    def test_spent_objectives_do_not_keep_their_blips(self):
+        start = self.js.index("  _drawMinimap(ctx, dungeon, player, monsters) {")
+        end = self.js.index("  _drawMinimapLegend(ctx, mx, my, mw, mh) {", start)
+        body = self.js[start:end]
+        self.assertIn("collected", body, "minimap must ignore collected sigils")
+        self.assertIn(".opened", body, "minimap must ignore opened vaults")
+
 
 if __name__ == "__main__":
     unittest.main()

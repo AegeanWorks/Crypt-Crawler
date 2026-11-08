@@ -533,6 +533,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Champion mechanics are discoverable on hover and in the README; boss/regular cards are unchanged. 181 unit tests green, harness 105/105, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F Swift Crypt Skeleton 60/200: before card ends at the strike preview, after adds "Swift: moves 2 tiles/turn".
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (affix-hint drift test), PRINCIPLE-011 (mechanics legible without a wiki).
 
+### ADR-067: The minimap forgets spent objectives (improvement cycle 26)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `_drawMinimap` coloured explored `TileType.SIGIL` and `TileType.VAULT` tiles unconditionally. The dungeon tile never changes when a sigil is collected or the vault opens, and the hover cards already hide both spent objectives. After a full objective run the map still showed a blue sigil and a dark-gold vault, sending the player back to a dead objective.
+- **Decision**: Build a spent-coordinate set from `sigil.collected` and `vault.opened` in `_drawMinimap`; draw those tiles with the explored-floor colour (`#2d3748`) instead of the objective colour. Leave live markers and the legend unchanged. Guard with `test_spent_objectives_do_not_keep_their_blips` (source drift) and `minimap_clears_spent_objectives` (canvas pixels: live `[99,179,237]`/`[214,158,46]` -> spent `[45,55,72]`). No tile, save, RNG or rule change.
+- **Consequences**: The minimap agrees with the hover cards and with a resumed save; live objectives still glow, spent ones read as explored floor. 182 unit tests green, harness 107/107, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, all three sigils collected and vault opened, before/after minimap crops.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first pixel check), PRINCIPLE-011 (the map and the hover card tell the same truth).
+
 
 
 

@@ -692,3 +692,37 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(enemies): explain champion affixes on hover`.
+
+## Cycle 26 — The minimap forgets spent objectives (2026-11-08)
+
+- **Area**: Levels (objective navigation).
+- **Find**: The minimap painted `TileType.SIGIL` and `TileType.VAULT` for every explored
+  tile regardless of `sigil.collected` / `vault.opened`, while the hover cards already hid
+  spent objectives. A pixel probe after collecting all three sigils and opening the vault
+  still read sigil-blue `[99,179,237]` and vault-gold `[214,158,46]`; the same-state
+  before-live and before-spent crops were identical. Failing guards:
+  `minimap_clears_spent_objectives` and `test_spent_objectives_do_not_keep_their_blips`.
+- **Analyze**: The tile type never changes when an objective is spent, so the map must
+  consult the objective objects. Build a spent-coordinate set in `_drawMinimap` and fall
+  back to the floor colour for those tiles. Killed: mutating the dungeon tile on pickup
+  (would drift the saved dungeon and the replay contract); dimming the blip (still
+  advertises the objective).
+- **Fix**: `_drawMinimap` skips collected sigils and opened vaults;
+  `tests/test_minimap_legend.py` gains a drift test; `tools/ai_harness.py` gains a
+  pixel-level selftest check; README's Minimap Key states spent objectives lose their blip.
+- **Screenshots** (same seed 42 B1F setup, 1920x1080, dsf 2; minimap clips plus full-page):
+  - before: `.inspect/cycles/c26/before-1-live-minimap.png` (live blue/gold) and
+    `before-2-spent-minimap.png` (same markers after all three sigils + vault)
+  - after: `after-1-live-minimap.png` (live blue/gold) and
+    `after-2-spent-minimap.png` (both markers now floor-gray)
+  - command: `python .inspect/cycles/play_c26.py before|after` (before uses HEAD renderer.js)
+- **Played run**: seed 42 B1F, monsters cleared and traps disarmed to isolate the objective
+  UI, objective tiles revealed, then real `stepPlayer` moves onto each sigil (held 1 -> 2
+  -> 3) and onto the vault (held 3 -> 0, `opened: true`); parked at (39,22). Before: the
+  spent pixels stayed blue/gold. After: both read `[45,55,72]`; live controls unchanged;
+  no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 182 OK;
+  `python tools/ai_harness.py selftest` -> 107 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(levels): clear spent objective markers from the minimap`.
