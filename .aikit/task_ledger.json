@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "CC-053",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794106999.6288514,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794107065.233324
   },
   "checkpoints": [
-    {
-      "task_id": "CC-047",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Enemies/bosses: type-gate Malakor's summon/enrage, give foundry bosses their own seal-break/fury, let the Choir own its split and search a wider ring when crowded; prove with failing-first phase checks, same-state Choir/Warden before/after and real 50% wait turns",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794097058.6999998,
-      "timestamp_str": "2026-11-08 03:17:38",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "Both boss phase blocks keyed on is_boss, so every boss ran Malakor's phase first: the Choir's phase_two was consumed by Malakor's summons/log and its split never ran (0 echoes, 3 skeletons), while the Ashen Warden borrowed the Malakor text and summoned two skeletons; a crowded Choir also logged 'splits into 0'",
-        "benefits": "Each boss owns its phase fiction: Choir splits into 2 even beside the vault/warden, foundry bosses escalate under their own name with no summons, Malakor keeps his summon/enrage",
-        "risks": "contract: Malakor blocks gain a type gate, other bosses gain seal-break/fury, Choir split searches rings 2-3 and retries; dependency: none; concurrency: none; state: no save/RNG change; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing Choir split check (0 echoes, phase consumed); pack boss no-Malakor; Malakor still summons 2 and enrages; real seed 42 2F/3F wait turns before/after; source test; inspector at three viewports; full gates"
-      },
-      "plan_digest": "66af341c6b7f15cbcf66972a1f5470aad23b85eb4b2adcc24e92d24f94d3c6e5"
-    },
     {
       "task_id": "CC-047",
       "phase": "phase 4",
@@ -308,6 +291,16 @@
         "next": "commit, complete CC-053, then cycle 25 (enemies/bosses)",
         "evidence": "179 tests, harness 105/105, inspector 75/75, gates 5/5"
       }
+    },
+    {
+      "task_id": "CC-053",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-053' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794107065.2333255,
+      "timestamp_str": "2026-11-08 06:04:25",
+      "agent": "opencode:cycles"
     }
   ]
 }
