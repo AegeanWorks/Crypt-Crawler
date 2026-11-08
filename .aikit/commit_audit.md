@@ -83,3 +83,15 @@ recorded dry. Every run ends with `python aikit.py publish crypt-crawler`.
   capacity paths are exercised by the inspector inventory audit.
 - **Action**: none.
 - **Push**: via `python aikit.py publish crypt-crawler`.
+
+## 1 → 18 — `7025ae0` (inventory selection and equipment caps)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **39 tests OK**.
+- **Cumulative changes**: real-index inventory selection under filters/sorting, expanded
+  equipment slots, equip/unequip caps and the full-backpack guard.
+- **Findings**: no surviving defect. `tests/test_combat.py` covers the full-backpack and
+  unequip limits; `tests/test_equipment_save.py` covers the free-action save paths; the
+  inspector checks `.inv-slot.selected` against the real item title. The 1→12 comparison
+  check also exercises the same selection path at current `HEAD`.
+- **Action**: none.
+- **Push**: via `python aikit.py publish crypt-crawler`.
