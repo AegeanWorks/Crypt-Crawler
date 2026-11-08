@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-058",
+    "task_id": "CC-059",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794113826.4496071,
+    "updated_at": 1794115221.7743492,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
     "continuations": [],
-    "completed_at": 1794113883.8442633
+    "completed_at": 1794115287.1695652
   },
   "checkpoints": [
-    {
-      "task_id": "CC-052",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Streak persistence shipped: killStreak/turnsSinceKill saved, restored with guards, updateStreak on resume and 0 on new run; tests/test_save_version.py + resume_restores_kill_streak (103 checks). Seed 42 3 kills/55 gold save+reload: before streak 0/no pill, after streak 3/'Streak: 3'; new run 0/hidden. Unit 178 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-064, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794101419.9231973,
-      "timestamp_str": "2026-11-08 04:30:19",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-052, then cycle 24 (combat feel)",
-        "evidence": "178 tests, harness 103/103, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-052",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-052' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794101450.7306483,
-      "timestamp_str": "2026-11-08 04:30:50",
-      "agent": "opencode:cycles"
-    },
-    {
-      "task_id": "CC-053",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Combat feel: make Strike hit the hovered adjacent enemy before falling back to the first adjacent foe, prove with a failing-first targeting check, a source test and a real mouse-hover-plus-1 run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794106971.8146126,
-      "timestamp_str": "2026-11-08 06:02:51",
-      "agent": "opencode:cycles",
-      "impact_assessment": {
-        "why": "tacticalStrike picked the first adjacent monster in array order; with two adjacent enemies the hover card previewed Target B but pressing 1 hit Target A (before A 89/B 100, log Target A), so the preview and blow disagreed",
-        "benefits": "The hovered enemy is the target when adjacent; touch/keyboard-only play keeps the first-adjacent fallback; the card preview matches the blow",
-        "risks": "contract: tacticalStrike reads renderer.hoverTile; dependency: none; concurrency: none; state: no save/RNG change; UI: engine.js in the game-ui surface",
-        "mitigation": "Failing check read A damaged/B full; after B damaged/A full; real mouse+keyboard pair; source test; inspector at three viewports; full gates"
-      },
-      "plan_digest": "a79fe363c4356f2239474ccfbb46c098ec6091941f0330ad945e2decd828c9f3"
-    },
     {
       "task_id": "CC-053",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794113883.8442655,
       "timestamp_str": "2026-11-08 07:58:03",
+      "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-059",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Progression/saves: persist free equipment and inventory actions - equip, unequip and drop mutate the player but never call saveGameState, so a reload immediately after equipping reverts it (starting sword_iron: equip -> saved equipped null, reload -> slot empty, sword back in bag); prove with a failing-first reload selftest, same-state post-reload before/after crops and a real equip+reload run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794114222.7043948,
+      "timestamp_str": "2026-11-08 08:03:42",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "useInventoryItem's equipment branch, dropInventoryItem and unequipSlot are free actions that change persistent state but never save; merchant buy/sell already save, so the asymmetry is a bug. A probe: equip sword_iron, saved equipped null, reload -> empty slot.",
+        "benefits": "Equipment, drop and unequip changes survive a reload; no combat, RNG or save-format change",
+        "risks": "contract: three saveGameState calls only; dependency: none; concurrency: none; state: save fields already exist; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing-first reload check and source test; real equip and page reload; same-state post-reload screenshots at 1920x1080; three-viewport inspector; full gates"
+      },
+      "plan_digest": "200329f08f04536d8ad8d4e72fe1b16ff9934015c05434660ed49f25066a4e0c"
+    },
+    {
+      "task_id": "CC-059",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Equipment/drop/unequip now save immediately: added this.saveGameState() to the equipment branch of useInventoryItem, dropInventoryItem and unequipSlot. Failing-first: test_equipment_save.py (3 checks) + equipment_change_survives_reload (before equipped sword_iron/saved null/resumed null; after saved/resumed sword_iron, bag 2 items). Real UI click on the starting sword + Equip, real page reload/resume at seed 42 B1F; before slot Empty after reload, after 'Forged Iron Sword'; no page errors. Unit 189 OK, harness 115/115, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-071, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794115221.7743492,
+      "timestamp_str": "2026-11-08 08:20:21",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-059, then cycle 31 (combat feel)",
+        "evidence": "189 tests, harness 115/115, inspector 75/75, gates 5/5"
+      }
+    },
+    {
+      "task_id": "CC-059",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'CC-059' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794115287.1695673,
+      "timestamp_str": "2026-11-08 08:21:27",
       "agent": "opencode:cycles"
     }
   ]
