@@ -1977,6 +1977,32 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # Relic comparison: selecting the starting iron sword must preview its
+    # +4 ATK against the empty weapon slot in the item card.
+    page = harness.open_page(seed)
+    page.click('.inv-slot[title^="Forged Iron Sword"]')
+    comparison = page.evaluate(
+        """() => {
+            const card = document.getElementById('itemCardDiff');
+            return {
+                text: card ? card.textContent.replace(/\\s+/g, ' ').trim() : null,
+                hidden: card ? card.classList.contains('hidden') : null,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "equipment_comparison_shows_deltas",
+        comparison["text"] is not None
+        and comparison["hidden"] is False
+        and "vs Empty Slot" in comparison["text"]
+        and "+4 ATK" in comparison["text"],
+        comparison,
+    ))
+    checks.append(_check(
+        "no_page_errors_after_comparison", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # Fog-of-war knowledge is part of the run: a reload must not erase the
     # minimap back to the current lantern circle.
     page = harness.open_page(seed)

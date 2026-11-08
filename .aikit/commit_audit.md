@@ -55,3 +55,19 @@ recorded dry. Every run ends with `python aikit.py publish crypt-crawler`.
 - **Action**: fixed at `HEAD`.
 - **Commit**: `fix(ui): persist the CRT scanline preference`.
 - **Push**: via `python aikit.py publish crypt-crawler`.
+
+## 1 → 12 — `f4c1f80` (relic slots, comparisons, loot FX)
+
+- **Historical gate**: `python -m unittest discover -s tests` → **35 tests OK**.
+- **Cumulative changes**: five relic slots, item comparison card, loot FX, starter weapon
+  and expanded catalog data.
+- **Finding**: the comparison feature had no end-to-end verification. The unit suite
+  checked item data and equipment caps, but nothing selected an item in the live UI and
+  asserted the diff card.
+- **Fix**: add the `equipment_comparison_shows_deltas` harness check: click the starting
+  `sword_iron` slot and require a visible `vs Empty Slot` card with `+4 ATK`.
+- **Proof**: harness check returns
+  `{"text": "vs Empty Slot:+4 ATK", "hidden": false}`; harness **137/137**, unit 210 OK.
+- **Action**: test gap closed.
+- **Commit**: `test(harness): cover the equipment comparison`.
+- **Push**: via `python aikit.py publish crypt-crawler`.
