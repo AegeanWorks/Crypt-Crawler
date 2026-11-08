@@ -269,5 +269,19 @@
     "final_snapshot_digest": "15305e8e70483e9af3a2b1604a4d763e452493868d4bf0bc924473e42b4d93f6",
     "final_snapshot_entries": 198,
     "surface_digest": "2e9f1ed1b6c95a34a3d2473545eaae04f0744b11f767d5481fb93f1b56ae0a5c"
+  },
+  {
+    "schema": 1,
+    "surface": "game-ui",
+    "baseline_commit": "6f9f6444f64e6f93dbb21b58b43b100f1eb98d37",
+    "contract_hash": "9c09d581a8113b4ea0b7dd817a3e4369c216cae42c2aed582dc88029728687fc",
+    "started_at": 1794141795.3264434,
+    "finished_at": 1794141907.53085,
+    "strikes": 0,
+    "reviewer": "headless inspector (75/75 checks, three viewports)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "4e2728acd7e00d79f3315fbcf3c75d7ef3becf36e6c1c8d9d7c27ef988b30f7d",
+    "final_snapshot_entries": 200,
+    "surface_digest": "3c7c1945bf75ea4a14dc80cfabcc96363521d7c8cccd84e17c56ec5dc1840c3b"
   }
 ]
