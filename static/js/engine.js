@@ -173,6 +173,7 @@ export class GameEngine {
     this.turn = 1;
     this.killStreak = 0;
     this.turnsSinceKill = 0;
+    this.ui.updateStreak(0);
     this.surgeFloor = 0;
     this.gameOver = false;
     this.victory = false;
@@ -199,6 +200,8 @@ export class GameEngine {
         this.bounties = saved.bounties || this._generateOfflineBounties(this.depth);
         this.runSeed = Number.isFinite(saved.runSeed) ? saved.runSeed : (Number.isFinite(this.dungeon?.seed) ? this.dungeon.seed : null);
         this.surgeFloor = Number.isFinite(saved.surgeFloor) ? saved.surgeFloor : 0;
+        this.killStreak = Number.isFinite(saved.killStreak) ? saved.killStreak : 0;
+        this.turnsSinceKill = Number.isFinite(saved.turnsSinceKill) ? saved.turnsSinceKill : 0;
         this.loreUnlocked = Array.from(new Set([
           ...(this.loreStart || []),
           ...loreArchive,
@@ -209,6 +212,7 @@ export class GameEngine {
         this._applyOmen({ announce: false, extraFoe: false });
         this.dungeon.updateFOV(this.player.x, this.player.y, this._effectiveFov());
         this.ui.updateHero(this.player, this.turn, this.depth, this.kills);
+        this.ui.updateStreak(this.killStreak);
         this.ui.renderBounties(this.bounties);
         this.ui.updateJournal(this.loreUnlocked.length, this.loreEntries.length);
         this.updateSigils();
@@ -3115,6 +3119,8 @@ export class GameEngine {
         difficulty: this.difficulty,
         runSeed: this.runSeed,
         surgeFloor: this.surgeFloor,
+        killStreak: this.killStreak,
+        turnsSinceKill: this.turnsSinceKill,
         player: this.player,
         monsters: this.monsters,
         merchantStock: this.merchantStock,

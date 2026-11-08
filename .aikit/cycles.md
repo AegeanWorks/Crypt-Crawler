@@ -614,3 +614,31 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(audio): whoosh into the next floor`.
+
+## Cycle 23 — The kill streak survives resume (2026-11-08)
+
+- **Area**: Progression and saves (kill streak).
+- **Find**: The save omitted `killStreak`/`turnsSinceKill`; `start` reset both to 0 and the
+  resume path never restored or re-rendered them. A 3-kill streak resumed at 0 with the header
+  badge gone; an in-page resume could also leave a stale badge. Failing check: resume read
+  `killStreak: 0` while the badge said 4.
+- **Analyze**: Save the two additive fields, restore with finite guards, update the badge on
+  resume and clear it on a new run. No version bump (old saves default 0). Killed: a save-version
+  migration (no schema change).
+- **Fix**: `killStreak`/`turnsSinceKill` in the save, restore after `surgeFloor`,
+  `ui.updateStreak(...)` on resume and `ui.updateStreak(0)` on a new run;
+  `tests/test_save_version.py` and `resume_restores_kill_streak`.
+- **Screenshots** (same seed 42 B1F, three real kills, save, reload, 1100x60 header clips):
+  - saved: `.inspect/cycles/c23/before-saved-header.png` / `after-saved-header.png` ("🔥 Streak: 3")
+  - resumed: `before-resumed-header.png` (no pill; streak lost) vs `after-resumed-header.png`
+    ("🔥 **Streak: 3**")
+  - new run: `before-newrun-header.png` / `after-newrun-header.png` (badge hidden)
+  - command: `python .inspect/cycles/play_c23.py before|after` (before uses HEAD engine.js)
+- **Played run**: three real `attackMonster` kills (streak 3, 55 gold), `saveGameState`, real
+  page reload: before resume `killStreak 0`, pill hidden; after `killStreak 3`, pill "3"; a new
+  seed-4242 run has streak 0 and no pill; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 178 OK;
+  `python tools/ai_harness.py selftest` -> 103 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `fix(save): keep the kill streak across resume`.

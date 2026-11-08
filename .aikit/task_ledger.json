@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-051",
+    "task_id": "CC-052",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794100609.7254362,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794101419.9231973,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794100649.684353
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-045",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Choir Echo bestiary row shipped; tests/test_bestiary.py + records_show_choir_echo_kills (93 checks). Real seed 42 B2F echo kill (shipped spawn helper, split posts crowded) -> record slain 1; Records before Unknown Entity, after 'Choir Echo - Slayed: 1'. Unit 165 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-057, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794094788.0987756,
-      "timestamp_str": "2026-11-08 02:39:48",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-045, then cycle 17 (combat feel)",
-        "evidence": "165 tests, harness 93/93, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-045",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-045' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794094825.624053,
-      "timestamp_str": "2026-11-08 02:40:25",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-046",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794100649.6843553,
       "timestamp_str": "2026-11-08 04:17:29",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-052",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Progression/saves: persist killStreak and turnsSinceKill, restore them and the header badge on resume, clear the badge on a new run, prove with a failing-first resume check, a source test and a real three-kill save/reload header before/after",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794101404.7532947,
+      "timestamp_str": "2026-11-08 04:30:04",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "The save omitted killStreak/turnsSinceKill and start reset them to 0; a 3-kill streak resumed at 0 with the HUD badge gone (and an in-page resume could leave a stale badge), so momentum and the badge disagreed",
+        "benefits": "A resumed run keeps its streak, turnsSinceKill decay and badge; a new run clears the badge; old saves default to 0",
+        "risks": "contract: additive save fields under version 2; dependency: none; concurrency: none; state: old saves default 0; UI: engine.js in the game-ui surface",
+        "mitigation": "Failing resume check (0/0 vs 4/2); saved/resumed header captures; real 3-kill save+reload; source test; inspector at three viewports; full gates"
+      },
+      "plan_digest": "3d0a38d5ce74a32adec1713bff2fc5e2bf28664de1d827e9e3a545784db9b219"
+    },
+    {
+      "task_id": "CC-052",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Streak persistence shipped: killStreak/turnsSinceKill saved, restored with guards, updateStreak on resume and 0 on new run; tests/test_save_version.py + resume_restores_kill_streak (103 checks). Seed 42 3 kills/55 gold save+reload: before streak 0/no pill, after streak 3/'Streak: 3'; new run 0/hidden. Unit 178 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-064, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794101419.9231973,
+      "timestamp_str": "2026-11-08 04:30:19",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-052, then cycle 24 (combat feel)",
+        "evidence": "178 tests, harness 103/103, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

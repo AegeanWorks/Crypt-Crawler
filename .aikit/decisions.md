@@ -509,6 +509,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: A floor transition is audible before the new floor renders; the step cue still layers underneath. 177 unit tests green, harness 101/101, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F stairs at (37,6), real step from (38,6): before `[90]`, after `[90, 220, 110]`, depth 1 -> 2, log "descended into Depth B2F".
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped audio path), PRINCIPLE-014 (failing-first descent check), PRINCIPLE-010 (two nodes per transition).
 
+### ADR-064: The kill streak survives save and resume (improvement cycle 23)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `saveGameState` stored turn, kills, gold, seed, surgeFloor and the dungeon, but not `killStreak` or `turnsSinceKill`. `start` resets both to 0 before the resume check, and the resume path never restored or re-rendered them. A run with a 3-kill streak resumed at 0 and the header badge vanished; an in-page resume could also leave a stale badge showing the pre-reload streak while the engine had 0.
+- **Decision**: Save `killStreak` and `turnsSinceKill`; restore them with finite-number guards after `surgeFloor`; call `ui.updateStreak(this.killStreak)` on resume and `ui.updateStreak(0)` when a new run starts. Add the `resume_restores_kill_streak` selftest check and extend `tests/test_save_version.py`. Additive fields under version 2; old saves default to 0.
+- **Consequences**: A resumed run keeps its momentum and the badge matches the engine; a new run clears the badge. 178 unit tests green, harness 103/103, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F, three real kills (streak 3), save, reload: before no streak pill, after "🔥 Streak: 3"; a new run hides it.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first resume check), PRINCIPLE-013 (additive save fields, old saves safe).
+
+
 
 
 

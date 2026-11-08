@@ -24,6 +24,13 @@ class TestSaveVersion(unittest.TestCase):
         self.assertNotIn("removeItem", body)
         self.assertNotIn("setItem", body)
 
+    def test_kill_streak_is_saved_restored_and_cleared(self):
+        self.assertIn("killStreak: this.killStreak", self.js)
+        self.assertIn("turnsSinceKill: this.turnsSinceKill", self.js)
+        self.assertIn("this.killStreak = Number.isFinite(saved.killStreak)", self.js)
+        self.assertIn("this.ui.updateStreak(this.killStreak)", self.js)
+        self.assertIn("this.ui.updateStreak(0)", self.js)
+
 
 if __name__ == "__main__":
     unittest.main()

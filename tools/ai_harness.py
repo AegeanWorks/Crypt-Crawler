@@ -1702,6 +1702,36 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     checks.append(_check("no_page_errors_after_theme_resume", not harness.errors, harness.errors))
     page.context.close()
 
+    # The kill streak is a run stat with XP/gold bonuses and a HUD badge; a save
+    # and resume must not silently reset it.
+    page = harness.open_page(seed)
+    streak_resume = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            e.killStreak = 4;
+            e.turnsSinceKill = 2;
+            e.ui.updateStreak(e.killStreak);
+            e.saveGameState();
+            await e.start(null, 1, 'paladin', true);
+            return {
+                killStreak: e.killStreak,
+                turnsSinceKill: e.turnsSinceKill,
+                pillHidden: document.getElementById('streakPill').classList.contains('hidden'),
+                count: document.getElementById('streakCount').textContent,
+            };
+        }"""
+    )
+    checks.append(_check(
+        "resume_restores_kill_streak",
+        streak_resume["killStreak"] == 4
+        and streak_resume["turnsSinceKill"] == 2
+        and streak_resume["pillHidden"] is False
+        and streak_resume["count"] == "4",
+        streak_resume,
+    ))
+    checks.append(_check("no_page_errors_after_streak_resume", not harness.errors, harness.errors))
+    page.context.close()
+
     # Deck affordability must match the shipped mana checks: the rogue's slot 4
     # is Fireball (10) and the mage's slot 4 is Nova (10), not the 8 the old table said.
     for hero_class in ("rogue", "mage"):
