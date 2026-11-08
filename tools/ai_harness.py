@@ -1034,6 +1034,53 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # A floor transition is a major event; it must not be silent.
+    page = harness.open_page(seed)
+    descend_cue = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const { sounds } = await import('/js/audio.js');
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const events = [];
+            const orig = AC.prototype.createOscillator;
+            AC.prototype.createOscillator = function () {
+                const osc = orig.call(this);
+                const param = osc.frequency;
+                const setValue = param.setValueAtTime.bind(param);
+                param.setValueAtTime = (value, when) => {
+                    events.push(Math.round(value));
+                    return setValue(value, when);
+                };
+                return osc;
+            };
+            sounds.playStep();
+            events.length = 0;
+            const startDepth = e.depth;
+            await e.descendFloor();
+            AC.prototype.createOscillator = orig;
+            return {
+                startDepth,
+                depth: e.depth,
+                transitioning: e.transitioning,
+                events,
+                log: Array.from(document.querySelectorAll('#chronicleLog .log-entry'))
+                    .map((el) => el.textContent)
+                    .filter((text) => text.includes('descended')),
+            };
+        }"""
+    )
+    checks.append(_check(
+        "descent_has_a_sound_cue",
+        descend_cue["depth"] == descend_cue["startDepth"] + 1
+        and descend_cue["transitioning"] is False
+        and 220 in descend_cue["events"]
+        and 110 in descend_cue["events"]
+        and any("descended" in line for line in descend_cue["log"]),
+        descend_cue,
+    ))
+    checks.append(_check("no_page_errors_after_descent_cue", not harness.errors, harness.errors))
+    page.context.close()
+
     # Regression: starting a new run while a descent is in flight must win.
     page = harness.open_page(seed)
     restart = page.evaluate(

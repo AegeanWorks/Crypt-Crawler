@@ -1,43 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "CC-050",
+    "task_id": "CC-051",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794099815.9145954,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794100609.7254362,
     "owner": "opencode:cycles",
     "started_by": "opencode:cycles",
-    "continuations": [],
-    "completed_at": 1794099856.8365204
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "CC-044",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Trap cues shipped: playSearch 600->900, playDisarm 350->90, playTrap spike 140/dart 700+520/snare 220; reveal/disarm/trigger wired; test_audio_cues extended + trap_cues_are_distinct (91 checks). Played seed 42 B1F: after reveal [600], disarm [350], trigger [90,700,520] HP 65->57; before [220,277,330,440]/[90,160]. Unit 163 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-056, .aikit/cycles.md",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794093378.7923892,
-      "timestamp_str": "2026-11-08 02:16:18",
-      "agent": "opencode:cycles",
-      "handoff": {
-        "state": "uncommitted and green",
-        "next": "commit, complete CC-044, then cycle 16 (progression/saves)",
-        "evidence": "163 tests, harness 91/91, inspector 75/75, gates 5/5"
-      }
-    },
-    {
-      "task_id": "CC-044",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'CC-044' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794093422.404925,
-      "timestamp_str": "2026-11-08 02:17:02",
-      "agent": "opencode:cycles"
-    },
     {
       "task_id": "CC-045",
       "phase": "phase 2",
@@ -301,6 +274,40 @@
       "timestamp": 1794099856.8365228,
       "timestamp_str": "2026-11-08 04:04:16",
       "agent": "opencode:cycles"
+    },
+    {
+      "task_id": "CC-051",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Audio: add a two-layer stone whoosh to every floor descent, prove with a failing-first oscillator check, a source test and a real stairs step before/after run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794100592.508103,
+      "timestamp_str": "2026-11-08 04:16:32",
+      "agent": "opencode:cycles",
+      "impact_assessment": {
+        "why": "Stepping onto the stairs changed the whole floor with only a chronicle line; the recorded events were [90] (step) and no transition cue, so the largest state change in the game was silent",
+        "benefits": "The descent is audible before the new floor renders; the step cue layers underneath; no rule/save change",
+        "risks": "contract: descendFloor calls playDescend; dependency: none; concurrency: none; state: no save/rule change; UI: audio.js and engine.js in the game-ui surface",
+        "mitigation": "Failing descent_cue check (events []); after [220,110]; real seed 42 stairs step depth 1->2 before [90]/after [90,220,110]; source test; inspector at three viewports; full gates"
+      },
+      "plan_digest": "4decc0e1473ea602bada93af5902da81cba1630facd33d4fa9b424923afcd47c"
+    },
+    {
+      "task_id": "CC-051",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Descent cue shipped: playDescend 220->55 saw + 110->40 sine in descendFloor; test_audio_cues + descent_has_a_sound_cue (101 checks). Real seed 42 step onto stairs (38,6 -> 37,6): before [90], after [90,220,110], depth 1->2; no page errors. Unit 177 OK, inspector 75/75 at three viewports, 0 console errors, aikit check 5/5. checklists: passed. ADR-063, .aikit/cycles.md",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794100609.7254362,
+      "timestamp_str": "2026-11-08 04:16:49",
+      "agent": "opencode:cycles",
+      "handoff": {
+        "state": "uncommitted and green",
+        "next": "commit, complete CC-051, then cycle 23 (progression/saves)",
+        "evidence": "177 tests, harness 101/101, inspector 75/75, gates 5/5"
+      }
     }
   ]
 }

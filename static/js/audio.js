@@ -365,6 +365,12 @@ class SoundSystem {
     }
   }
 
+  playDescend() {
+    // A two-layer stone whoosh for a floor transition.
+    this._blip("sawtooth", 220, 55, 0.12, 0.55);
+    this._blip("sine", 110, 40, 0.1, 0.7, 0.05);
+  }
+
   playShieldWall() {
     if (this.sfxMuted) return;
     this.init();

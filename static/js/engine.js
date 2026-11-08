@@ -966,6 +966,7 @@ export class GameEngine {
     const token = this.runToken;
     const newDepth = this.depth + 1;
     this.ui.logMessage(`You descended into Depth B${newDepth}F! The catacombs grow colder...`, "system");
+    sounds.playDescend();
 
     try {
       const _chainSeed = Number.isFinite(this.runSeed) ? this.runSeed : (Number.isFinite(this.dungeon?.seed) ? this.dungeon.seed : 1);

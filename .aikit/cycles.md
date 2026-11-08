@@ -590,3 +590,27 @@ class, difficulty and viewport.
   `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
   `python aikit.py check crypt-crawler` -> 5/5.
 - **Commit**: `feat(gfx): burst every defeated monster into dust`.
+
+## Cycle 22 — A descent cue for the stairs (2026-11-08)
+
+- **Area**: Audio cues (floor transition).
+- **Find**: Stepping onto the stairs changed the whole floor with only a chronicle line. The
+  recorded events were `[90]` (the step) and no transition cue; the largest state change in the
+  game was silent.
+- **Analyze**: Add a two-layer whoosh at the start of `descendFloor`; keep the step cue. No
+  rule/save change. Killed: a music sting (the ambient score already changes biome; a short
+  effect is enough).
+- **Fix**: `playDescend()` (sawtooth 220->55 + sine 110->40) called after the descent log;
+  `tests/test_audio_cues.py` and the `descent_has_a_sound_cue` selftest check.
+- **Screenshots** (same seed 42, real step onto the stairs from (38,6), 1920x1080):
+  - before: `.inspect/cycles/c22/before-stairs-before.png` (B1F stairs, depth 1)
+  - after: `after-descent-after.png` (B2F, depth 2, "You descended into Depth B2F!")
+  - the cue is audio; the event logs are `[90]` before vs `[90, 220, 110]` after
+  - command: `python .inspect/cycles/play_c22.py before|after` (before uses HEAD audio/engine)
+- **Played run**: real `stepPlayer` onto the stairs; depth 1 -> 2, turn 1, log "descended into
+  Depth B2F"; no page errors.
+- **Gates**: `python -m unittest discover -s tests` -> 177 OK;
+  `python tools/ai_harness.py selftest` -> 101 checks, 0 failed;
+  `python tools/inspect_ui.py --viewports desktop,laptop,mobile --scenario all` -> 75/75;
+  `python aikit.py check crypt-crawler` -> 5/5.
+- **Commit**: `feat(audio): whoosh into the next floor`.

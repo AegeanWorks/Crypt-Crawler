@@ -37,6 +37,12 @@ class TestAudioCues(unittest.TestCase):
         self.assertEqual(self.engine.count("sounds.playDisarm()"), 1)
         self.assertEqual(self.engine.count("sounds.playTrap(kind)"), 1)
 
+    def test_floor_descent_has_a_cue(self):
+        self.assertIn("playDescend()", self.audio)
+        self.assertIn("this._blip(\"sawtooth\", 220, 55", self.audio)
+        self.assertIn("this._blip(\"sine\", 110, 40", self.audio)
+        self.assertEqual(self.engine.count("sounds.playDescend()"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

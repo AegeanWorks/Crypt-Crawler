@@ -501,6 +501,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Every kill leaves a visible ring/burst at the tile while the hit slash and damage float still read; boss/champion feedback is preserved. 176 unit tests green, harness 99/99, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F Sneaky Goblin at (19,6), 14 HP, one attack, 80ms frame: before 8 particles/0 shockwaves, after 30 particles/1 ring.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (death-effect drift test), PRINCIPLE-010 (16+8 particles and one ring per kill).
 
+### ADR-063: A descent cue for the stairs (improvement cycle 22)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Stepping onto the stairs changed the whole floor with only a chronicle line; the recorded oscillator events were `[90]` (the step) and no transition cue. The largest state change in the game was silent, unlike the trap, telegraph and combat events that have dedicated sounds.
+- **Decision**: Add `sounds.playDescend()`, a two-layer stone whoosh (sawtooth 220 -> 55 Hz over 0.55s plus sine 110 -> 40 Hz over 0.7s with a 50ms offset), and call it in `descendFloor` immediately after the "descended into Depth" log. Extend `tests/test_audio_cues.py` and add the `descent_has_a_sound_cue` selftest check (depth +1, transitioning false, events include 220 and 110, log present). No rule/save change.
+- **Consequences**: A floor transition is audible before the new floor renders; the step cue still layers underneath. 177 unit tests green, harness 101/101, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F stairs at (37,6), real step from (38,6): before `[90]`, after `[90, 220, 110]`, depth 1 -> 2, log "descended into Depth B2F".
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped audio path), PRINCIPLE-014 (failing-first descent check), PRINCIPLE-010 (two nodes per transition).
+
+
 
 
 
