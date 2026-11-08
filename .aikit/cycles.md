@@ -958,3 +958,39 @@ class, difficulty and viewport.
 - **Gates**: unit 194 OK; harness 117 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(levels): keep a merchant on every depth-two floor`.
+
+## Cycle 34 — The minimap key survives a narrow canvas (2026-11-08)
+
+- **Area**: UI readability (mobile minimap legend).
+- **Find**: The minimap key was drawn into the 760x540 canvas at 7px. At a 390x844
+  viewport the canvas is 372px wide, so the key rendered at 3.43px on-screen; the mobile
+  capture shows the nine labels as an unreadable smear. The desktop key at 783px canvas
+  width renders at 7.21px and stays legible. Measured with a real seeded run, not by eye:
+  `canvasLegendFontPx` 3.43 (mobile) vs 7.21 (desktop).
+- **Analyze**: The canvas is scaled as a bitmap, so enlarging the internal font would need
+  a ~180px-wide box and still shrink to 8px. Draw the key as DOM text in CSS pixels when
+  the canvas is narrower than 600px, and keep the canvas key above that. Use one
+  `MINIMAP_LEGEND_ROWS` source for both so the labels and colours cannot drift. Killed:
+  hiding the key on mobile (the README promises every blip is named), and abbreviating
+  the labels (shorter but not readable).
+- **Fix**: `renderer.js` defines `MINIMAP_LEGEND_ROWS`, builds `#minimapLegend` in the
+  canvas wrapper, and toggles `.visible` from a `ResizeObserver` when the canvas drops
+  below 600px; `_drawMinimapLegend` returns early in that mode. `style.css` gives the DOM
+  key a 10px two-column grid. `tests/test_minimap_legend_dom.py` guards the nine labels,
+  the switch and the 10px CSS.
+- **Screenshots** (seed 42 B1F, live run, 390x844 and 1366x768, dsf 2; before uses HEAD
+  `renderer.js`/`style.css`):
+  - before: `.inspect/cycles/c34/before-mobile-legend.png` shows the 3.43px canvas smear;
+    `before-mobile-full.png` is the full mobile HUD.
+  - after: `after-mobile-legend.png` shows the 10px two-column DOM key (9 items,
+    106.5x84 CSS px) under the minimap; `after-mobile-full.png` is the same full HUD.
+    `after-desktop-legend.png` shows the unchanged canvas key at 7.21px and the DOM key
+    hidden (`display: none`, `compact: false`).
+  - command: `python .inspect/cycles/play_c34.py before|after`
+- **Played run**: The probe started a real seed 42 B1F paladin run and left the live render
+  loop running at both viewports. Mobile: canvas 372x264, DOM key 9 items at 10px,
+  `compact: true`. Desktop: canvas 783x556, canvas key 7.21px, DOM key hidden,
+  `compact: false`. `errors: []` at both viewports.
+- **Gates**: unit 197 OK; harness 117 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `fix(ui): keep the minimap key readable on narrow canvases`.

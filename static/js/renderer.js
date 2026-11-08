@@ -5,6 +5,14 @@
 
 import { TileType } from "./dungeon.js";
 
+// Single source for the minimap key: the canvas box on wide screens, the
+// DOM box on narrow canvases where the 760x540 bitmap is scaled down.
+const MINIMAP_LEGEND_ROWS = [
+  [["Stairs", "#ecc94b"], ["Chest", "#ed8936"], ["Shop", "#b794f4"]],
+  [["Sigil", "#63b3ed"], ["Vault", "#d69e2e"], ["Trap", "#f6ad55"]],
+  [["Shrine", "#38b2ac"], ["Pact", "#f56565"], ["Soul", "#d6bcfa"]],
+];
+
 export class DungeonRenderer {
   constructor(canvas) {
     this.canvas = canvas;
@@ -27,6 +35,61 @@ export class DungeonRenderer {
     this.healColor = "#68d391";
     this.arcaneColor = "#9f7aea";
     this.poisonColor = "#48bb78";
+    this._minimapLegendCompact = false;
+    this._minimapLegend = this._buildMinimapLegendDom();
+    if (typeof ResizeObserver !== "undefined") {
+      this._minimapLegendObserver = new ResizeObserver(() => this._refreshMinimapLegend());
+      this._minimapLegendObserver.observe(this.canvas);
+    } else if (typeof window !== "undefined") {
+      this._minimapLegendResize = () => this._refreshMinimapLegend();
+      window.addEventListener("resize", this._minimapLegendResize);
+    }
+    this._refreshMinimapLegend();
+  }
+
+  _buildMinimapLegendDom() {
+    if (typeof document === "undefined") return null;
+    const wrapper = this.canvas.parentElement;
+    if (!wrapper) return null;
+    let legend = wrapper.querySelector("#minimapLegend");
+    if (!legend) {
+      legend = document.createElement("div");
+      legend.id = "minimapLegend";
+      legend.className = "minimap-legend";
+      legend.setAttribute("role", "note");
+      legend.setAttribute("aria-label", "Minimap key");
+      wrapper.appendChild(legend);
+    }
+    legend.replaceChildren();
+    for (const row of MINIMAP_LEGEND_ROWS) {
+      for (const [label, color] of row) {
+        const item = document.createElement("span");
+        item.className = "minimap-legend-item";
+        const swatch = document.createElement("i");
+        swatch.style.background = color;
+        swatch.setAttribute("aria-hidden", "true");
+        const text = document.createElement("span");
+        text.textContent = label;
+        item.append(swatch, text);
+        legend.appendChild(item);
+      }
+    }
+    return legend;
+  }
+
+  _refreshMinimapLegend() {
+    if (!this._minimapLegend) return;
+    const wrapper = this.canvas.parentElement;
+    if (!wrapper) return;
+    const canvasRect = this.canvas.getBoundingClientRect();
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const scale = this.canvas.width ? canvasRect.width / this.canvas.width : 1;
+    const compact = canvasRect.width > 0 && canvasRect.width < 600;
+    this._minimapLegendCompact = compact;
+    this._minimapLegend.classList.toggle("visible", compact);
+    this._minimapLegend.setAttribute("aria-hidden", compact ? "false" : "true");
+    this._minimapLegend.style.right = `${Math.max(8, (wrapperRect.right - canvasRect.right) + 10 * scale)}px`;
+    this._minimapLegend.style.top = `${Math.max(8, (canvasRect.top - wrapperRect.top) + 94 * scale + 4)}px`;
   }
 
   addJackpotExplosion(x, y) {
@@ -2413,6 +2476,8 @@ export class DungeonRenderer {
   }
 
   _drawMinimapLegend(ctx, mx, my, mw, mh) {
+    // Narrow canvases use the DOM key: 7 canvas-pixels would render at ~3px.
+    if (this._minimapLegendCompact) return;
     const legendY = my + mh + 2;
     const legendH = 32;
     ctx.save();
@@ -2423,13 +2488,8 @@ export class DungeonRenderer {
     ctx.strokeRect(mx, legendY, mw, legendH);
     ctx.font = "7px 'SFMono-Regular', Consolas, monospace";
     ctx.textBaseline = "middle";
-    const rows = [
-      [["Stairs", "#ecc94b"], ["Chest", "#ed8936"], ["Shop", "#b794f4"]],
-      [["Sigil", "#63b3ed"], ["Vault", "#d69e2e"], ["Trap", "#f6ad55"]],
-      [["Shrine", "#38b2ac"], ["Pact", "#f56565"], ["Soul", "#d6bcfa"]],
-    ];
     let y = legendY + 7;
-    for (const row of rows) {
+    for (const row of MINIMAP_LEGEND_ROWS) {
       let x = mx + 4;
       for (const [label, color] of row) {
         ctx.fillStyle = color;

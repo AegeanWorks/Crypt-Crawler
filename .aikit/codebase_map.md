@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `54`
-- **Total Classes**: `56`
+- **Total Python Modules**: `55`
+- **Total Classes**: `57`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `287`
-- **Total Source Lines**: `10853`
+- **Total Class Methods**: `291`
+- **Total Source Lines**: `10887`
 
 ---
 
@@ -661,6 +661,20 @@
   - Method `.test_minimap_draws_a_named_legend()`
   - Method `.test_trap_blip_is_distinct_from_vault_and_stairs()`
   - Method `.test_spent_objectives_do_not_keep_their_blips()`
+
+---
+
+### [`tests/test_minimap_legend_dom.py`](tests/test_minimap_legend_dom.py)
+> *Narrow canvases get a readable DOM minimap key.*
+
+**Size**: `34` lines (`1264` bytes)
+
+**Classes:**
+- `class TestMinimapLegendDom`
+  - Method `.setUp()`
+  - Method `.test_all_nine_labels_stay_in_the_single_source()`
+  - Method `.test_narrow_canvas_switches_to_the_dom_key()`
+  - Method `.test_dom_key_text_is_readable_css_pixels()`
 
 ---
 

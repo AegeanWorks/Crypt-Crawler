@@ -597,6 +597,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Every depth >= 2 floor with a free floor tile offers its merchant; the soul and other props relocate but the one-soul/one-pact contracts hold. No save format or movement rule change. 194 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5, and `validate_fairness.py --seeds 1..30 --depths 1,2,3` is 90/90 (84/90 before). Evidence: seed 1 B2F real ArrowRight, before no merchant + soul modal, after merchant tile + "Grimbold the Wandering Hermit"; same-state room and modal captures in `.inspect/cycles/c33/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (read-before-write), PRINCIPLE-014 (failing-first placement test), PRINCIPLE-011 (a reachable shop on every depth-two floor).
 
+### ADR-075: The minimap key becomes DOM text on narrow canvases (improvement cycle 34)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `_drawMinimapLegend` drew the nine-label key into the 760x540 canvas at 7px. At a 390x844 viewport the canvas is 372px wide, so the key rendered at 3.43px on-screen and was unreadable; at 1366x768 (783px canvas) it rendered at 7.21px and stayed legible. Enlarging the canvas font would require a very wide box and still shrink with the bitmap.
+- **Decision**: Keep one `MINIMAP_LEGEND_ROWS` data source in `renderer.js`. Build a `#minimapLegend` DOM element in the canvas wrapper and toggle its `.visible` class from a `ResizeObserver` whenever the canvas width drops below 600px; `_drawMinimapLegend` returns early in that mode. Style the DOM key as a 10px, two-column grid in `style.css`. Guard with `tests/test_minimap_legend_dom.py` (nine labels, DOM switch, 10px CSS) and list it in the README tree.
+- **Consequences**: The minimap key is legible at mobile and narrow-center-panel widths without changing the canvas resolution or desktop rendering; the DOM key covers part of the map on narrow screens but remains a static, pointer-transparent note. 197 unit tests green, harness 117/117, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: mobile probe 3.43px canvas text -> 10px DOM text with 9 items (106.5x84), desktop DOM key hidden and canvas key unchanged; same-state mobile crops in `.inspect/cycles/c34/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (measured in the live renderer), PRINCIPLE-014 (source drift test), PRINCIPLE-011 (the map key is readable on every supported viewport).
+
 
 
 
