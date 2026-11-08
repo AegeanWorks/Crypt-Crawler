@@ -53,6 +53,13 @@ class TestAudioCues(unittest.TestCase):
         self.assertEqual(self.engine.count("sounds.playDeath()"), 1)
         self.assertEqual(self.engine.count("sounds.playVictory()"), 1)
 
+    def test_damage_over_time_has_distinct_ticks(self):
+        self.assertIn("playStatusTick(kind", self.audio)
+        self.assertIn("this._blip(\"sine\", 260, 150", self.audio)
+        self.assertIn("this._blip(\"sawtooth\", 200, 80", self.audio)
+        self.assertEqual(self.engine.count('sounds.playStatusTick("poison")'), 1)
+        self.assertEqual(self.engine.count('sounds.playStatusTick("burn")'), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

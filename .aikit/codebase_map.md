@@ -9,8 +9,8 @@
 - **Total Python Modules**: `56`
 - **Total Classes**: `58`
 - **Total Top-Level Functions**: `60`
-- **Total Class Methods**: `294`
-- **Total Source Lines**: `10936`
+- **Total Class Methods**: `295`
+- **Total Source Lines**: `10984`
 
 ---
 
@@ -252,7 +252,7 @@
 ### [`tests/test_audio_cues.py`](tests/test_audio_cues.py)
 > *Audio cue contract: ranged and telegraphed attacks keep an entrance cue.*
 
-**Size**: `58` lines (`2693` bytes)
+**Size**: `65` lines (`3106` bytes)
 
 **Classes:**
 - `class TestAudioCues`
@@ -262,6 +262,7 @@
   - Method `.test_trap_search_disarm_and_kinds_have_their_own_cues()`
   - Method `.test_floor_descent_has_a_cue()`
   - Method `.test_run_endings_have_their_own_cues()`
+  - Method `.test_damage_over_time_has_distinct_ticks()`
 
 ---
 
@@ -849,7 +850,7 @@
 ### [`tools/ai_harness.py`](tools/ai_harness.py)
 > *AI gameplay harness for Crypt-Crawler: a stable, deterministic way for an agent (or a*
 
-**Size**: `3191` lines (`133230` bytes)
+**Size**: `3232` lines (`134953` bytes)
 
 **Classes:**
 - `class Harness` - *One server and one headless browser shared by every page the harness opens.*

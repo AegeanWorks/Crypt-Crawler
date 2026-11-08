@@ -1031,3 +1031,38 @@ class, difficulty and viewport.
 - **Gates**: unit 199 OK; harness 119 checks, 0 failed; inspector 75/75 at three
   viewports, 0 console errors; aikit check 5/5.
 - **Commit**: `fix(effects): isolate visual randomness from the seeded run`.
+
+## Cycle 36 — Poison and burn find their voice (2026-11-08)
+
+- **Area**: Audio cues (damage-over-time ticks).
+- **Find**: `_tickPlayerStatuses` applied poison (-3) and burn (-4) damage with a log
+  line and floating text but no sound. A real seed 42 B1F Space turn with poison 2 and
+  burn 2 recorded only the ambient music oscillators (`55, 73, 0`); the new harness check
+  `damage_over_time_has_distinct_cues` failed on HEAD with `freqs: []` while HP still
+  dropped 50 -> 43. A player looking away could lose seven HP in silence.
+- **Analyze**: Damage-over-time is a turn-boundary event, so it needs a short reminder,
+  not the full hit sound: two quiet blips per type, distinct from the shrine, trap and
+  death cues. Play only for the hero's ticks (not every monster) so a poisoned crowd
+  cannot stack a wall of sound. Killed: reusing `playHit` (generic hit identity, and its
+  crit flag is meaningless here), playing a long cue (it repeats every turn), and adding
+  a cue for monster ticks (stacking risk).
+- **Fix**: Add `playStatusTick(kind)` in `audio.js` (poison: sine 260 -> 150 plus triangle
+  180 -> 120; burn: sawtooth 200 -> 80 plus square 520 -> 360); call it from the poison
+  and burn branches of `_tickPlayerStatuses` in `engine.js`. Extend
+  `tests/test_audio_cues.py` and add the `damage_over_time_has_distinct_cues` harness
+  check.
+- **Evidence** (audio is the claim; the panels show the unchanged state):
+  - seed 42 B1F, player staged at 50/65 HP with Poison (2) and Burning (2), real Space:
+    before `.inspect/cycles/c36/before-1-before-panel.png` and
+    `before-2-after-panel.png` show HP 50 -> 43 and badges 2 -> 1;
+    `after-1-before-panel.png` / `after-2-after-panel.png` show the same visual state.
+  - oscillator events before: `55, 73, 0` (ambient music only); after:
+    `..., 260, 180, 200, 520` (poison pair + burn pair).
+  - command: `python .inspect/cycles/play_c36.py before|after`
+- **Played run**: Real browser Space turn with poison 2/burn 2 at seed 42 B1F. Both builds:
+  HP 50 -> 43, statuses 2 -> 1, log "Venom burns in your veins! (-3 HP)" then "Fire
+  singes your armor! (-4 HP)", no page errors. The only difference is the four damage
+  oscillators in the shipped audio path.
+- **Gates**: unit 200 OK; harness 121 checks, 0 failed; inspector 75/75 at three
+  viewports, 0 console errors; aikit check 5/5.
+- **Commit**: `feat(audio): give poison and burn ticks a voice`.

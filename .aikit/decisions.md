@@ -613,6 +613,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Consequences**: Effects still flicker and emit sparks, but they no longer shift seed-reproducible damage, loot, traps or AI rolls; the same seed/actions produce the same outcome regardless of frame timing. No save format or gameplay-value change. 199 unit tests green, harness 119/119, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real snare step immediate vs 1.1s projectile delay, 2 vs 1 damage before, 1 vs 1 after; projectile still visible in flight in both builds; same-state captures in `.inspect/cycles/c35/`.
 - Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped render path), PRINCIPLE-014 (failing-first RNG check), PRINCIPLE-013 (reproducible seeded state).
 
+### ADR-077: Poison and burn ticks get quiet, distinct cues (improvement cycle 36)
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `_tickPlayerStatuses` applied poison (-3) and burn (-4) damage with a log line and floating text but no audio. A real seed 42 B1F Space turn with poison 2/burn 2 recorded only ambient music (`55, 73, 0`) while HP fell 50 -> 43; the new `damage_over_time_has_distinct_cues` harness check failed on HEAD with `freqs: []`. A player looking away could lose seven HP silently.
+- **Decision**: Add `playStatusTick(kind)` to `audio.js`: poison is a sine 260 -> 150 plus a triangle 180 -> 120; burn is a sawtooth 200 -> 80 plus a square 520 -> 360. Call it from the poison and burn branches of `_tickPlayerStatuses`. Keep monster ticks silent to avoid stacking when several enemies burn or poison. Extend `tests/test_audio_cues.py` and add the harness check around a real `waitTurn`.
+- **Consequences**: Turn-boundary damage is audible and distinct by type without reusing the generic hit cue, the shrine chime or the run-ending knells. No gameplay, save or RNG change; the cue is short enough to repeat each turn. 200 unit tests green, harness 121/121, inspector 75/75 at three viewports with 0 console errors, `aikit check` 5/5. Evidence: seed 42 B1F real Space turn, HP 50 -> 43 with badges 2 -> 1; oscillator events `55,73,0` -> `55,73,0,260,180,200,520`; same-state panels in `.inspect/cycles/c36/`.
+- Cross-principle check: no principle section changed. Serves PRINCIPLE-003 (recorded from the shipped turn path), PRINCIPLE-014 (failing-first cue check), PRINCIPLE-011 (a visible HP loss also has an audible cause).
+
 
 
 

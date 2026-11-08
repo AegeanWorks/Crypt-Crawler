@@ -2588,6 +2588,7 @@ export class GameEngine {
       this.player.hp = Math.max(0, this.player.hp - 3);
       this.renderer.addFloatingText("-3 POISON", this.player.x, this.player.y, "#48bb78");
       this.ui.logMessage("Venom burns in your veins! (-3 HP)", "hit");
+      sounds.playStatusTick("poison");
       effects.poison -= 1;
       if (effects.poison <= 0) delete effects.poison;
       if (this.player.hp <= 0) return "poison";
@@ -2596,6 +2597,7 @@ export class GameEngine {
       this.player.hp = Math.max(0, this.player.hp - 4);
       this.renderer.addFloatingText("-4 BURN", this.player.x, this.player.y, "#f6ad55");
       this.ui.logMessage("Fire singes your armor! (-4 HP)", "hit");
+      sounds.playStatusTick("burn");
       effects.burn -= 1;
       if (effects.burn <= 0) delete effects.burn;
       if (this.player.hp <= 0) return "burn";

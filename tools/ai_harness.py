@@ -2418,6 +2418,47 @@ def selftest(harness: Harness) -> List[Dict[str, Any]]:
     ))
     page.context.close()
 
+    # Damage-over-time is otherwise silent: poison and burn each need a short,
+    # distinct tick in the real turn path.
+    page = harness.open_page(seed)
+    status_ticks = page.evaluate(
+        """async () => {
+            const e = window.gameEngine;
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const events = [];
+            const orig = AC.prototype.createOscillator;
+            AC.prototype.createOscillator = function () {
+                const osc = orig.call(this);
+                const param = osc.frequency;
+                const setValue = param.setValueAtTime.bind(param);
+                param.setValueAtTime = (value, when) => {
+                    events.push({ freq: Math.round(value), type: osc.type });
+                    return setValue(value, when);
+                };
+                return osc;
+            };
+            e.monsters = [];
+            e.player.hp = 50;
+            e.player.max_hp = 65;
+            e.player.status_effects = { poison: 2, burn: 2 };
+            events.length = 0;
+            e.waitTurn();
+            const ticks = events.slice();
+            AC.prototype.createOscillator = orig;
+            return { ticks, hp: e.player.hp, turn: e.turn };
+        }"""
+    )
+    tick_freqs = [entry["freq"] for entry in status_ticks.get("ticks", [])]
+    checks.append(_check(
+        "damage_over_time_has_distinct_cues",
+        260 in tick_freqs and 200 in tick_freqs and 520 in tick_freqs,
+        {"freqs": tick_freqs, "hp": status_ticks.get("hp"), "turn": status_ticks.get("turn")},
+    ))
+    checks.append(_check(
+        "no_page_errors_after_status_tick", not harness.errors, harness.errors
+    ))
+    page.context.close()
+
     # Trap audio identity: a reveal ping, a disarm clank and a distinct cue per
     # trap kind (spike thud, dart double-tick, snare snap), not the shrine chime.
     page = harness.open_page(seed)

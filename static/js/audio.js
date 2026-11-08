@@ -272,6 +272,17 @@ class SoundSystem {
     osc.stop(now + 0.26);
   }
 
+  playStatusTick(kind = "poison") {
+    // A short, quiet reminder that a damage-over-time effect just bit.
+    if (kind === "burn") {
+      this._blip("sawtooth", 200, 80, 0.09, 0.12);
+      this._blip("square", 520, 360, 0.05, 0.06, 0.05);
+    } else {
+      this._blip("sine", 260, 150, 0.1, 0.14);
+      this._blip("triangle", 180, 120, 0.06, 0.18, 0.06);
+    }
+  }
+
   playBow() {
     if (this.sfxMuted) return;
     this.init();
